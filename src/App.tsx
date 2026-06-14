@@ -1,10 +1,14 @@
 import {
+  ArrowRight,
+  BadgeCheck,
   Bell,
+  BriefcaseBusiness,
   CalendarDays,
   Camera,
   Check,
   CheckCircle2,
   ChevronDown,
+  ChevronRight,
   CircleUserRound,
   Clock3,
   Dog,
@@ -16,17 +20,22 @@ import {
   ImagePlus,
   LayoutDashboard,
   MapPin,
+  Menu,
   MessageCircle,
   PackageCheck,
   Paperclip,
-  PenLine,
+  Play,
   Plus,
+  Rocket,
   Search,
   Send,
   Settings,
   ShieldCheck,
+  Smartphone,
   Sparkles,
   Star,
+  Timer,
+  TrendingUp,
   UploadCloud,
   UserRoundCheck,
   UsersRound,
@@ -34,6 +43,7 @@ import {
   WalletCards,
   Wrench,
   X,
+  Zap,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import workResult from "./assets/faucet-result.jpg";
@@ -134,7 +144,365 @@ const statusClass: Record<OrderStatus, string> = {
   "Ожидает мастера": "status-waiting",
 };
 
-function App() {
+const landingBenefits = [
+  {
+    icon: Zap,
+    title: "Быстрый отклик",
+    text: "Заказ сразу получают свободные мастера нужной категории рядом с вами.",
+  },
+  {
+    icon: WalletCards,
+    title: "Без комиссии",
+    text: "Никаких процентов с заказа. Прозрачная подписка и цена, о которой вы договорились.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Цена обсуждается",
+    text: "Мастер может предложить другую сумму, а вы решаете в чате до принятия заказа.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Рейтинг с двух сторон",
+    text: "Заказчик и мастер обязательно оценивают друг друга после завершения работы.",
+  },
+];
+
+const landingSteps = [
+  {
+    number: "01",
+    icon: Camera,
+    title: "Покажите задачу",
+    text: "Выберите направление, добавьте описание, фото или короткое видео.",
+  },
+  {
+    number: "02",
+    icon: MapPin,
+    title: "Укажите условия",
+    text: "Отметьте район, удобное время и цену, которую готовы предложить.",
+  },
+  {
+    number: "03",
+    icon: UserRoundCheck,
+    title: "Выберите мастера",
+    text: "Сравните рейтинг, скорость и предложение. Примите лучший отклик.",
+  },
+];
+
+const teamRoles = [
+  { initials: "ПР", role: "Продукт", text: "Сценарии, в которых заказ закрывается быстро и без лишних шагов.", tone: "team-coral" },
+  { initials: "UX", role: "Дизайн", text: "Понятный интерфейс для пользователей и мастеров любого возраста.", tone: "team-blue" },
+  { initials: "IT", role: "Разработка", text: "Надёжная платформа, геопоиск, чат и уведомления в реальном времени.", tone: "team-yellow" },
+  { initials: "24", role: "Забота", text: "Проверка спорных ситуаций, безопасность и поддержка сообщества.", tone: "team-green" },
+];
+
+function Landing({ onOpenApp }: { onOpenApp: () => void }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setMenuOpen(false);
+  };
+
+  return (
+    <div className="landing">
+      <header className="landing-nav">
+        <button className="landing-logo" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+          <span className="brand-mark"><Wrench size={21} /></span>
+          <span>Мастер<b>GO</b></span>
+        </button>
+        <nav className={menuOpen ? "landing-links open" : "landing-links"} aria-label="Навигация лендинга">
+          <button onClick={() => scrollTo("how")}>Как это работает</button>
+          <button onClick={() => scrollTo("benefits")}>Преимущества</button>
+          <button onClick={() => scrollTo("categories")}>Услуги</button>
+          <button onClick={() => scrollTo("team")}>Команда</button>
+        </nav>
+        <div className="landing-nav-actions">
+          <button className="landing-login" onClick={onOpenApp}>Войти</button>
+          <button className="landing-demo-button" onClick={onOpenApp}>
+            Открыть демо <ArrowRight size={16} />
+          </button>
+        </div>
+        <button className="landing-menu" onClick={() => setMenuOpen((value) => !value)} aria-label="Открыть меню">
+          {menuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+      </header>
+
+      <main>
+        <section className="landing-hero">
+          <div className="hero-glow hero-glow-one" />
+          <div className="hero-glow hero-glow-two" />
+          <div className="hero-copy">
+            <div className="hero-badge"><Sparkles size={15} /> Сервис быстрых услуг рядом</div>
+            <h1>Нужный мастер.<br /><em>В нужный момент.</em></h1>
+            <p className="hero-lead">
+              Опишите задачу, предложите цену и получите отклики от проверенных
+              специалистов поблизости. Без комиссии и долгого поиска.
+            </p>
+            <div className="hero-actions">
+              <button className="landing-primary" onClick={onOpenApp}>
+                Разместить заказ <ArrowRight size={18} />
+              </button>
+              <button className="landing-secondary" onClick={() => scrollTo("how")}>
+                <span><Play size={14} fill="currentColor" /></span> Как это работает
+              </button>
+            </div>
+            <div className="hero-proof">
+              <div className="proof-avatars">
+                <span>АС</span><span>МР</span><span>ДК</span><span>+18</span>
+              </div>
+              <p><strong>Свободные мастера уже рядом</strong><span>Вы выбираете по рейтингу и условиям</span></p>
+            </div>
+          </div>
+
+          <div className="hero-product">
+            <div className="hero-product-grid" />
+            <div className="floating-chip chip-secure"><ShieldCheck size={17} /> Безопасная сделка</div>
+            <div className="floating-chip chip-speed"><Timer size={17} /> Отклик за минуты</div>
+            <article className="request-preview">
+              <div className="request-preview-head">
+                <div>
+                  <span className="preview-kicker">Новый заказ</span>
+                  <h3>Установить кухонный кран</h3>
+                </div>
+                <span className="preview-live"><i /> Идёт поиск</span>
+              </div>
+              <img src={workResult} alt="Пример задачи по установке кухонного крана" />
+              <div className="request-facts">
+                <span><MapPin size={15} /> Хамовники · 3,2 км</span>
+                <span><Clock3 size={15} /> Сегодня</span>
+              </div>
+              <div className="request-price">
+                <span>Цена заказчика</span>
+                <strong>4 500 ₽</strong>
+              </div>
+              <div className="response-stack">
+                <div className="response-row response-first">
+                  <span className="avatar avatar-blue">АС</span>
+                  <p><strong>Алексей С.</strong><small><Star size={11} fill="currentColor" /> 4.96 · через 25 мин</small></p>
+                  <b>4 500 ₽</b>
+                  <span className="response-check"><Check size={13} /></span>
+                </div>
+                <div className="response-row">
+                  <span className="avatar avatar-orange">МР</span>
+                  <p><strong>Михаил Р.</strong><small><Star size={11} fill="currentColor" /> 4.89 · сегодня</small></p>
+                  <b>5 000 ₽</b>
+                </div>
+              </div>
+              <button onClick={onOpenApp}>Выбрать мастера <ChevronRight size={16} /></button>
+            </article>
+            <div className="hero-message">
+              <span className="avatar avatar-blue">АС</span>
+              <p><strong>Алексей</strong><span>Могу быть через 25 минут</span></p>
+              <MessageCircle size={18} />
+            </div>
+          </div>
+        </section>
+
+        <section className="landing-metrics" aria-label="Ключевые преимущества">
+          <div><strong>0%</strong><span>комиссии с заказа</span></div>
+          <div><strong>1</strong><span>понятная подписка</span></div>
+          <div><strong>2</strong><span>стороны честного рейтинга</span></div>
+          <div><strong>24/7</strong><span>заказы могут находить мастеров</span></div>
+        </section>
+
+        <section className="landing-section how-section" id="how">
+          <div className="section-heading">
+            <span className="section-label">Три простых шага</span>
+            <h2>От проблемы до мастера<br />без десятков звонков</h2>
+            <p>Весь путь заказа остаётся внутри сервиса: от фото задачи до итогового отзыва.</p>
+          </div>
+          <div className="steps-grid">
+            {landingSteps.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <article className="landing-step" key={step.number}>
+                  <span className="step-number">{step.number}</span>
+                  <span className="step-icon"><Icon size={24} /></span>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                  {index < landingSteps.length - 1 && <span className="step-arrow"><ArrowRight size={20} /></span>}
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="benefits-section" id="benefits">
+          <div className="benefits-inner">
+            <div className="benefits-copy">
+              <span className="section-label light">Почему МастерGO</span>
+              <h2>Мы убрали всё,<br />что мешает договориться</h2>
+              <p>
+                Платформа зарабатывает на подписке, а не на вашем заказе.
+                Поэтому нам выгодно, чтобы хороший мастер находился быстро,
+                условия были прозрачны, а пользователи возвращались.
+              </p>
+              <button className="landing-primary light-button" onClick={onOpenApp}>
+                Попробовать сервис <ArrowRight size={18} />
+              </button>
+            </div>
+            <div className="benefits-grid">
+              {landingBenefits.map((benefit) => {
+                const Icon = benefit.icon;
+                return (
+                  <article key={benefit.title}>
+                    <span><Icon size={22} /></span>
+                    <h3>{benefit.title}</h3>
+                    <p>{benefit.text}</p>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="landing-section categories-section" id="categories">
+          <div className="section-heading split-heading">
+            <div>
+              <span className="section-label">Помощь на каждый день</span>
+              <h2>От срочного крана<br />до личной тренировки</h2>
+            </div>
+            <p>Начинаем с самых частых бытовых задач и постепенно расширяем направления вместе с сообществом.</p>
+          </div>
+          <div className="landing-category-grid">
+            {categories.map((category, index) => {
+              const Icon = category.icon;
+              const examples = [
+                "Краны, трубы, протечки",
+                "Сборка и установка",
+                "Выгул и присмотр",
+                "Тренировки и восстановление",
+                "Уборка и бытовые задачи",
+                "Любая понятная задача",
+              ];
+              return (
+                <button key={category.title} className={`landing-category ${category.tone}`} onClick={onOpenApp}>
+                  <span><Icon size={25} /></span>
+                  <h3>{category.title}</h3>
+                  <p>{examples[index]}</p>
+                  <i><ArrowRight size={16} /></i>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="trust-section">
+          <div className="trust-visual">
+            <div className="trust-orbit orbit-one" />
+            <div className="trust-orbit orbit-two" />
+            <span className="trust-shield"><ShieldCheck size={52} /></span>
+            <span className="trust-badge badge-one"><BadgeCheck size={17} /> Проверка профиля</span>
+            <span className="trust-badge badge-two"><Star size={17} fill="currentColor" /> Реальные отзывы</span>
+            <span className="trust-badge badge-three"><FileCheck2 size={17} /> Фото результата</span>
+          </div>
+          <div className="trust-copy">
+            <span className="section-label">Доверие встроено в продукт</span>
+            <h2>Репутация важнее случайной скидки</h2>
+            <p>
+              После каждого заказа обе стороны оставляют обязательный отзыв.
+              Мастер показывает результат «до и после», а история выполненных
+              работ помогает выбрать специалиста осознанно.
+            </p>
+            <ul>
+              <li><CheckCircle2 size={18} /> Проверка данных и специализации мастера</li>
+              <li><CheckCircle2 size={18} /> Точный адрес открывается только после принятия</li>
+              <li><CheckCircle2 size={18} /> Переписка и согласованные условия сохраняются</li>
+              <li><CheckCircle2 size={18} /> Рейтинг есть и у мастера, и у заказчика</li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="subscription-section">
+          <div className="subscription-copy">
+            <span className="section-label">Простая бизнес-модель</span>
+            <h2>Подписка вместо комиссии</h2>
+            <p>
+              Вы заранее знаете стоимость сервиса. Мы не увеличиваем цену работы
+              и не забираем процент у мастера.
+            </p>
+            <div className="subscription-points">
+              <span><Check size={15} /> Неограниченные отклики</span>
+              <span><Check size={15} /> Чат и история заказов</span>
+              <span><Check size={15} /> Рейтинг и портфолио</span>
+            </div>
+          </div>
+          <article className="price-card">
+            <span className="price-card-label">Для старта</span>
+            <div className="price-card-value"><strong>Пробный период</strong><span>для первых пользователей</span></div>
+            <p>Проверяем ценность продукта вместе с пилотным сообществом.</p>
+            <button onClick={onOpenApp}>Присоединиться к пилоту <ArrowRight size={17} /></button>
+            <small>Условия подписки будут подтверждены перед публичным запуском.</small>
+          </article>
+        </section>
+
+        <section className="landing-section team-section" id="team">
+          <div className="section-heading">
+            <span className="section-label">Команда продукта</span>
+            <h2>Строим сервис вокруг<br />реальной человеческой помощи</h2>
+            <p>
+              Мы объединяем продуктовый подход, дизайн, технологии и заботу о пользователях.
+              Сейчас команда создаёт MVP и готовит платформу к пилотному запуску.
+            </p>
+          </div>
+          <div className="team-grid">
+            {teamRoles.map((member) => (
+              <article key={member.role}>
+                <span className={member.tone}>{member.initials}</span>
+                <h3>{member.role}</h3>
+                <p>{member.text}</p>
+              </article>
+            ))}
+          </div>
+          <div className="team-note">
+            <Rocket size={25} />
+            <div>
+              <strong>Мы в начале пути</strong>
+              <p>Поэтому обратная связь первых заказчиков и мастеров напрямую влияет на продукт.</p>
+            </div>
+            <button onClick={onOpenApp}>Посмотреть MVP <ArrowRight size={16} /></button>
+          </div>
+        </section>
+
+        <section className="landing-cta">
+          <div className="cta-pattern" />
+          <span className="cta-icon"><Wrench size={28} /></span>
+          <h2>Задача появилась?<br />Мастер уже может быть рядом.</h2>
+          <p>Разместите первый заказ и посмотрите, как работает МастерGO.</p>
+          <div>
+            <button className="landing-primary light-button" onClick={onOpenApp}>
+              Открыть демо сервиса <ArrowRight size={18} />
+            </button>
+            <button className="cta-master-button" onClick={() => scrollTo("team")}>
+              <BriefcaseBusiness size={17} /> Стать мастером
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer className="landing-footer">
+        <div className="footer-main">
+          <div className="footer-brand">
+            <div className="landing-logo">
+              <span className="brand-mark"><Wrench size={21} /></span>
+              <span>Мастер<b>GO</b></span>
+            </div>
+            <p>Быстрый способ найти надёжную помощь рядом без комиссии.</p>
+          </div>
+          <div><strong>Продукт</strong><button onClick={() => scrollTo("how")}>Как это работает</button><button onClick={() => scrollTo("categories")}>Категории</button><button onClick={onOpenApp}>Демо кабинета</button></div>
+          <div><strong>Доверие</strong><button onClick={() => scrollTo("benefits")}>Преимущества</button><button onClick={() => scrollTo("team")}>О команде</button><button onClick={() => scrollTo("benefits")}>Безопасность</button></div>
+          <div><strong>Для связи</strong><span>Москва</span><span>Пилотная версия MVP</span><span>hello@mastergo.ru</span></div>
+        </div>
+        <div className="footer-bottom">
+          <span>© 2026 МастерGO. Концепт продукта.</span>
+          <span>Сделано для быстрых и честных договорённостей.</span>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function DashboardApp({ onBackToSite }: { onBackToSite: () => void }) {
   const [activeNav, setActiveNav] = useState("Главная");
   const [showComposer, setShowComposer] = useState(false);
   const [composerStep, setComposerStep] = useState(1);
@@ -219,7 +587,7 @@ function App() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <button className="brand" onClick={() => setActiveNav("Главная")}>
+        <button className="brand" onClick={onBackToSite}>
           <span className="brand-mark"><Wrench size={21} /></span>
           <span>Мастер<span>GO</span></span>
         </button>
@@ -647,6 +1015,16 @@ function App() {
       {toast && <div className="toast"><CheckCircle2 size={18} /> {toast}</div>}
     </div>
   );
+}
+
+function App() {
+  const [view, setView] = useState<"landing" | "app">("landing");
+
+  if (view === "app") {
+    return <DashboardApp onBackToSite={() => setView("landing")} />;
+  }
+
+  return <Landing onOpenApp={() => setView("app")} />;
 }
 
 export default App;
