@@ -8,7 +8,7 @@ export function Brand() {
         <Wrench size={21} />
       </span>
       <span>
-        Мастер<b>GO</b>
+        Home<b>Fix</b>
       </span>
     </Link>
   );

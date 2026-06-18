@@ -1,13 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Camera, CheckCircle2, MapPin, MessageCircle, ShieldCheck, Sparkles, Star, Timer, WalletCards } from "lucide-react";
+import { ArrowRight, Camera, CheckCircle2, Clock3, ImagePlus, MapPin, MessageCircle, ShieldCheck, Star, Timer, WalletCards } from "lucide-react";
 import { Brand } from "@/components/Brand";
 import { categories, formatRub, masters } from "@/lib/mock-data";
 
 const steps = [
-  { icon: Camera, title: "Покажите задачу", text: "Описание, фото, район, время и бюджет в одной заявке." },
-  { icon: Timer, title: "Получите отклики", text: "Мастера по категории видят заявку и предлагают цену/время." },
-  { icon: MessageCircle, title: "Выберите и договоритесь", text: "Чат открывается после выбора мастера, условия сохраняются." },
+  { icon: Camera, title: "Категория и фото", text: "Выберите тип работы и прикрепите фото проблемы." },
+  { icon: MapPin, title: "Адрес и бюджет", text: "Укажите район, удобное время и желаемую цену." },
+  { icon: MessageCircle, title: "Отклики рядом", text: "Мастера предлагают время и стоимость, вы выбираете лучшего." },
 ];
 
 export default function HomePage() {
@@ -29,16 +29,20 @@ export default function HomePage() {
       <main>
         <section className="hero">
           <div>
-            <span className="badge"><Sparkles size={15} /> MVP маркетплейса мастеров</span>
-            <h1>Нужный мастер.<br /><em>В нужный момент.</em></h1>
+            <span className="badge">Цифровой помощник для дома</span>
+            <h1>Что нужно сделать дома?</h1>
             <p className="lead">
-              HomeFix / МастерGO помогает быстро найти сантехника, электрика,
-              сборщика мебели или мастера на час. Клиент публикует заявку,
-              мастера предлагают условия, после работы обе стороны оставляют отзыв.
+              Опишите проблему, добавьте фото и получите предложения от мастеров рядом.
+              Без доски объявлений, долгого поиска и лишних действий.
             </p>
             <div className="hero-actions">
               <Link className="primary-btn" href="/client/requests/new">Создать заявку <ArrowRight size={18} /></Link>
-              <Link className="secondary-btn" href="/master/requests">Смотреть заказы</Link>
+              <Link className="secondary-btn" href="/master/requests">Я мастер</Link>
+            </div>
+            <div className="quick-flow" aria-label="Создание заявки менее чем за 30 секунд">
+              {["Категория", "Фото", "Описание", "Адрес", "Бюджет", "Публикация"].map((item, index) => (
+                <span key={item}><b>{index + 1}</b>{item}</span>
+              ))}
             </div>
           </div>
           <div className="hero-card">
@@ -48,11 +52,12 @@ export default function HomePage() {
                   <span className="pill">Сантехника</span>
                   <h3>Течёт кран на кухне</h3>
                 </div>
-                <span className="live">Есть отклики</span>
+                <span className="live">3 предложения</span>
               </div>
               <Image src="/uploads/faucet-result.jpg" width={900} height={520} alt="Установка кухонного крана" priority />
               <div className="preview-row">
                 <span className="muted"><MapPin size={15} /> Хамовники</span>
+                <span className="muted"><Clock3 size={15} /> Сегодня</span>
                 <strong>{formatRub(4500)}</strong>
               </div>
               <div className="offer-mini">
@@ -69,8 +74,8 @@ export default function HomePage() {
         </section>
 
         <section className="section">
-          <span className="badge">Что закрывает MVP</span>
-          <h2>Полный путь заявки</h2>
+          <span className="badge">Минимум действий</span>
+          <h2>Заявка быстрее, чем звонок мастеру</h2>
           <div className="grid-3">
             {steps.map((step) => {
               const Icon = step.icon;
@@ -86,28 +91,30 @@ export default function HomePage() {
         </section>
 
         <section className="dark-section">
+          <span className="badge badge-dark">Design System</span>
+          <h2>Спокойный интерфейс без визуального шума</h2>
           <div className="grid-3">
             <article>
               <WalletCards size={34} />
-              <h3>Без высокой комиссии</h3>
-              <p className="muted">MVP оставляет возможность подписки для мастеров и оплаты внутри сервиса позже.</p>
+              <h3>Чистая модель</h3>
+              <p className="muted">Понятные условия, видимая цена и прозрачный выбор мастера.</p>
             </article>
             <article>
               <ShieldCheck size={34} />
-              <h3>Доверие и модерация</h3>
-              <p className="muted">Отзывы, рейтинг, проверка мастеров и админ-панель для развития безопасности.</p>
+              <h3>Доверие</h3>
+              <p className="muted">Рейтинг, история работ, статусы и отзывы после каждого заказа.</p>
             </article>
             <article>
               <CheckCircle2 size={34} />
-              <h3>История квартиры</h3>
-              <p className="muted">После завершения работа сохраняется в истории ремонта по адресу.</p>
+              <h3>Система на будущее</h3>
+              <p className="muted">Готово для гарантий, документов мастера, push-уведомлений и оплат.</p>
             </article>
           </div>
         </section>
 
         <section className="section">
           <span className="badge">Категории</span>
-          <h2>Самые частые бытовые задачи</h2>
+          <h2>Популярные категории</h2>
           <div className="grid-3">
             {categories.map((category) => {
               const Icon = category.icon;
@@ -119,6 +126,25 @@ export default function HomePage() {
                 </Link>
               );
             })}
+          </div>
+        </section>
+
+        <section className="section">
+          <span className="badge">UI Kit</span>
+          <h2>Компоненты продукта</h2>
+          <div className="ui-kit-grid">
+            <article className="card">
+              <h3>Button</h3>
+              <div className="hero-actions"><Link className="primary-btn" href="/client/requests/new">Primary</Link><Link className="secondary-btn" href="/how-it-works">Secondary</Link></div>
+            </article>
+            <article className="card">
+              <h3>Upload</h3>
+              <div className="upload-card"><ImagePlus size={22} /> Добавить фото</div>
+            </article>
+            <article className="card">
+              <h3>Status Badge</h3>
+              <div className="hero-actions"><span className="status-badge success">Свободен сейчас</span><span className="status-badge warning">Срочно</span></div>
+            </article>
           </div>
         </section>
       </main>
