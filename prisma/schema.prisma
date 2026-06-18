@@ -1,0 +1,265 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CLIENT
+  MASTER
+  ADMIN
+}
+
+enum BudgetType {
+  FIXED
+  NEGOTIABLE
+  REQUEST_PRICE
+}
+
+enum Urgency {
+  NORMAL
+  URGENT
+}
+
+enum RepairStatus {
+  DRAFT
+  PUBLISHED
+  IN_NEGOTIATION
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+model User {
+  id            String   @id @default(cuid())
+  role          UserRole
+  name          String
+  phone         String?  @unique
+  email         String   @unique
+  passwordHash  String   @map("password_hash")
+  avatarUrl     String?  @map("avatar_url")
+  ratingAvg     Float    @default(0) @map("rating_avg")
+  ratingCount   Int      @default(0) @map("rating_count")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  masterProfile MasterProfile?
+  addresses     Address[]
+  clientRequests RepairRequest[] @relation("ClientRequests")
+  selectedJobs   RepairRequest[] @relation("SelectedMaster")
+  sentMessages   ChatMessage[]
+  reviewsGiven   Review[] @relation("ReviewsGiven")
+  reviewsReceived Review[] @relation("ReviewsReceived")
+  notifications  Notification[]
+  repairHistory  HomeRepairHistory[] @relation("ClientRepairHistory")
+  masterHistory  HomeRepairHistory[] @relation("MasterRepairHistory")
+
+  @@map("users")
+}
+
+model MasterProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique @map("user_id")
+  bio             String
+  experienceYears Int      @default(0) @map("experience_years")
+  isVerified      Boolean  @default(false) @map("is_verified")
+  city            String
+  district        String
+  workRadiusKm    Int      @default(5) @map("work_radius_km")
+  isAvailableNow  Boolean  @default(false) @map("is_available_now")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user       User             @relation(fields: [userId], references: [id])
+  categories MasterCategory[]
+  offers     Offer[]
+
+  @@map("master_profiles")
+}
+
+model Category {
+  id        String @id @default(cuid())
+  name      String
+  slug      String @unique
+  icon      String
+
+  masters MasterCategory[]
+  requests RepairRequest[]
+  history HomeRepairHistory[]
+
+  @@map("categories")
+}
+
+model MasterCategory {
+  id         String @id @default(cuid())
+  masterId   String @map("master_id")
+  categoryId String @map("category_id")
+
+  master   MasterProfile @relation(fields: [masterId], references: [id])
+  category Category      @relation(fields: [categoryId], references: [id])
+
+  @@unique([masterId, categoryId])
+  @@map("master_categories")
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String  @map("user_id")
+  title     String
+  city      String
+  district  String
+  street    String
+  house     String
+  apartment String?
+  comment   String?
+
+  user     User                @relation(fields: [userId], references: [id])
+  requests RepairRequest[]
+  history  HomeRepairHistory[]
+
+  @@map("addresses")
+}
+
+model RepairRequest {
+  id                String       @id @default(cuid())
+  clientId          String       @map("client_id")
+  categoryId        String       @map("category_id")
+  addressId         String       @map("address_id")
+  title             String
+  description       String
+  budgetAmount      Int?         @map("budget_amount")
+  budgetType        BudgetType   @default(NEGOTIABLE) @map("budget_type")
+  preferredDate     DateTime?    @map("preferred_date")
+  preferredTimeFrom String?      @map("preferred_time_from")
+  preferredTimeTo   String?      @map("preferred_time_to")
+  urgency           Urgency      @default(NORMAL)
+  status            RepairStatus @default(DRAFT)
+  selectedMasterId  String?      @map("selected_master_id")
+  finalPrice        Int?         @map("final_price")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  client         User                @relation("ClientRequests", fields: [clientId], references: [id])
+  selectedMaster User?               @relation("SelectedMaster", fields: [selectedMasterId], references: [id])
+  category       Category            @relation(fields: [categoryId], references: [id])
+  address        Address             @relation(fields: [addressId], references: [id])
+  photos         RepairRequestPhoto[]
+  offers         Offer[]
+  messages       ChatMessage[]
+  reviews        Review[]
+  history        HomeRepairHistory?
+
+  @@map("repair_requests")
+}
+
+model RepairRequestPhoto {
+  id              String   @id @default(cuid())
+  repairRequestId String   @map("repair_request_id")
+  url             String
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  repairRequest RepairRequest @relation(fields: [repairRequestId], references: [id])
+
+  @@map("repair_request_photos")
+}
+
+model Offer {
+  id              String      @id @default(cuid())
+  repairRequestId String      @map("repair_request_id")
+  masterId        String      @map("master_id")
+  price           Int
+  comment         String
+  availableDate   DateTime?   @map("available_date")
+  availableTimeFrom String?   @map("available_time_from")
+  availableTimeTo   String?   @map("available_time_to")
+  status          OfferStatus @default(PENDING)
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  repairRequest RepairRequest @relation(fields: [repairRequestId], references: [id])
+  master        MasterProfile @relation(fields: [masterId], references: [id])
+
+  @@map("offers")
+}
+
+model ChatMessage {
+  id              String    @id @default(cuid())
+  repairRequestId String    @map("repair_request_id")
+  senderId        String    @map("sender_id")
+  message         String
+  createdAt       DateTime  @default(now()) @map("created_at")
+  readAt          DateTime? @map("read_at")
+
+  repairRequest RepairRequest @relation(fields: [repairRequestId], references: [id])
+  sender        User          @relation(fields: [senderId], references: [id])
+
+  @@map("chat_messages")
+}
+
+model Review {
+  id                  String   @id @default(cuid())
+  repairRequestId      String   @map("repair_request_id")
+  reviewerId           String   @map("reviewer_id")
+  revieweeId           String   @map("reviewee_id")
+  rating               Int
+  comment              String
+  punctualityRating    Int?     @map("punctuality_rating")
+  priceFairnessRating  Int?     @map("price_fairness_rating")
+  qualityRating        Int?     @map("quality_rating")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  repairRequest RepairRequest @relation(fields: [repairRequestId], references: [id])
+  reviewer      User          @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  reviewee      User          @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+
+  @@map("reviews")
+}
+
+model HomeRepairHistory {
+  id              String   @id @default(cuid())
+  clientId         String   @map("client_id")
+  addressId        String   @map("address_id")
+  repairRequestId  String   @unique @map("repair_request_id")
+  masterId         String   @map("master_id")
+  categoryId       String   @map("category_id")
+  title            String
+  description      String
+  finalPrice       Int      @map("final_price")
+  completedAt      DateTime @map("completed_at")
+  warrantyUntil    DateTime? @map("warranty_until")
+  notes            String?
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  client        User          @relation("ClientRepairHistory", fields: [clientId], references: [id])
+  master        User          @relation("MasterRepairHistory", fields: [masterId], references: [id])
+  address       Address       @relation(fields: [addressId], references: [id])
+  repairRequest RepairRequest @relation(fields: [repairRequestId], references: [id])
+  category      Category      @relation(fields: [categoryId], references: [id])
+
+  @@map("home_repair_history")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  type      String
+  title     String
+  body      String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
