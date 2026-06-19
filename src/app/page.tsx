@@ -16,6 +16,7 @@ export default function HomePage() {
       <header className="landing-nav">
         <Brand />
         <nav>
+          <Link href="/product">Продукт</Link>
           <Link href="/design">Дизайн-проект</Link>
           <Link href="/how-it-works">Как работает</Link>
           <Link href="/client/dashboard">Клиент</Link>
@@ -37,7 +38,7 @@ export default function HomePage() {
               Без доски объявлений, долгого поиска и лишних действий.
             </p>
             <div className="hero-actions">
-              <Link className="primary-btn" href="/client/requests/new">Создать заявку <ArrowRight size={18} /></Link>
+              <Link className="primary-btn" href="/product">Открыть продукт <ArrowRight size={18} /></Link>
               <Link className="secondary-btn" href="/master/requests">Я мастер</Link>
             </div>
             <div className="quick-flow" aria-label="Создание заявки менее чем за 30 секунд">
