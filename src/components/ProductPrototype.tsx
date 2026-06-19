@@ -15,29 +15,14 @@ import {
   UserRoundCheck,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Brand } from "./Brand";
 import { categories, formatRub } from "@/lib/mock-data";
+import type { MvpMessage, MvpOrder, MvpOrderStatus, MvpRole, MvpState } from "@/lib/mvp-types";
 
-type Role = "client" | "master";
-type OrderStatus = "published" | "assigned" | "in_progress" | "completed" | "declined";
+type ApiResponse<T> = { ok: true; data: T } | { ok: false; error: string };
 
-type Order = {
-  id: string;
-  title: string;
-  category: string;
-  price: number;
-  address: string;
-  district: string;
-  time: string;
-  description: string;
-  status: OrderStatus;
-  photo: boolean;
-  master?: string;
-  offers: number;
-};
-
-const statusLabel: Record<OrderStatus, string> = {
+const statusLabel: Record<MvpOrderStatus, string> = {
   published: "Ищем мастера",
   assigned: "Мастер выбран",
   in_progress: "В работе",
@@ -45,32 +30,19 @@ const statusLabel: Record<OrderStatus, string> = {
   declined: "Отклонено",
 };
 
-const initialOrders: Order[] = [
-  {
-    id: "HF-1042",
-    title: "Поменять кран на кухне",
-    category: "Сантехника",
-    price: 1500,
-    address: "ул. Ефремова, 12",
-    district: "Хамовники",
-    time: "Сегодня до 20:00",
-    description: "Кран куплен, нужно снять старый и поставить новый.",
-    status: "published",
-    photo: true,
-    offers: 0,
-  },
-];
+const emptyState: MvpState = {
+  orders: [],
+  messages: [],
+};
 
 export function ProductPrototype() {
-  const [role, setRole] = useState<Role>("client");
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [role, setRole] = useState<MvpRole>("client");
+  const [state, setState] = useState<MvpState>(emptyState);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [chatOrderId, setChatOrderId] = useState<string | null>(null);
   const [chatText, setChatText] = useState("");
-  const [messages, setMessages] = useState([
-    { mine: false, text: "Здравствуйте! Готов приехать через 35 минут." },
-    { mine: true, text: "Отлично, кран уже куплен." },
-  ]);
   const [form, setForm] = useState({
     title: "Поменять кран на кухне",
     category: "Сантехника",
@@ -81,65 +53,84 @@ export function ProductPrototype() {
     description: "Кран куплен, нужно снять старый и поставить новый.",
   });
 
+  const loadState = useCallback(async () => {
+    const response = await fetch("/api/mvp/state", { cache: "no-store" });
+    const payload = (await response.json()) as ApiResponse<MvpState>;
+    if (!payload.ok) throw new Error(payload.error);
+    setState(payload.data);
+    setError("");
+  }, []);
+
+  useEffect(() => {
+    loadState()
+      .catch((err: Error) => setError(err.message))
+      .finally(() => setIsLoading(false));
+  }, [loadState]);
+
+  const orders = state.orders;
   const activeOrders = useMemo(() => orders.filter((order) => order.status !== "completed"), [orders]);
   const history = useMemo(() => orders.filter((order) => order.status === "completed"), [orders]);
   const selectedChatOrder = orders.find((order) => order.id === chatOrderId);
+  const chatMessages = state.messages.filter((message) => message.orderId === chatOrderId);
 
-  function createOrder() {
-    const next: Order = {
-      id: `HF-${Math.floor(2000 + Math.random() * 7000)}`,
-      title: form.title,
-      category: form.category,
+  async function mutate<T>(url: string, body?: unknown) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : "{}",
+    });
+    const payload = (await response.json()) as ApiResponse<T>;
+    if (!payload.ok) {
+      setError(payload.error);
+      return null;
+    }
+    await loadState();
+    return payload.data;
+  }
+
+  async function createOrder() {
+    const order = await mutate<MvpOrder>("/api/mvp/orders", {
+      ...form,
       price: Number(form.price) || 0,
-      address: form.address,
-      district: form.district,
-      time: form.time,
-      description: form.description,
-      status: "published",
-      photo: true,
-      offers: 0,
-    };
-    setOrders((current) => [next, ...current]);
+    });
+    if (!order) return;
+
     setShowCreate(false);
     setRole("client");
+    setChatOrderId(order.id);
   }
 
-  function acceptOrder(orderId: string) {
-    setOrders((current) =>
-      current.map((order) =>
-        order.id === orderId
-          ? { ...order, status: "assigned", master: "Алексей Соколов", offers: order.offers + 1 }
-          : order,
-      ),
-    );
-    setChatOrderId(orderId);
+  async function acceptOrder(orderId: string) {
+    const order = await mutate<MvpOrder>(`/api/mvp/orders/${orderId}/accept`);
+    if (order) setChatOrderId(orderId);
   }
 
-  function declineOrder(orderId: string) {
-    setOrders((current) =>
-      current.map((order) =>
-        order.id === orderId ? { ...order, status: "declined" } : order,
-      ),
-    );
+  async function proposePrice(order: MvpOrder) {
+    const nextPrice = Math.max(100, Math.round(order.price * 1.2));
+    const updatedOrder = await mutate<MvpOrder>(`/api/mvp/orders/${order.id}/accept`, { price: nextPrice });
+    if (updatedOrder) setChatOrderId(order.id);
   }
 
-  function startWork(orderId: string) {
-    setOrders((current) =>
-      current.map((order) => (order.id === orderId ? { ...order, status: "in_progress" } : order)),
-    );
+  async function declineOrder(orderId: string, reason = "Не подходит по условиям") {
+    await mutate<MvpOrder>(`/api/mvp/orders/${orderId}/decline`, { reason });
   }
 
-  function completeOrder(orderId: string) {
-    setOrders((current) =>
-      current.map((order) => (order.id === orderId ? { ...order, status: "completed" } : order)),
-    );
-    setChatOrderId(null);
+  async function startWork(orderId: string) {
+    await mutate<MvpOrder>(`/api/mvp/orders/${orderId}/start`);
   }
 
-  function sendMessage() {
-    if (!chatText.trim()) return;
-    setMessages((current) => [...current, { mine: role === "client", text: chatText.trim() }]);
-    setChatText("");
+  async function completeOrder(orderId: string) {
+    const order = await mutate<MvpOrder>(`/api/mvp/orders/${orderId}/complete`);
+    if (order) setChatOrderId(null);
+  }
+
+  async function sendMessage() {
+    if (!chatText.trim() || !chatOrderId) return;
+    const sent = await mutate<MvpMessage>(`/api/mvp/orders/${chatOrderId}/messages`, {
+      role,
+      text: chatText.trim(),
+    });
+    if (sent) setChatText("");
   }
 
   return (
@@ -154,7 +145,14 @@ export function ProductPrototype() {
       </header>
 
       <main className="product-main">
-        {role === "client" ? (
+        {error && <div className="product-alert">{error}</div>}
+        {isLoading ? (
+          <section className="empty-state">
+            <Clock3 size={24} />
+            <h3>Загружаем заявки</h3>
+            <p>Поднимаем рабочее состояние MVP.</p>
+          </section>
+        ) : role === "client" ? (
           <>
             <section className="product-hero-card">
               <div>
@@ -185,10 +183,18 @@ export function ProductPrototype() {
                           {order.status !== "published" && order.status !== "declined" && (
                             <button className="secondary-btn" onClick={() => setChatOrderId(order.id)}><MessageCircle size={16} /> Чат</button>
                           )}
+                          {order.status === "declined" && <small>{order.declineReason}</small>}
                         </>
                       }
                     />
                   ))}
+                  {!activeOrders.length && (
+                    <article className="empty-state">
+                      <Plus size={24} />
+                      <h3>Создайте первую заявку</h3>
+                      <p>Мастера рядом увидят задачу и смогут быстро принять заказ.</p>
+                    </article>
+                  )}
                 </div>
               </div>
 
@@ -202,7 +208,7 @@ export function ProductPrototype() {
                     <span className="status-badge success">Завершено</span>
                     <h3>{order.title}</h3>
                     <p>{order.master} · {formatRub(order.price)}</p>
-                    <small>Гарантия и фото результата появятся в следующей версии.</small>
+                    <small>Следующий шаг MVP: фото “до/после”, гарантия и отзывы обеих сторон.</small>
                   </article>
                 )) : (
                   <article className="empty-state">
@@ -220,7 +226,7 @@ export function ProductPrototype() {
               <div>
                 <span className="badge">Кабинет мастера</span>
                 <h1>Новые заявки рядом</h1>
-                <p className="muted">Видны только релевантные задачи по категории, району и доступности.</p>
+                <p className="muted">Видны релевантные задачи по категории, району и доступности.</p>
               </div>
               <span className="status-badge success">Свободен сейчас</span>
             </section>
@@ -239,7 +245,8 @@ export function ProductPrototype() {
                       actions={
                         <>
                           <button className="primary-btn" onClick={() => acceptOrder(order.id)}>Принять</button>
-                          <button className="secondary-btn" onClick={() => declineOrder(order.id)}>Отказаться</button>
+                          <button className="secondary-btn" onClick={() => proposePrice(order)}>Своя цена</button>
+                          <button className="secondary-btn" onClick={() => declineOrder(order.id, "Не успеваю по времени")}>Отказаться</button>
                         </>
                       }
                     />
@@ -312,11 +319,12 @@ export function ProductPrototype() {
             <button className="modal-close" onClick={() => setChatOrderId(null)}><X size={18} /></button>
           </header>
           <div className="chat-box">
-            {messages.map((message, index) => (
-              <div className={message.mine ? "message mine" : "message"} key={`${message.text}-${index}`}>
+            {chatMessages.map((message) => (
+              <div className={message.role === role ? "message mine" : "message"} key={message.id}>
                 {message.text}
               </div>
             ))}
+            {!chatMessages.length && <div className="message">Чат откроется после первого сообщения.</div>}
           </div>
           <footer>
             <input value={chatText} onChange={(e) => setChatText(e.target.value)} placeholder="Сообщение" onKeyDown={(e) => e.key === "Enter" && sendMessage()} />
@@ -328,7 +336,7 @@ export function ProductPrototype() {
   );
 }
 
-function OrderCard({ order, actions }: { order: Order; actions: React.ReactNode }) {
+function OrderCard({ order, actions }: { order: MvpOrder; actions: ReactNode }) {
   return (
     <article className="product-order-card">
       <div className="order-photo">

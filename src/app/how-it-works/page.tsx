@@ -15,7 +15,7 @@ export default function HowItWorksPage() {
     <div className="landing">
       <header className="landing-nav">
         <Brand />
-        <Link className="nav-cta" href="/client/requests/new">Создать заявку</Link>
+        <Link className="nav-cta" href="/product">Создать заявку</Link>
       </header>
       <main className="section">
         <span className="badge">Как работает</span>
@@ -28,7 +28,7 @@ export default function HowItWorksPage() {
             </article>
           ))}
         </div>
-        <Link className="primary-btn" href="/client/dashboard">Открыть кабинет <ArrowRight size={18} /></Link>
+        <Link className="primary-btn" href="/product">Открыть MVP <ArrowRight size={18} /></Link>
       </main>
     </div>
   );

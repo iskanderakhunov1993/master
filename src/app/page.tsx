@@ -16,14 +16,11 @@ export default function HomePage() {
       <header className="landing-nav">
         <Brand />
         <nav>
-          <Link href="/product">Продукт</Link>
-          <Link href="/design">Дизайн-проект</Link>
           <Link href="/how-it-works">Как работает</Link>
-          <Link href="/client/dashboard">Клиент</Link>
-          <Link href="/master/dashboard">Мастер</Link>
-          <Link href="/admin">Админ</Link>
+          <Link href="/master/requests">Для мастеров</Link>
+          <Link href="/login">Войти</Link>
         </nav>
-        <Link className="nav-cta" href="/client/requests/new">
+        <Link className="nav-cta" href="/product">
           Создать заявку <ArrowRight size={16} />
         </Link>
       </header>
@@ -137,7 +134,7 @@ export default function HomePage() {
           <div className="ui-kit-grid">
             <article className="card">
               <h3>Button</h3>
-              <div className="hero-actions"><Link className="primary-btn" href="/client/requests/new">Primary</Link><Link className="secondary-btn" href="/how-it-works">Secondary</Link></div>
+              <div className="hero-actions"><Link className="primary-btn" href="/product">Primary</Link><Link className="secondary-btn" href="/how-it-works">Secondary</Link></div>
             </article>
             <article className="card">
               <h3>Upload</h3>

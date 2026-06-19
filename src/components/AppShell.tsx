@@ -3,9 +3,9 @@ import { ReactNode } from "react";
 import { Brand } from "./Brand";
 
 const nav = [
+  { href: "/product", label: "MVP продукт" },
   { href: "/client/dashboard", label: "Клиент" },
   { href: "/master/dashboard", label: "Мастер" },
-  { href: "/admin", label: "Админ" },
 ];
 
 export function AppShell({ children, role }: { children: ReactNode; role?: string }) {
@@ -22,8 +22,8 @@ export function AppShell({ children, role }: { children: ReactNode; role?: strin
         </nav>
         <div className="app-sidebar-card">
           <span>{role ?? "MVP"}</span>
-          <strong>Demo mode</strong>
-          <p>API и Prisma готовы, интерфейс работает на seed-логике.</p>
+          <strong>Рабочий MVP</strong>
+          <p>Ключевой сценарий уже работает через API: заявка, отклик, чат и завершение.</p>
         </div>
       </aside>
       <main className="app-main">{children}</main>

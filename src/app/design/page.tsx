@@ -62,10 +62,10 @@ export default function DesignPage() {
         <Brand />
         <nav>
           <Link href="/">Главная</Link>
-          <Link href="/client/requests/new">Заявка</Link>
+          <Link href="/product">Заявка</Link>
           <Link href="/master/requests">Мастер</Link>
         </nav>
-        <Link className="nav-cta" href="/client/requests/new">
+        <Link className="nav-cta" href="/product">
           Создать заявку <ArrowRight size={16} />
         </Link>
       </header>
@@ -81,7 +81,7 @@ export default function DesignPage() {
               а мастер видит только релевантные заказы.
             </p>
             <div className="hero-actions">
-              <Link className="primary-btn" href="/client/requests/new">Открыть сценарий клиента</Link>
+              <Link className="primary-btn" href="/product">Открыть сценарий клиента</Link>
               <Link className="secondary-btn" href="/master/requests">Сценарий мастера</Link>
             </div>
           </div>
@@ -93,7 +93,7 @@ export default function DesignPage() {
               <div className="upload-card"><ImagePlus size={20} /> Добавить фото</div>
               <div className="phone-row"><span>Бюджет</span><strong>{formatRub(1500)}</strong></div>
               <div className="phone-row"><span>Адрес</span><strong>Хамовники</strong></div>
-              <Link className="primary-btn" href="/client/requests/new">Опубликовать</Link>
+              <Link className="primary-btn" href="/product">Опубликовать</Link>
             </div>
           </div>
         </section>
@@ -204,7 +204,7 @@ export default function DesignPage() {
                 <span><MapPin size={15} /> Хамовники</span>
                 <span><Clock3 size={15} /> Сегодня</span>
               </div>
-              <Link className="primary-btn" href="/client/requests/new">Вызвать мастера</Link>
+              <Link className="primary-btn" href="/product">Вызвать мастера</Link>
             </article>
             <article className="hifi-card">
               <span className="badge">Мастер</span>
