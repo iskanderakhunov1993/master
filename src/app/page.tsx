@@ -16,6 +16,7 @@ export default function HomePage() {
       <header className="landing-nav">
         <Brand />
         <nav>
+          <Link href="/design">Дизайн-проект</Link>
           <Link href="/how-it-works">Как работает</Link>
           <Link href="/client/dashboard">Клиент</Link>
           <Link href="/master/dashboard">Мастер</Link>
