@@ -1,6 +1,6 @@
 export type MvpRole = "client" | "master";
 
-export type MvpOrderStatus = "published" | "assigned" | "in_progress" | "completed" | "declined";
+export type MvpOrderStatus = "published" | "assigned" | "in_progress" | "awaiting_review" | "completed" | "declined";
 
 export type MvpOrder = {
   id: string;
@@ -28,7 +28,18 @@ export type MvpMessage = {
   createdAt: string;
 };
 
+export type MvpReview = {
+  id: string;
+  orderId: string;
+  reviewerRole: MvpRole;
+  rating: number;
+  comment: string;
+  paymentConfirmed?: boolean;
+  createdAt: string;
+};
+
 export type MvpState = {
   orders: MvpOrder[];
   messages: MvpMessage[];
+  reviews: MvpReview[];
 };

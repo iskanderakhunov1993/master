@@ -7,11 +7,10 @@ export async function POST(
 ) {
   const { id } = await params;
   const order = updateMvpOrder(id, {
-    status: "completed",
-    completedAt: new Date().toISOString(),
+    status: "awaiting_review",
   });
   if (!order) return fail("Заявка не найдена", 404);
 
-  addMvpMessage(id, "client", "Работа завершена. Оставляем отзывы с обеих сторон.");
+  addMvpMessage(id, "client", "Работа выполнена. Теперь нужно подтвердить оплату и оставить взаимные отзывы.");
   return ok(order);
 }

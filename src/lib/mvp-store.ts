@@ -1,4 +1,4 @@
-import type { MvpMessage, MvpOrder, MvpOrderStatus, MvpRole, MvpState } from "./mvp-types";
+import type { MvpMessage, MvpOrder, MvpOrderStatus, MvpReview, MvpRole, MvpState } from "./mvp-types";
 
 type GlobalMvpState = typeof globalThis & {
   homefixMvpState?: MvpState;
@@ -39,11 +39,13 @@ const initialState: MvpState = {
       createdAt: nowIso(),
     },
   ],
+  reviews: [],
 };
 
 function getState() {
   const globalState = globalThis as GlobalMvpState;
   globalState.homefixMvpState ??= structuredClone(initialState);
+  globalState.homefixMvpState.reviews ??= [];
   return globalState.homefixMvpState;
 }
 
@@ -52,6 +54,7 @@ function publicState(): MvpState {
   return {
     orders: [...state.orders],
     messages: [...state.messages],
+    reviews: [...state.reviews],
   };
 }
 
@@ -99,4 +102,34 @@ export function addMvpMessage(orderId: string, role: MvpRole, text: string) {
 
 export function getMvpMessages(orderId: string) {
   return getState().messages.filter((message) => message.orderId === orderId);
+}
+
+export function addMvpReview(input: Omit<MvpReview, "id" | "createdAt">) {
+  const state = getState();
+  const order = state.orders.find((item) => item.id === input.orderId);
+  if (!order) return null;
+
+  const existingIndex = state.reviews.findIndex(
+    (review) => review.orderId === input.orderId && review.reviewerRole === input.reviewerRole,
+  );
+  const review: MvpReview = {
+    ...input,
+    id: existingIndex >= 0 ? state.reviews[existingIndex].id : `REV-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    createdAt: nowIso(),
+  };
+
+  if (existingIndex >= 0) {
+    state.reviews[existingIndex] = review;
+  } else {
+    state.reviews = [...state.reviews, review];
+  }
+
+  const hasClientReview = state.reviews.some((item) => item.orderId === input.orderId && item.reviewerRole === "client");
+  const hasMasterReview = state.reviews.some((item) => item.orderId === input.orderId && item.reviewerRole === "master");
+  if (hasClientReview && hasMasterReview) {
+    order.status = "completed";
+    order.completedAt = nowIso();
+  }
+
+  return review;
 }

@@ -12,13 +12,14 @@ import {
   Send,
   ShieldCheck,
   Star,
+  Timer,
   UserRoundCheck,
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Brand } from "./Brand";
 import { categories, formatRub } from "@/lib/mock-data";
-import type { MvpMessage, MvpOrder, MvpOrderStatus, MvpRole, MvpState } from "@/lib/mvp-types";
+import type { MvpMessage, MvpOrder, MvpOrderStatus, MvpReview, MvpRole, MvpState } from "@/lib/mvp-types";
 
 type ApiResponse<T> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -26,6 +27,7 @@ const statusLabel: Record<MvpOrderStatus, string> = {
   published: "Ищем мастера",
   assigned: "Мастер выбран",
   in_progress: "В работе",
+  awaiting_review: "Ждём отзывы",
   completed: "Завершено",
   declined: "Отклонено",
 };
@@ -33,6 +35,7 @@ const statusLabel: Record<MvpOrderStatus, string> = {
 const emptyState: MvpState = {
   orders: [],
   messages: [],
+  reviews: [],
 };
 
 export function ProductPrototype() {
@@ -41,8 +44,14 @@ export function ProductPrototype() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [reviewOrderId, setReviewOrderId] = useState<string | null>(null);
   const [chatOrderId, setChatOrderId] = useState<string | null>(null);
   const [chatText, setChatText] = useState("");
+  const [reviewForm, setReviewForm] = useState({
+    rating: "5",
+    comment: "",
+    paymentConfirmed: false,
+  });
   const [form, setForm] = useState({
     title: "Поменять кран на кухне",
     category: "Сантехника",
@@ -71,7 +80,21 @@ export function ProductPrototype() {
   const activeOrders = useMemo(() => orders.filter((order) => order.status !== "completed"), [orders]);
   const history = useMemo(() => orders.filter((order) => order.status === "completed"), [orders]);
   const selectedChatOrder = orders.find((order) => order.id === chatOrderId);
+  const selectedReviewOrder = orders.find((order) => order.id === reviewOrderId);
   const chatMessages = state.messages.filter((message) => message.orderId === chatOrderId);
+  const calendarOrders = useMemo(
+    () => orders.filter((order) => order.status === "assigned" || order.status === "in_progress" || order.status === "awaiting_review" || order.status === "completed"),
+    [orders],
+  );
+
+  function reviewFor(orderId: string, reviewerRole: MvpRole) {
+    return state.reviews.find((review) => review.orderId === orderId && review.reviewerRole === reviewerRole);
+  }
+
+  function openReview(orderId: string) {
+    setReviewOrderId(orderId);
+    setReviewForm({ rating: "5", comment: "", paymentConfirmed: false });
+  }
 
   async function mutate<T>(url: string, body?: unknown) {
     const response = await fetch(url, {
@@ -121,7 +144,23 @@ export function ProductPrototype() {
 
   async function completeOrder(orderId: string) {
     const order = await mutate<MvpOrder>(`/api/mvp/orders/${orderId}/complete`);
-    if (order) setChatOrderId(null);
+    if (order) {
+      setChatOrderId(null);
+      openReview(orderId);
+    }
+  }
+
+  async function submitReview() {
+    if (!selectedReviewOrder) return;
+    const response = await mutate<{ review: MvpReview; state: MvpState }>(`/api/mvp/orders/${selectedReviewOrder.id}/review`, {
+      role,
+      rating: Number(reviewForm.rating),
+      comment: reviewForm.comment,
+      paymentConfirmed: role === "client" ? reviewForm.paymentConfirmed : undefined,
+    });
+    if (!response) return;
+    setReviewOrderId(null);
+    setReviewForm({ rating: "5", comment: "", paymentConfirmed: false });
   }
 
   async function sendMessage() {
@@ -180,6 +219,12 @@ export function ProductPrototype() {
                         <>
                           {order.status === "assigned" && <button className="secondary-btn" onClick={() => startWork(order.id)}>Мастер в пути</button>}
                           {order.status === "in_progress" && <button className="primary-btn" onClick={() => completeOrder(order.id)}>Завершить</button>}
+                          {order.status === "awaiting_review" && !reviewFor(order.id, "client") && (
+                            <button className="primary-btn" onClick={() => openReview(order.id)}>Подтвердить оплату и отзыв</button>
+                          )}
+                          {order.status === "awaiting_review" && reviewFor(order.id, "client") && (
+                            <small>Ваш отзыв принят. Ждём отзыв мастера.</small>
+                          )}
                           {order.status !== "published" && order.status !== "declined" && (
                             <button className="secondary-btn" onClick={() => setChatOrderId(order.id)}><MessageCircle size={16} /> Чат</button>
                           )}
@@ -208,7 +253,7 @@ export function ProductPrototype() {
                     <span className="status-badge success">Завершено</span>
                     <h3>{order.title}</h3>
                     <p>{order.master} · {formatRub(order.price)}</p>
-                    <small>Следующий шаг MVP: фото “до/после”, гарантия и отзывы обеих сторон.</small>
+                    <ReviewSummary orderId={order.id} reviews={state.reviews} />
                   </article>
                 )) : (
                   <article className="empty-state">
@@ -259,6 +304,36 @@ export function ProductPrototype() {
                     </article>
                   )}
                 </div>
+
+                <div className="section-title-row product-subtitle-row">
+                  <h2>Мой календарь работ</h2>
+                  <span>{calendarOrders.length}</span>
+                </div>
+                <div className="timeline-list">
+                  {calendarOrders.map((order) => (
+                    <article className="timeline-card" key={order.id}>
+                      <span className={order.status === "completed" ? "timeline-dot success" : "timeline-dot"} />
+                      <div>
+                        <strong>{order.time}</strong>
+                        <p>{order.title} · {statusLabel[order.status]}</p>
+                        {order.status === "awaiting_review" && !reviewFor(order.id, "master") && (
+                          <button className="secondary-btn compact-btn" onClick={() => openReview(order.id)}>Оценить клиента</button>
+                        )}
+                        {order.status === "awaiting_review" && reviewFor(order.id, "master") && (
+                          <small>Ваш отзыв принят. Ждём клиента.</small>
+                        )}
+                        {order.status === "completed" && <ReviewSummary orderId={order.id} reviews={state.reviews} />}
+                      </div>
+                    </article>
+                  ))}
+                  {!calendarOrders.length && (
+                    <article className="empty-state">
+                      <Timer size={24} />
+                      <h3>Календарь появится после принятого заказа</h3>
+                      <p>Тут будет история как в GitHub: даты, статусы, выполненные работы и отзывы.</p>
+                    </article>
+                  )}
+                </div>
               </div>
 
               <aside className="master-profile-card">
@@ -304,6 +379,48 @@ export function ProductPrototype() {
                 <label className="field">Бюджет<input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></label>
               </div>
               <button className="primary-btn" onClick={createOrder}>Опубликовать заявку</button>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {selectedReviewOrder && (
+        <div className="product-modal-backdrop" onMouseDown={() => setReviewOrderId(null)}>
+          <section className="product-modal review-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" onClick={() => setReviewOrderId(null)}><X size={18} /></button>
+            <span className="badge">Обязательное закрытие</span>
+            <h2>{role === "client" ? "Подтвердите оплату и оцените мастера" : "Оцените клиента"}</h2>
+            <p className="muted">
+              Заказ попадёт в финальную историю только после отзывов обеих сторон. Это защищает качество мастеров и клиентов.
+            </p>
+            <article className="review-order-card">
+              <strong>{selectedReviewOrder.title}</strong>
+              <span>{formatRub(selectedReviewOrder.price)} · {selectedReviewOrder.time}</span>
+            </article>
+            <div className="form-grid">
+              {role === "client" && (
+                <label className="check-field">
+                  <input
+                    type="checkbox"
+                    checked={reviewForm.paymentConfirmed}
+                    onChange={(event) => setReviewForm({ ...reviewForm, paymentConfirmed: event.target.checked })}
+                  />
+                  Я подтверждаю, что оплатил мастеру самостоятельно вне сервиса
+                </label>
+              )}
+              <label className="field">Оценка
+                <select value={reviewForm.rating} onChange={(event) => setReviewForm({ ...reviewForm, rating: event.target.value })}>
+                  {[5, 4, 3, 2, 1].map((rating) => <option key={rating} value={rating}>{rating} из 5</option>)}
+                </select>
+              </label>
+              <label className="field">Комментарий обязателен
+                <textarea
+                  value={reviewForm.comment}
+                  onChange={(event) => setReviewForm({ ...reviewForm, comment: event.target.value })}
+                  placeholder={role === "client" ? "Например: мастер приехал вовремя, всё сделал аккуратно" : "Например: клиент был на связи, условия совпали с заявкой"}
+                />
+              </label>
+              <button className="primary-btn" onClick={submitReview}>Сохранить отзыв</button>
             </div>
           </section>
         </div>
@@ -363,5 +480,22 @@ function OrderCard({ order, actions }: { order: MvpOrder; actions: ReactNode }) 
         <div className="order-actions">{actions}</div>
       </div>
     </article>
+  );
+}
+
+function ReviewSummary({ orderId, reviews }: { orderId: string; reviews: MvpReview[] }) {
+  const clientReview = reviews.find((review) => review.orderId === orderId && review.reviewerRole === "client");
+  const masterReview = reviews.find((review) => review.orderId === orderId && review.reviewerRole === "master");
+
+  return (
+    <div className="review-summary">
+      {clientReview && (
+        <p><Star size={14} fill="currentColor" /> Клиент мастеру: {clientReview.rating}/5 — {clientReview.comment}</p>
+      )}
+      {masterReview && (
+        <p><Star size={14} fill="currentColor" /> Мастер клиенту: {masterReview.rating}/5 — {masterReview.comment}</p>
+      )}
+      {clientReview?.paymentConfirmed && <small>Оплата подтверждена клиентом самостоятельно.</small>}
+    </div>
   );
 }
