@@ -8,8 +8,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "МастерGO / HomeFix",
-  description: "MVP маркетплейса бытовых мастеров без высокой комиссии.",
+  title: "Мастер рядом — сфоткай, починим",
+  description:
+    "Сфотографируйте проблему — проверенные мастера рядом откликнутся. Сантехника, электрика, сборка мебели и другие бытовые услуги.",
 };
 
 export default function RootLayout({

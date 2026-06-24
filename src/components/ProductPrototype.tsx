@@ -499,3 +499,5 @@ function ReviewSummary({ orderId, reviews }: { orderId: string; reviews: MvpRevi
     </div>
   );
 }
+
+export default ProductPrototype;
