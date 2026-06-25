@@ -42,14 +42,21 @@ export default function MasterRequestsPage() {
   if (loading)
     return (
       <AppShell role="MASTER">
-        <p className="muted">Загрузка заявок…</p>
+        <div className="page-head"><h1>Заявки рядом</h1></div>
+        <div className="request-list">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="skeleton" style={{ height: 140, marginBottom: 12, borderRadius: "var(--radius-md)" }} />
+          ))}
+        </div>
       </AppShell>
     );
 
   if (error)
     return (
       <AppShell role="MASTER">
-        <p className="pill-red">{error}</p>
+        <div className="empty-state">
+          <p style={{ color: "var(--red)" }}>{error}</p>
+        </div>
       </AppShell>
     );
 
@@ -58,11 +65,22 @@ export default function MasterRequestsPage() {
   return (
     <AppShell role="MASTER">
       <div className="page-head">
-        <h1>Доступные заявки</h1>
+        <h1>
+          Заявки рядом
+          {visible.length > 0 && (
+            <span className="pill" style={{ marginLeft: 12, fontSize: "0.85rem", verticalAlign: "middle" }}>
+              {visible.length}
+            </span>
+          )}
+        </h1>
       </div>
 
       {visible.length === 0 ? (
-        <div className="empty-state">Нет новых заявок рядом</div>
+        <div className="empty-state animate-fadeIn">
+          <div style={{ fontSize: "3rem", marginBottom: 16 }}>📋</div>
+          <h3 style={{ marginBottom: 8 }}>Нет новых заявок рядом</h3>
+          <p className="muted">Загляните позже — новые заявки появляются каждый день</p>
+        </div>
       ) : (
         <div className="request-list">
           {visible.map((r) => (
@@ -81,12 +99,12 @@ export default function MasterRequestsPage() {
               }}
               href={`/master/requests/${r.id}`}
             >
-              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                <Link className="primary-btn" href={`/master/requests/${r.id}`}>
+              <div className="flex gap-2" style={{ marginTop: 12 }}>
+                <Link className="btn-primary btn-sm" href={`/master/requests/${r.id}`}>
                   Откликнуться
                 </Link>
                 <button
-                  className="secondary-btn"
+                  className="btn-secondary btn-sm"
                   onClick={(e) => {
                     e.preventDefault();
                     skip(r.id);

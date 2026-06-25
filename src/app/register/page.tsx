@@ -6,17 +6,6 @@ import Link from "next/link";
 import { Brand } from "@/components/Brand";
 import { Loader2, User, Wrench } from "lucide-react";
 
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "12px 14px",
-  background: "var(--card)",
-  color: "var(--text)",
-  border: "1px solid var(--line)",
-  borderRadius: 10,
-  fontSize: "0.95rem",
-  outline: "none",
-};
-
 type Role = "CLIENT" | "MASTER";
 
 export default function RegisterPage() {
@@ -57,134 +46,120 @@ export default function RegisterPage() {
     }
   }
 
-  const roleCard = (value: Role, label: string, desc: string, Icon: typeof User) => (
-    <button
-      type="button"
-      onClick={() => setRole(value)}
-      style={{
-        flex: 1,
-        padding: 20,
-        background: role === value ? "var(--card2)" : "var(--card)",
-        border: role === value ? "2px solid var(--accent)" : "2px solid var(--line)",
-        borderRadius: 12,
-        cursor: "pointer",
-        textAlign: "center",
-        color: "var(--text)",
-        transition: "all .15s",
-      }}
-    >
-      <Icon size={28} style={{ color: role === value ? "var(--accent)" : "var(--muted)", marginBottom: 8 }} />
-      <div style={{ fontWeight: 600, marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{desc}</div>
-    </button>
-  );
+  const roles: { value: Role; label: string; desc: string; Icon: typeof User; emoji: string }[] = [
+    { value: "CLIENT", label: "Клиент", desc: "Нужно найти мастера", Icon: User, emoji: "👤" },
+    { value: "MASTER", label: "Мастер", desc: "Хочу получать заказы", Icon: Wrench, emoji: "🔧" },
+  ];
 
   return (
-    <div className="landing" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div className="landing flex flex-col" style={{ minHeight: "100vh", background: "var(--bg-soft)" }}>
       <header className="landing-nav">
         <Brand size="default" />
       </header>
 
-      <main
-        className="section"
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "40px 16px",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            maxWidth: 480,
-            background: "var(--card)",
-            borderRadius: 16,
-            padding: 32,
-            border: "1px solid var(--line)",
-          }}
-        >
-          <h2 style={{ marginBottom: 8, fontSize: "1.5rem" }}>Регистрация</h2>
-          <p className="muted" style={{ marginBottom: 24 }}>
-            Создайте аккаунт и начните за 30 секунд
-          </p>
+      <main className="section flex items-center justify-center" style={{ flex: 1, padding: "40px 16px" }}>
+        <div className="card animate-fadeIn" style={{ width: "100%", maxWidth: 480, padding: 32 }}>
+          <div className="text-center" style={{ marginBottom: 24 }}>
+            <h2 style={{ marginBottom: 8, fontSize: "1.5rem" }}>Регистрация</h2>
+            <p className="muted">Создайте аккаунт и начните за 30 секунд</p>
+          </div>
 
           {error && (
-            <div
-              style={{
-                background: "rgba(239,68,68,.12)",
-                color: "var(--red)",
-                padding: "10px 14px",
-                borderRadius: 8,
-                marginBottom: 16,
-                fontSize: "0.9rem",
-              }}
-            >
+            <div style={{
+              background: "var(--accent-light)",
+              color: "var(--red)",
+              padding: "10px 14px",
+              borderRadius: 8,
+              marginBottom: 16,
+              fontSize: "0.9rem",
+            }}>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ display: "flex", gap: 12 }}>
-              {roleCard("CLIENT", "Клиент", "Ищу мастера", User)}
-              {roleCard("MASTER", "Мастер", "Ищу заказы", Wrench)}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <div className="flex gap-3">
+              {roles.map((r) => (
+                <button
+                  key={r.value}
+                  type="button"
+                  onClick={() => setRole(r.value)}
+                  className="card"
+                  style={{
+                    flex: 1,
+                    padding: 20,
+                    textAlign: "center",
+                    cursor: "pointer",
+                    border: role === r.value
+                      ? "2px solid var(--accent)"
+                      : "2px solid transparent",
+                    background: role === r.value
+                      ? "var(--accent-light)"
+                      : undefined,
+                    transition: "all .2s",
+                  }}
+                >
+                  <div style={{ fontSize: "1.75rem", marginBottom: 8 }}>{r.emoji}</div>
+                  <div style={{ fontWeight: 600, marginBottom: 4 }}>{r.label}</div>
+                  <div className="muted" style={{ fontSize: "0.8rem" }}>{r.desc}</div>
+                </button>
+              ))}
             </div>
 
-            <label className="field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <span style={{ fontSize: "0.85rem", color: "var(--muted)" }}>Имя</span>
+            <label className="field">
+              <span className="muted" style={{ fontSize: "0.85rem" }}>Имя</span>
               <input
                 type="text"
+                className="input"
                 required
                 placeholder="Александр"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                style={inputStyle}
               />
             </label>
 
-            <label className="field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <span style={{ fontSize: "0.85rem", color: "var(--muted)" }}>Email</span>
+            <label className="field">
+              <span className="muted" style={{ fontSize: "0.85rem" }}>Email</span>
               <input
                 type="email"
+                className="input"
                 required
                 placeholder="user@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                style={inputStyle}
               />
             </label>
 
-            <label className="field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <span style={{ fontSize: "0.85rem", color: "var(--muted)" }}>Телефон</span>
+            <label className="field">
+              <span className="muted" style={{ fontSize: "0.85rem" }}>Телефон</span>
               <input
                 type="tel"
+                className="input"
                 required
-                placeholder="+7 999 000 00 00"
+                placeholder="+7 900 000-00-00"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                style={inputStyle}
               />
             </label>
 
-            <label className="field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <span style={{ fontSize: "0.85rem", color: "var(--muted)" }}>Пароль</span>
+            <label className="field">
+              <span className="muted" style={{ fontSize: "0.85rem" }}>Пароль</span>
               <input
                 type="password"
+                className="input"
                 required
                 placeholder="Минимум 6 символов"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={inputStyle}
               />
             </label>
 
-            <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: 8 }}>
+            <button type="submit" className="btn-primary w-full" disabled={loading} style={{ marginTop: 8 }}>
               {loading ? <><Loader2 size={18} className="spin" /> Регистрация...</> : "Создать аккаунт"}
             </button>
           </form>
 
-          <p style={{ textAlign: "center", marginTop: 20, fontSize: "0.9rem", color: "var(--muted)" }}>
+          <p className="muted text-center" style={{ marginTop: 20, fontSize: "0.9rem" }}>
             Уже есть аккаунт?{" "}
             <Link href="/login" style={{ color: "var(--accent)" }}>
               Войти

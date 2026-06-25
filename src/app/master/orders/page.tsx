@@ -53,7 +53,7 @@ export default function MasterOrdersPage() {
   if (error)
     return (
       <AppShell role="MASTER">
-        <p className="pill-red">{error}</p>
+        <p style={{ color: "var(--red)" }}>{error}</p>
       </AppShell>
     );
 
@@ -66,7 +66,7 @@ export default function MasterOrdersPage() {
       {orders.length === 0 ? (
         <div className="empty-state">
           <p>У вас пока нет активных заказов</p>
-          <Link className="primary-btn" href="/master/requests">
+          <Link className="btn-primary" href="/master/requests">
             Смотреть заявки
           </Link>
         </div>
@@ -77,7 +77,7 @@ export default function MasterOrdersPage() {
               key={o.id}
               href={`/master/requests/${o.id}`}
               className="request-card"
-              style={{ textDecoration: "none", color: "var(--text)" }}
+              style={{ textDecoration: "none" }}
             >
               <div>
                 <span className="pill">{o.category.name}</span>

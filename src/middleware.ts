@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const AUTH_API_PATHS = ['/api/auth/login', '/api/auth/register']
+const PUBLIC_API_PATHS = ['/api/auth/', '/api/categories', '/api/masters/']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
 
   // API routes (except auth endpoints) — return 401 JSON
   if (pathname.startsWith('/api/')) {
-    if (AUTH_API_PATHS.some((p) => pathname.startsWith(p))) {
+    if (PUBLIC_API_PATHS.some((p) => pathname.startsWith(p))) {
       return NextResponse.next()
     }
     if (!token) {

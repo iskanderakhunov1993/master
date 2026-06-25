@@ -3,8 +3,8 @@ import { Brand } from "@/components/Brand";
 import {
   ArrowRight,
   Camera,
-  CheckCircle2,
   Users,
+  CheckCircle2,
 } from "lucide-react";
 
 const categories = [
@@ -17,9 +17,24 @@ const categories = [
 ];
 
 const steps = [
-  { icon: Camera, title: "Сфотографируйте", desc: "Сделайте фото проблемы и опишите задачу за 30 секунд" },
-  { icon: Users, title: "Мастера откликаются", desc: "Получите предложения от проверенных мастеров рядом" },
-  { icon: CheckCircle2, title: "Работа выполнена", desc: "Выберите лучшего мастера и задача решена" },
+  {
+    icon: Camera,
+    num: "1",
+    title: "Сфотографируйте",
+    desc: "Сделайте фото проблемы и опишите задачу за 30 секунд",
+  },
+  {
+    icon: Users,
+    num: "2",
+    title: "Мастера откликаются",
+    desc: "Получите предложения от проверенных мастеров рядом",
+  },
+  {
+    icon: CheckCircle2,
+    num: "3",
+    title: "Работа выполнена",
+    desc: "Выберите лучшего мастера и задача решена",
+  },
 ];
 
 export default function HomePage() {
@@ -27,8 +42,8 @@ export default function HomePage() {
     <div className="landing">
       <nav className="landing-nav">
         <Brand size="default" />
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <Link href="/login" style={{ color: "var(--muted)", textDecoration: "none" }}>
+        <div className="flex items-center gap-3">
+          <Link href="/login" className="muted">
             Войти
           </Link>
           <Link href="/register" className="nav-cta">
@@ -37,103 +52,142 @@ export default function HomePage() {
         </div>
       </nav>
 
-      <section className="thumb-hero" style={{
-        background: "linear-gradient(135deg, var(--bg) 0%, #0f1a35 50%, var(--bg) 100%)",
-        padding: "100px 0 80px",
-        textAlign: "center",
-      }}>
+      {/* HERO */}
+      <section className="hero" style={{ padding: "120px 0 100px", textAlign: "center" }}>
         <div className="section">
-          <h1 style={{ fontSize: "3.2rem", fontWeight: 800, lineHeight: 1.1, marginBottom: 16 }}>
-            Мастер <span style={{ color: "var(--accent)" }}>рядом</span>
+          <div className="pill" style={{ marginBottom: 20, display: "inline-block" }}>
+            Сервис бытовых заявок
+          </div>
+          <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 20 }}>
+            Сфотографируй проблему —
+            <br />
+            <span style={{ color: "var(--accent)" }}>мастера рядом откликнутся</span>
           </h1>
-          <p className="lead" style={{ color: "var(--muted)", maxWidth: 480, margin: "0 auto 36px" }}>
-            Сфоткай — починим. Найдите проверенного мастера для любой бытовой задачи за минуты.
+          <p className="lead" style={{ maxWidth: 520, margin: "0 auto 40px" }}>
+            Клиент создаёт заявку по фото за 30 секунд. Проверенные мастера видят
+            её и предлагают цену. Без комиссий — платите мастеру напрямую.
           </p>
-          <div className="hero-actions" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <Link href="/register" className="primary-btn">
+          <div className="flex items-center justify-center gap-3" style={{ flexWrap: "wrap" }}>
+            <Link href="/register" className="btn-primary">
               Создать заявку <ArrowRight size={18} />
             </Link>
-            <Link href="/register" className="secondary-btn">
+            <Link href="/register" className="btn-secondary">
               Я мастер
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="dark-section" style={{ padding: "80px 0" }}>
-        <div className="section">
-          <h2 style={{ textAlign: "center", marginBottom: 48, fontSize: "1.75rem" }}>
-            Как это работает
-          </h2>
-          <div className="grid-3">
-            {steps.map((s, i) => {
-              const Icon = s.icon;
-              return (
-                <div className="card" key={i} style={{ textAlign: "center", padding: 32 }}>
-                  <div style={{
-                    width: 56, height: 56, borderRadius: "50%",
-                    background: "var(--soft)", display: "flex",
-                    alignItems: "center", justifyContent: "center",
-                    margin: "0 auto 16px", color: "var(--accent)",
-                  }}>
-                    <Icon size={28} />
-                  </div>
-                  <h3 style={{ marginBottom: 8 }}>{s.title}</h3>
-                  <p className="muted">{s.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
+      {/* HOW IT WORKS */}
       <section className="section" style={{ padding: "80px 0" }}>
-        <h2 style={{ textAlign: "center", marginBottom: 48, fontSize: "1.75rem" }}>
-          Популярные категории
+        <h2 className="section-title" style={{ textAlign: "center", fontSize: "1.75rem", marginBottom: 48 }}>
+          Как это работает
         </h2>
         <div className="grid-3">
-          {categories.map((c) => (
-            <Link
-              href="/register"
-              className="card"
-              key={c.name}
-              style={{ padding: 28, textAlign: "center", textDecoration: "none", color: "var(--text)" }}
-            >
-              <span style={{ fontSize: "2.5rem", display: "block", marginBottom: 12 }}>{c.icon}</span>
-              <span style={{ fontWeight: 600 }}>{c.name}</span>
-            </Link>
-          ))}
+          {steps.map((s) => {
+            const Icon = s.icon;
+            return (
+              <div className="card animate-fadeIn" key={s.num} style={{ textAlign: "center", padding: 32 }}>
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: "50%",
+                    background: "var(--accent)",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 16px",
+                    fontWeight: 800,
+                    fontSize: "1.25rem",
+                  }}
+                >
+                  {s.num}
+                </div>
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: "50%",
+                    background: "var(--accent-light)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 16px",
+                    color: "var(--accent)",
+                  }}
+                >
+                  <Icon size={28} />
+                </div>
+                <h3 style={{ marginBottom: 8 }}>{s.title}</h3>
+                <p className="muted">{s.desc}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      <section className="dark-section" style={{ padding: "60px 0" }}>
+      {/* CATEGORIES */}
+      <section style={{ padding: "80px 0", background: "var(--bg-section)" }}>
         <div className="section">
-          <div className="stats-grid">
-            <div className="stat-card">
-              <span style={{ fontSize: "2rem", fontWeight: 700, color: "var(--accent)" }}>3</span>
-              <span className="muted">бесплатных отклика</span>
-            </div>
-            <div className="stat-card">
-              <span style={{ fontSize: "2rem", fontWeight: 700, color: "var(--green)" }}>0%</span>
-              <span className="muted">комиссии</span>
-            </div>
-            <div className="stat-card">
-              <span style={{ fontSize: "2rem", fontWeight: 700, color: "var(--orange)" }}>4.8 ⭐</span>
-              <span className="muted">средний рейтинг</span>
-            </div>
+          <h2 className="section-title" style={{ textAlign: "center", fontSize: "1.75rem", marginBottom: 48 }}>
+            Популярные категории
+          </h2>
+          <div className="grid-3">
+            {categories.map((c) => (
+              <Link
+                href="/register"
+                className="card"
+                key={c.name}
+                style={{ padding: 28, textAlign: "center" }}
+              >
+                <span style={{ fontSize: "2.5rem", display: "block", marginBottom: 12 }}>
+                  {c.icon}
+                </span>
+                <span style={{ fontWeight: 600 }}>{c.name}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="section" style={{ padding: "80px 0", textAlign: "center" }}>
-        <h2 style={{ marginBottom: 16, fontSize: "1.75rem" }}>Готовы начать?</h2>
-        <p className="muted" style={{ marginBottom: 32, maxWidth: 400, margin: "0 auto 32px" }}>
-          Создайте заявку прямо сейчас — это бесплатно и займёт 30 секунд
-        </p>
-        <Link href="/register" className="primary-btn">
-          Создать заявку <ArrowRight size={18} />
-        </Link>
+      {/* STATS */}
+      <section className="section" style={{ padding: "60px 0" }}>
+        <div className="stats-grid" style={{ maxWidth: 700, margin: "0 auto" }}>
+          <div className="stat-card" style={{ textAlign: "center" }}>
+            <strong style={{ fontSize: "2rem", color: "var(--accent)" }}>3</strong>
+            <span className="muted">бесплатных отклика</span>
+          </div>
+          <div className="stat-card" style={{ textAlign: "center" }}>
+            <strong style={{ fontSize: "2rem", color: "var(--green)" }}>0%</strong>
+            <span className="muted">комиссии</span>
+          </div>
+          <div className="stat-card" style={{ textAlign: "center" }}>
+            <strong style={{ fontSize: "2rem", color: "var(--orange)" }}>4.8 ⭐</strong>
+            <span className="muted">средний рейтинг</span>
+          </div>
+        </div>
       </section>
+
+      {/* CTA */}
+      <section style={{ padding: "80px 0", textAlign: "center", background: "var(--bg-section)" }}>
+        <div className="section">
+          <h2 style={{ fontSize: "1.75rem", marginBottom: 16 }}>Готовы начать?</h2>
+          <p className="lead" style={{ maxWidth: 400, margin: "0 auto 32px" }}>
+            Создайте заявку прямо сейчас — это бесплатно
+          </p>
+          <Link href="/register" className="btn-primary">
+            Создать заявку <ArrowRight size={18} />
+          </Link>
+        </div>
+      </section>
+
+      <footer style={{ padding: 24, borderTop: "1px solid var(--line)", textAlign: "center" }}>
+        <p className="muted" style={{ fontSize: 13 }}>
+          © 2026 Мастер рядом — сервис бытовых заявок
+        </p>
+      </footer>
     </div>
   );
 }

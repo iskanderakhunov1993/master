@@ -73,7 +73,7 @@ export default function ClientHistoryPage() {
       key={o.id}
       href={`/client/history/${o.address.id}`}
       className="card"
-      style={{ display: "block", textDecoration: "none", color: "var(--text)" }}
+      style={{ display: "block", textDecoration: "none" }}
     >
       <div
         style={{

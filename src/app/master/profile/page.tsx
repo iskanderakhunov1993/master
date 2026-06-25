@@ -60,7 +60,7 @@ export default function MasterProfilePage() {
   if (error || !me)
     return (
       <AppShell role="MASTER">
-        <p className="pill-red">{error || "Не удалось загрузить профиль"}</p>
+        <p style={{ color: "var(--red)" }}>{error || "Не удалось загрузить профиль"}</p>
       </AppShell>
     );
 
@@ -74,7 +74,7 @@ export default function MasterProfilePage() {
         <h1>Профиль мастера</h1>
       </div>
 
-      <div className="card">
+      <div className="card" style={{ padding: 24 }}>
         <h2 style={{ marginTop: 0 }}>{me.name}</h2>
         <div
           style={{
@@ -96,8 +96,8 @@ export default function MasterProfilePage() {
       </div>
 
       {mp.categories.length > 0 && (
-        <div className="section">
-          <h3>Категории</h3>
+        <div style={{ marginTop: 24 }}>
+          <h3 style={{ marginBottom: 12 }}>Категории</h3>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {mp.categories.map((c, i) => (
               <span key={i} className="pill">
@@ -108,7 +108,7 @@ export default function MasterProfilePage() {
         </div>
       )}
 
-      <div className="card" style={{ marginTop: 16 }}>
+      <div className="card" style={{ marginTop: 16, padding: 20 }}>
         <h3 style={{ marginTop: 0 }}>Подписка</h3>
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           <div>
@@ -129,10 +129,7 @@ export default function MasterProfilePage() {
         </div>
       </div>
 
-      <div
-        className="card"
-        style={{ marginTop: 16, background: "var(--card2)" }}
-      >
+      <div className="card" style={{ marginTop: 16, padding: 20 }}>
         <h3 style={{ marginTop: 0 }}>Портфолио</h3>
         <p className="muted">
           Портфолио появится после первых заказов
@@ -140,7 +137,7 @@ export default function MasterProfilePage() {
       </div>
 
       <button
-        className="dark-btn"
+        className="btn-secondary"
         style={{ marginTop: 24, width: "100%" }}
         onClick={handleLogout}
         disabled={loggingOut}

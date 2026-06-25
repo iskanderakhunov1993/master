@@ -46,7 +46,7 @@ export default function ClientProfilePage() {
     return (
       <AppShell role="CLIENT">
         <div className="page-head"><h1>Профиль</h1></div>
-        <div style={{ height: 250, background: "var(--card)", borderRadius: "var(--radius-md)" }} />
+        <div className="skeleton" style={{ height: 250, borderRadius: "var(--radius-md)" }} />
       </AppShell>
     );
   }
@@ -110,7 +110,7 @@ export default function ClientProfilePage() {
       </div>
 
       <button
-        className="secondary-btn"
+        className="btn-secondary"
         onClick={handleLogout}
         disabled={loggingOut}
         style={{ width: "100%", marginTop: 24, opacity: loggingOut ? 0.6 : 1 }}

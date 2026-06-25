@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     });
 
     const token = await createToken(user.id);
-    setAuthCookie(token);
+    await setAuthCookie(token);
 
     return ok(user, 201);
   } catch (error) {

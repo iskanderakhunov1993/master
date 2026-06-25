@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     if (!valid) return fail("Неверный email или пароль", 401);
 
     const token = await createToken(user.id);
-    setAuthCookie(token);
+    await setAuthCookie(token);
 
     return ok({
       id: user.id,

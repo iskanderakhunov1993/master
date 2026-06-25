@@ -40,14 +40,23 @@ export default function MasterDashboardPage() {
   if (loading)
     return (
       <AppShell role="MASTER">
-        <p className="muted">Загрузка…</p>
+        <div className="page-head">
+          <div className="skeleton" style={{ height: 32, width: 200 }} />
+        </div>
+        <div className="stats-grid">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="stat-card skeleton" style={{ height: 80 }} />
+          ))}
+        </div>
       </AppShell>
     );
 
   if (error || !me)
     return (
       <AppShell role="MASTER">
-        <p className="pill-red">{error || "Не удалось загрузить профиль"}</p>
+        <div className="empty-state">
+          <p style={{ color: "var(--red)" }}>{error || "Не удалось загрузить профиль"}</p>
+        </div>
       </AppShell>
     );
 
@@ -60,28 +69,34 @@ export default function MasterDashboardPage() {
     <AppShell role="MASTER">
       <div className="page-head">
         <div>
-          <h1>Привет, {me.name}!</h1>
-          <p className="muted">Вы мастер</p>
+          <h1>Привет, {me.name}! 👋</h1>
+          <p className="muted">Панель мастера</p>
         </div>
-        <Link className="primary-btn" href="/master/requests">
+        <Link className="btn-primary" href="/master/requests">
           Смотреть заявки
         </Link>
       </div>
 
+      {/* Verification status */}
       {mp.isVerified ? (
-        <div className="card" style={{ borderLeft: "3px solid var(--green)" }}>
-          <span className="pill-green">Верифицирован</span>
+        <div className="card animate-fadeIn" style={{
+          padding: "16px 20px",
+          borderLeft: "3px solid var(--green)",
+          marginBottom: 16,
+        }}>
+          <div className="flex items-center gap-2">
+            <span className="pill-green">Верифицирован ✓</span>
+            <span className="muted" style={{ fontSize: "0.85rem" }}>Ваш профиль подтверждён</span>
+          </div>
         </div>
       ) : (
-        <div
-          className="card"
-          style={{
-            borderLeft: "3px solid var(--orange)",
-            background: "var(--card2)",
-          }}
-        >
-          <h3 style={{ margin: "0 0 4px" }}>Пройдите верификацию</h3>
-          <p className="muted" style={{ margin: 0 }}>
+        <div className="card animate-fadeIn" style={{
+          padding: "16px 20px",
+          borderLeft: "3px solid var(--orange)",
+          marginBottom: 16,
+        }}>
+          <h3 style={{ margin: "0 0 4px" }}>⚠️ Пройдите верификацию</h3>
+          <p className="muted" style={{ margin: 0, fontSize: "0.9rem" }}>
             Верифицированные мастера получают больше заявок и доверие клиентов.
           </p>
         </div>
@@ -90,26 +105,30 @@ export default function MasterDashboardPage() {
       <div className="stats-grid">
         <div className="stat-card">
           <span className="muted">Рейтинг</span>
-          <strong>★ {me.ratingAvg?.toFixed(1) ?? "—"}</strong>
+          <strong style={{ fontSize: "1.5rem" }}>
+            ⭐ {me.ratingAvg?.toFixed(1) ?? "—"}
+          </strong>
         </div>
         <div className="stat-card">
           <span className="muted">Выполнено</span>
-          <strong>{me.ratingCount}</strong>
+          <strong style={{ fontSize: "1.5rem" }}>{me.ratingCount}</strong>
         </div>
         <div className="stat-card">
           <span className="muted">Откликов осталось</span>
-          <strong>{totalResponses}</strong>
+          <strong style={{ fontSize: "1.5rem", color: totalResponses > 0 ? "var(--green)" : "var(--red)" }}>
+            {totalResponses}
+          </strong>
         </div>
         <div className="stat-card">
           <span className="muted">Тариф</span>
-          <strong>{plan}</strong>
+          <strong style={{ fontSize: "1.5rem" }}>{plan}</strong>
         </div>
       </div>
 
       {mp.categories.length > 0 && (
-        <div className="section">
-          <h3>Ваши категории</h3>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <div style={{ marginTop: 24 }}>
+          <h3 style={{ marginBottom: 12 }}>Ваши категории</h3>
+          <div className="flex gap-2" style={{ flexWrap: "wrap" }}>
             {mp.categories.map((c, i) => (
               <span key={i} className="pill">
                 {c.category.name}

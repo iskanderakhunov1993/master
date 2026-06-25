@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import AppShell from "@/components/AppShell";
+import { Send, Star } from "lucide-react";
 
 interface MasterUser {
   id: string;
@@ -54,12 +55,12 @@ interface RequestDetail {
   client?: { id: string };
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  PUBLISHED: "Опубликована",
-  ASSIGNED: "Назначена",
-  IN_PROGRESS: "В работе",
-  COMPLETED: "Завершена",
-  CANCELLED: "Отменена",
+const STATUS_LABELS: Record<string, { label: string; cls: string }> = {
+  PUBLISHED: { label: "Опубликована", cls: "pill" },
+  ASSIGNED: { label: "Назначена", cls: "pill-orange" },
+  IN_PROGRESS: { label: "В работе", cls: "pill-orange" },
+  COMPLETED: { label: "Завершена", cls: "pill-green" },
+  CANCELLED: { label: "Отменена", cls: "pill" },
 };
 
 export default function ClientRequestPage() {
@@ -159,7 +160,7 @@ export default function ClientRequestPage() {
   if (loading) {
     return (
       <AppShell role="CLIENT">
-        <div style={{ height: 300, background: "var(--card)", borderRadius: "var(--radius-md)" }} />
+        <div className="skeleton" style={{ height: 300, borderRadius: "var(--radius-md)" }} />
       </AppShell>
     );
   }
@@ -174,6 +175,7 @@ export default function ClientRequestPage() {
     );
   }
 
+  const statusInfo = STATUS_LABELS[request.status] || { label: request.status, cls: "pill" };
   const hasMyReview = request.reviews.some((r) => r.reviewer.id === currentUserId);
   const showReviewForm = request.status === "COMPLETED" && !hasMyReview;
 
@@ -182,44 +184,53 @@ export default function ClientRequestPage() {
       {/* Header */}
       <div className="page-head">
         <div>
-          <h1>{request.title}</h1>
-          <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
+          <div className="flex items-center gap-2" style={{ marginBottom: 8 }}>
+            <span className={statusInfo.cls}>{statusInfo.label}</span>
             <span className="pill">{request.category.icon} {request.category.name}</span>
-            <span className="badge">{STATUS_LABELS[request.status] || request.status}</span>
           </div>
+          <h1>{request.title}</h1>
         </div>
       </div>
 
-      {/* Details */}
-      <div className="grid-3">
-        <article className="card">
-          <h3>Бюджет</h3>
-          <p>{request.budgetAmount != null ? `${request.budgetAmount.toLocaleString("ru-RU")} ₽` : "Не указан"}</p>
+      {/* Info cards */}
+      <div className="grid-3" style={{ marginBottom: 16 }}>
+        <article className="card" style={{ padding: 20 }}>
+          <span className="muted" style={{ fontSize: "0.8rem" }}>Бюджет</span>
+          <div style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: 4 }}>
+            {request.budgetAmount != null ? `${request.budgetAmount.toLocaleString("ru-RU")} ₽` : "Не указан"}
+          </div>
         </article>
-        <article className="card">
-          <h3>Район</h3>
-          <p>{request.address?.district || "Не указан"}</p>
+        <article className="card" style={{ padding: 20 }}>
+          <span className="muted" style={{ fontSize: "0.8rem" }}>Район</span>
+          <div style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: 4 }}>
+            {request.address?.district || "Не указан"}
+          </div>
         </article>
-        <article className="card">
-          <h3>Время</h3>
-          <p>{request.preferredTimeFrom || "Не указано"}</p>
+        <article className="card" style={{ padding: 20 }}>
+          <span className="muted" style={{ fontSize: "0.8rem" }}>Когда</span>
+          <div style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: 4 }}>
+            {request.preferredTimeFrom || "Гибко"}
+          </div>
         </article>
       </div>
 
-      <div className="card" style={{ padding: 20, marginTop: 16 }}>
-        <p>{request.description}</p>
+      {/* Description */}
+      <div className="card" style={{ padding: 20, marginBottom: 16 }}>
+        <p style={{ margin: 0 }}>{request.description}</p>
         {request.urgency && (
           <div className="request-meta" style={{ marginTop: 12 }}>
-            <span>Срочность: {request.urgency}</span>
+            <span className="pill-orange" style={{ fontSize: "0.8rem" }}>
+              {request.urgency === "URGENT" ? "Срочно" : request.urgency}
+            </span>
           </div>
         )}
       </div>
 
       {/* Photos */}
       {request.photos && request.photos.length > 0 && (
-        <div className="section" style={{ marginTop: 16 }}>
+        <div style={{ marginBottom: 16 }}>
           <h3 style={{ marginBottom: 12 }}>Фото</h3>
-          <div style={{ display: "flex", gap: 8, overflowX: "auto" }}>
+          <div className="flex gap-2" style={{ overflowX: "auto" }}>
             {request.photos.map((photo, i) => (
               <div
                 key={i}
@@ -227,11 +238,8 @@ export default function ClientRequestPage() {
                   width: 120,
                   height: 120,
                   borderRadius: "var(--radius-sm)",
-                  background: "var(--card2)",
+                  background: `url(${photo.url}) center/cover`,
                   flexShrink: 0,
-                  backgroundImage: `url(${photo.url})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
                 }}
               />
             ))}
@@ -241,20 +249,20 @@ export default function ClientRequestPage() {
 
       {/* Offers */}
       {request.offers.length > 0 && (
-        <section className="section" style={{ marginTop: 16 }}>
-          <span className="badge" style={{ marginBottom: 12, display: "inline-block" }}>
-            Предложения мастеров ({request.offers.length})
-          </span>
+        <section style={{ marginBottom: 16 }}>
+          <h3 style={{ marginBottom: 12 }}>
+            Предложения мастеров
+            <span className="pill" style={{ marginLeft: 8, fontSize: "0.8rem" }}>
+              {request.offers.length}
+            </span>
+          </h3>
           <div className="request-list">
             {request.offers.map((offer) => {
               const master = offer.master.user;
               return (
-                <article className="request-card" key={offer.id} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <div
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: "50%",
+                <article className="card" key={offer.id} style={{ padding: 20, marginBottom: 12 }}>
+                  <div className="flex gap-3" style={{ alignItems: "flex-start" }}>
+                    <div className="avatar avatar-md" style={{
                       background: "var(--accent)",
                       display: "flex",
                       alignItems: "center",
@@ -263,39 +271,39 @@ export default function ClientRequestPage() {
                       fontWeight: 700,
                       fontSize: 18,
                       flexShrink: 0,
-                    }}
-                  >
-                    {master.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <h3 style={{ margin: 0 }}>{master.name}</h3>
-                      <span className="muted" style={{ fontSize: 14 }}>
-                        {master.ratingAvg?.toFixed(1) || "—"} ({master.ratingCount})
-                      </span>
+                    }}>
+                      {master.name.charAt(0).toUpperCase()}
                     </div>
-                    <strong style={{ fontSize: 20 }}>
-                      {offer.price.toLocaleString("ru-RU")} ₽
-                    </strong>
-                    {offer.guaranteeDays > 0 && (
-                      <div className="muted" style={{ fontSize: 13 }}>
-                        Гарантия: {offer.guaranteeDays} дн.
+                    <div style={{ flex: 1 }}>
+                      <div className="flex justify-between items-center">
+                        <h4 style={{ margin: 0 }}>{master.name}</h4>
+                        <span className="muted" style={{ fontSize: "0.85rem" }}>
+                          ⭐ {master.ratingAvg?.toFixed(1) || "—"} ({master.ratingCount})
+                        </span>
                       </div>
-                    )}
-                    {offer.comment && (
-                      <p className="muted" style={{ margin: "8px 0 0", fontSize: 14 }}>
-                        {offer.comment}
-                      </p>
-                    )}
-                    {offer.status === "PENDING" && (
-                      <button
-                        className="primary-btn"
-                        style={{ marginTop: 12 }}
-                        onClick={() => acceptOffer(offer.id)}
-                      >
-                        Выбрать
-                      </button>
-                    )}
+                      <div style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: 4, color: "var(--accent)" }}>
+                        {offer.price.toLocaleString("ru-RU")} ₽
+                      </div>
+                      {offer.guaranteeDays > 0 && (
+                        <span className="pill-green" style={{ fontSize: "0.75rem", marginTop: 8, display: "inline-block" }}>
+                          Гарантия {offer.guaranteeDays} дн.
+                        </span>
+                      )}
+                      {offer.comment && (
+                        <p className="muted" style={{ margin: "8px 0 0", fontSize: "0.9rem" }}>
+                          {offer.comment}
+                        </p>
+                      )}
+                      {offer.status === "PENDING" && (
+                        <button
+                          className="btn-primary"
+                          style={{ marginTop: 12 }}
+                          onClick={() => acceptOffer(offer.id)}
+                        >
+                          Выбрать мастера
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </article>
               );
@@ -305,11 +313,11 @@ export default function ClientRequestPage() {
       )}
 
       {/* Chat */}
-      <section className="card" style={{ marginTop: 16 }}>
-        <h3>Чат</h3>
+      <section className="card" style={{ padding: 20, marginBottom: 16 }}>
+        <h3 style={{ marginBottom: 12 }}>Чат</h3>
         <div className="chat-box">
           {request.messages.length === 0 && (
-            <p className="muted" style={{ textAlign: "center", padding: 24 }}>
+            <p className="muted text-center" style={{ padding: 24 }}>
               Нет сообщений
             </p>
           )}
@@ -318,7 +326,7 @@ export default function ClientRequestPage() {
               key={msg.id}
               className={msg.sender.id === currentUserId ? "message mine" : "message"}
             >
-              <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>
+              <div className="muted" style={{ fontSize: "0.75rem", marginBottom: 4 }}>
                 {msg.sender.name} &middot;{" "}
                 {new Date(msg.createdAt).toLocaleString("ru-RU", {
                   day: "numeric",
@@ -332,58 +340,64 @@ export default function ClientRequestPage() {
           ))}
           <div ref={chatEndRef} />
         </div>
-        <div className="two-col" style={{ marginTop: 16 }}>
+        <div className="flex gap-2" style={{ marginTop: 12 }}>
           <input
             type="text"
-            className="field"
+            className="input"
             value={msgText}
             onChange={(e) => setMsgText(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            placeholder="Сообщение"
+            placeholder="Написать сообщение..."
+            style={{ flex: 1 }}
           />
           <button
             type="button"
-            className="dark-btn"
+            className="btn-primary"
             onClick={sendMessage}
             disabled={sendingMsg || !msgText.trim()}
-            style={{ opacity: sendingMsg || !msgText.trim() ? 0.5 : 1 }}
+            style={{ opacity: sendingMsg || !msgText.trim() ? 0.5 : 1, padding: "0 16px" }}
           >
-            {sendingMsg ? "..." : "Отправить"}
+            <Send size={18} />
           </button>
         </div>
       </section>
 
       {/* Review form */}
       {showReviewForm && (
-        <div className="card" style={{ padding: 20, marginTop: 16 }}>
-          <h3 style={{ marginBottom: 12 }}>Оставить отзыв</h3>
-          <div className="form-grid">
-            <label className="field">
-              Оценка
-              <select
-                value={reviewRating}
-                onChange={(e) => setReviewRating(Number(e.target.value))}
+        <div className="card animate-fadeIn" style={{ padding: 20, marginBottom: 16 }}>
+          <h3 style={{ marginBottom: 16 }}>Оставить отзыв</h3>
+          <div className="flex gap-2" style={{ marginBottom: 16 }}>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setReviewRating(n)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 4,
+                  color: n <= reviewRating ? "var(--orange)" : "var(--line)",
+                  fontSize: "1.5rem",
+                }}
               >
-                {[5, 4, 3, 2, 1].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              Комментарий
-              <textarea
-                value={reviewComment}
-                onChange={(e) => setReviewComment(e.target.value)}
-                placeholder="Расскажите о работе мастера..."
-                rows={3}
-              />
-            </label>
+                <Star size={28} fill={n <= reviewRating ? "var(--orange)" : "none"} />
+              </button>
+            ))}
           </div>
+          <label className="field">
+            Комментарий
+            <textarea
+              className="input"
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              placeholder="Расскажите о работе мастера..."
+              rows={3}
+            />
+          </label>
           <button
             type="button"
-            className="primary-btn"
+            className="btn-primary w-full"
             onClick={submitReview}
             disabled={submittingReview}
             style={{ marginTop: 12, opacity: submittingReview ? 0.6 : 1 }}
@@ -395,11 +409,11 @@ export default function ClientRequestPage() {
 
       {/* Existing reviews */}
       {request.reviews.length > 0 && (
-        <div className="section" style={{ marginTop: 16 }}>
+        <div style={{ marginBottom: 16 }}>
           <h3 style={{ marginBottom: 12 }}>Отзывы</h3>
           {request.reviews.map((rev) => (
             <div key={rev.id} className="card" style={{ padding: 16, marginBottom: 8 }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div className="flex justify-between items-center">
                 <strong>{rev.reviewer.name}</strong>
                 <span style={{ color: "var(--orange)" }}>
                   {"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}

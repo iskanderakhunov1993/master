@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AppShell from "@/components/AppShell";
+import { Camera, CheckCircle2 } from "lucide-react";
 
 interface Category {
   id: string;
@@ -20,10 +21,12 @@ const URGENCY_OPTIONS = [
 
 const BUDGET_OPTIONS = [
   { label: "Жду цену мастера", value: "REQUEST_PRICE", amount: 0 },
-  { label: "до 3 000₽", value: "FIXED", amount: 3000 },
-  { label: "до 5 000₽", value: "FIXED", amount: 5000 },
+  { label: "до 3 000 ₽", value: "FIXED", amount: 3000 },
+  { label: "до 5 000 ₽", value: "FIXED", amount: 5000 },
   { label: "Диагностика", value: "FIXED", amount: 500 },
 ];
+
+const STEP_LABELS = ["Категория", "Описание", "Бюджет"];
 
 export default function NewRequestPage() {
   const router = useRouter();
@@ -41,7 +44,6 @@ export default function NewRequestPage() {
   const [budgetIdx, setBudgetIdx] = useState(0);
   const [district, setDistrict] = useState("");
   const [addressText, setAddressText] = useState("");
-  const [addressId, setAddressId] = useState("");
 
   useEffect(() => {
     fetch("/api/categories")
@@ -68,7 +70,7 @@ export default function NewRequestPage() {
         title,
         description,
         categoryId,
-        addressId: addressId || "placeholder",
+        addressId: "placeholder",
         budgetType: budget.value === "REQUEST_PRICE" ? "REQUEST_PRICE" : "FIXED",
         urgency,
       };
@@ -91,28 +93,11 @@ export default function NewRequestPage() {
     }
   }
 
-  const stepIndicator = (
-    <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 24 }}>
-      {[0, 1, 2].map((s) => (
-        <div
-          key={s}
-          style={{
-            width: s === step ? 32 : 10,
-            height: 10,
-            borderRadius: 5,
-            background: s === step ? "var(--accent)" : "var(--card2)",
-            transition: "all 0.3s",
-          }}
-        />
-      ))}
-    </div>
-  );
-
   if (loading) {
     return (
       <AppShell role="CLIENT">
         <div className="page-head"><h1>Новая заявка</h1></div>
-        <div style={{ height: 200, background: "var(--card)", borderRadius: "var(--radius-md)" }} />
+        <div className="skeleton" style={{ height: 200, borderRadius: "var(--radius-md)" }} />
       </AppShell>
     );
   }
@@ -121,12 +106,59 @@ export default function NewRequestPage() {
     <AppShell role="CLIENT">
       <div className="page-head"><h1>Новая заявка</h1></div>
 
-      {stepIndicator}
+      {/* Step indicator */}
+      <div className="flex items-center justify-center" style={{ marginBottom: 32, gap: 0 }}>
+        {STEP_LABELS.map((label, i) => (
+          <div key={i} className="flex items-center">
+            <div className="flex flex-col items-center" style={{ minWidth: 72 }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 700,
+                  fontSize: "0.85rem",
+                  background: i <= step ? "var(--accent)" : "var(--bg-section)",
+                  color: i <= step ? "#fff" : "var(--muted)",
+                  transition: "all .3s",
+                }}
+              >
+                {i < step ? <CheckCircle2 size={18} /> : i + 1}
+              </div>
+              <span
+                className="muted"
+                style={{
+                  fontSize: "0.75rem",
+                  marginTop: 6,
+                  color: i === step ? "var(--accent)" : undefined,
+                  fontWeight: i === step ? 600 : 400,
+                }}
+              >
+                {label}
+              </span>
+            </div>
+            {i < 2 && (
+              <div
+                style={{
+                  width: 48,
+                  height: 2,
+                  background: i < step ? "var(--accent)" : "var(--bg-section)",
+                  marginBottom: 20,
+                  transition: "background .3s",
+                }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
 
       {error && (
         <div style={{
           color: "var(--red)",
-          background: "var(--card)",
+          background: "var(--accent-light)",
           padding: 12,
           borderRadius: "var(--radius-sm)",
           marginBottom: 16,
@@ -137,27 +169,31 @@ export default function NewRequestPage() {
 
       {/* Step 0: Category */}
       {step === 0 && (
-        <div className="section">
+        <div className="animate-fadeIn">
           <h2 style={{ marginBottom: 16 }}>Выберите категорию</h2>
           <div className="grid-3">
             {categories.map((cat) => (
-              <div
+              <button
                 key={cat.id}
+                type="button"
                 className="card"
                 onClick={() => setCategoryId(cat.id)}
                 style={{
                   cursor: "pointer",
                   textAlign: "center",
-                  padding: 20,
+                  padding: 24,
                   border: categoryId === cat.id
                     ? "2px solid var(--accent)"
                     : "2px solid transparent",
-                  transition: "border 0.2s",
+                  background: categoryId === cat.id
+                    ? "var(--accent-light)"
+                    : undefined,
+                  transition: "all .2s",
                 }}
               >
-                <div style={{ fontSize: 32, marginBottom: 8 }}>{cat.icon}</div>
-                <div>{cat.name}</div>
-              </div>
+                <div style={{ fontSize: "2rem", marginBottom: 8 }}>{cat.icon}</div>
+                <div style={{ fontWeight: 600 }}>{cat.name}</div>
+              </button>
             ))}
           </div>
         </div>
@@ -165,7 +201,7 @@ export default function NewRequestPage() {
 
       {/* Step 1: Description + urgency */}
       {step === 1 && (
-        <div className="section">
+        <div className="animate-fadeIn">
           <div
             className="upload-card"
             onClick={() => setHasPhoto(!hasPhoto)}
@@ -173,13 +209,18 @@ export default function NewRequestPage() {
               cursor: "pointer",
               textAlign: "center",
               padding: 32,
-              marginBottom: 16,
+              marginBottom: 24,
               border: hasPhoto ? "2px solid var(--accent)" : "2px dashed var(--line)",
+              background: hasPhoto ? "var(--accent-light)" : undefined,
+              transition: "all .2s",
             }}
           >
-            <div style={{ fontSize: 32, marginBottom: 8 }}>&#x1F4F7;</div>
-            <span className="muted">
-              {hasPhoto ? "Фото добавлено" : "Нажмите, чтобы добавить фото"}
+            <Camera size={32} style={{ color: "var(--accent)", marginBottom: 8 }} />
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>
+              {hasPhoto ? "Фото добавлено" : "Добавить фото или видео"}
+            </div>
+            <span className="muted" style={{ fontSize: "0.8rem" }}>
+              до 10 фото или видео до 30 секунд
             </span>
           </div>
 
@@ -188,6 +229,7 @@ export default function NewRequestPage() {
               Заголовок
               <input
                 type="text"
+                className="input"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Например: Починить кран"
@@ -196,6 +238,7 @@ export default function NewRequestPage() {
             <label className="field">
               Описание
               <textarea
+                className="input"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Опишите задачу подробнее..."
@@ -204,13 +247,13 @@ export default function NewRequestPage() {
             </label>
           </div>
 
-          <h3 style={{ margin: "20px 0 12px" }}>Когда нужно?</h3>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <h3 style={{ margin: "24px 0 12px" }}>Когда нужно?</h3>
+          <div className="flex gap-2" style={{ flexWrap: "wrap" }}>
             {URGENCY_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
-                className={urgency === opt.value ? "primary-btn" : "dark-btn"}
+                className={urgency === opt.value ? "chip chip-active" : "chip"}
                 onClick={() => setUrgency(opt.value)}
               >
                 {opt.label}
@@ -222,14 +265,14 @@ export default function NewRequestPage() {
 
       {/* Step 2: Budget + Location */}
       {step === 2 && (
-        <div className="section">
+        <div className="animate-fadeIn">
           <h3 style={{ marginBottom: 12 }}>Бюджет</h3>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
+          <div className="flex gap-2" style={{ flexWrap: "wrap", marginBottom: 32 }}>
             {BUDGET_OPTIONS.map((opt, i) => (
               <button
                 key={i}
                 type="button"
-                className={budgetIdx === i ? "primary-btn" : "dark-btn"}
+                className={budgetIdx === i ? "chip chip-active" : "chip"}
                 onClick={() => setBudgetIdx(i)}
               >
                 {opt.label}
@@ -244,6 +287,7 @@ export default function NewRequestPage() {
                 Район
                 <input
                   type="text"
+                  className="input"
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
                   placeholder="Центральный"
@@ -253,32 +297,32 @@ export default function NewRequestPage() {
                 Улица и дом
                 <input
                   type="text"
+                  className="input"
                   value={addressText}
                   onChange={(e) => setAddressText(e.target.value)}
                   placeholder="ул. Пушкина, д. 10"
                 />
               </label>
             </div>
-            <label className="field">
-              ID адреса (из базы)
-              <input
-                type="text"
-                value={addressId}
-                onChange={(e) => setAddressId(e.target.value)}
-                placeholder="Введите существующий ID адреса"
-              />
-              <span className="muted" style={{ fontSize: 12 }}>
-                Необходим существующий ID адреса из базы данных
-              </span>
-            </label>
+          </div>
+
+          <div style={{
+            marginTop: 16,
+            padding: "12px 16px",
+            borderRadius: "var(--radius-sm)",
+            background: "var(--accent-light)",
+            fontSize: "0.85rem",
+            color: "var(--green)",
+          }}>
+            🔒 Точный адрес увидит только выбранный мастер
           </div>
         </div>
       )}
 
       {/* Navigation */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 24, gap: 12 }}>
+      <div className="flex justify-between" style={{ marginTop: 32, gap: 12 }}>
         {step > 0 ? (
-          <button type="button" className="secondary-btn" onClick={() => setStep(step - 1)}>
+          <button type="button" className="btn-secondary" onClick={() => setStep(step - 1)}>
             Назад
           </button>
         ) : (
@@ -287,7 +331,7 @@ export default function NewRequestPage() {
         {step < 2 ? (
           <button
             type="button"
-            className="primary-btn"
+            className="btn-primary"
             disabled={!canNext}
             onClick={() => setStep(step + 1)}
             style={{ opacity: canNext ? 1 : 0.5 }}
@@ -297,7 +341,7 @@ export default function NewRequestPage() {
         ) : (
           <button
             type="button"
-            className="primary-btn"
+            className="btn-primary"
             onClick={handleSubmit}
             disabled={submitting}
             style={{ opacity: submitting ? 0.6 : 1 }}

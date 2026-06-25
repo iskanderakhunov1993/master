@@ -74,35 +74,16 @@ export default function ClientDashboardPage() {
     return (
       <AppShell role="CLIENT">
         <div className="page-head">
-          <div
-            style={{
-              height: 32,
-              width: 200,
-              borderRadius: "var(--radius-sm)",
-              background: "var(--card2)",
-            }}
-          />
+          <div className="skeleton" style={{ height: 32, width: 200 }} />
         </div>
         <div className="stats-grid">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="stat-card"
-              style={{ height: 80, background: "var(--card)", borderRadius: "var(--radius-md)" }}
-            />
+            <div key={i} className="stat-card skeleton" style={{ height: 80 }} />
           ))}
         </div>
         <div className="request-list">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              style={{
-                height: 120,
-                background: "var(--card)",
-                borderRadius: "var(--radius-md)",
-                marginBottom: 12,
-              }}
-            />
+            <div key={i} className="skeleton" style={{ height: 120, marginBottom: 12, borderRadius: "var(--radius-md)" }} />
           ))}
         </div>
       </AppShell>
@@ -128,32 +109,34 @@ export default function ClientDashboardPage() {
     <AppShell role="CLIENT">
       <div className="page-head">
         <div>
-          <h1>Привет, {user?.name}!</h1>
+          <h1>Привет, {user?.name}! 👋</h1>
         </div>
-        <Link className="primary-btn" href="/client/requests/new">Создать заявку</Link>
+        <Link className="btn-primary" href="/client/requests/new">Создать заявку</Link>
       </div>
 
       <div className="stats-grid">
         <div className="stat-card">
           <span className="muted">Активные заявки</span>
-          <strong>{activeRequests.length}</strong>
+          <strong style={{ fontSize: "1.5rem" }}>{activeRequests.length}</strong>
         </div>
         <div className="stat-card">
           <span className="muted">Всего откликов</span>
-          <strong>{totalOffers}</strong>
+          <strong style={{ fontSize: "1.5rem" }}>{totalOffers}</strong>
         </div>
         <div className="stat-card">
           <span className="muted">Рейтинг</span>
-          <strong>{user?.ratingAvg ? user.ratingAvg.toFixed(1) : "—"}</strong>
+          <strong style={{ fontSize: "1.5rem" }}>{user?.ratingAvg ? `${user.ratingAvg.toFixed(1)} ⭐` : "—"}</strong>
         </div>
       </div>
 
       {requests.length === 0 ? (
-        <div className="empty-state">
-          <p className="muted" style={{ marginBottom: 16 }}>
-            У вас пока нет заявок
+        <div className="empty-state animate-fadeIn">
+          <div style={{ fontSize: "3rem", marginBottom: 16 }}>📋</div>
+          <h3 style={{ marginBottom: 8 }}>У вас пока нет заявок</h3>
+          <p className="muted" style={{ marginBottom: 24 }}>
+            Создайте первую заявку и найдите мастера за минуты
           </p>
-          <Link className="primary-btn" href="/client/requests/new">Создать первую заявку</Link>
+          <Link className="btn-primary" href="/client/requests/new">Создать первую заявку</Link>
         </div>
       ) : (
         <section className="request-list">
