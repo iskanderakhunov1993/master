@@ -17,7 +17,6 @@ const navMap: Record<Role, { icon: string; label: string; href: string }[]> = {
   MASTER: [
     { icon: '📋', label: 'Заявки',        href: '/master/requests' },
     { icon: '🧰', label: 'Мои заказы',    href: '/master/orders' },
-    { icon: '⭐', label: 'Рейтинг',       href: '/master/profile' },
     { icon: '💎', label: 'Подписка',      href: '/master/subscription' },
     { icon: '👤', label: 'Профиль',       href: '/master/profile' },
   ],
