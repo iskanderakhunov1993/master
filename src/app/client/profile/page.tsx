@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AppShell from "@/components/AppShell";
+import NotificationSettings from "@/components/NotificationSettings";
 
 interface UserProfile {
   name: string;
@@ -154,6 +155,11 @@ export default function ClientProfilePage() {
           <div style={{ fontSize: "2rem", marginBottom: 8 }}>💬</div>
           <p className="muted" style={{ margin: 0 }}>Отзывы появятся после первых заказов</p>
         </div>
+      </div>
+
+      {/* NOTIFICATIONS */}
+      <div style={{ marginTop: 16 }}>
+        <NotificationSettings />
       </div>
 
       {/* ACTIONS */}

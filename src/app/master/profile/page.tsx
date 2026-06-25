@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
+import NotificationSettings from "@/components/NotificationSettings";
 
 interface PortfolioItem {
   id: string;
@@ -334,6 +335,11 @@ export default function MasterProfilePage() {
             <strong>{avgResponse} минут</strong>
           </div>
         </div>
+      </div>
+
+      {/* NOTIFICATIONS */}
+      <div style={{ marginTop: 16 }}>
+        <NotificationSettings />
       </div>
 
       {/* ACTIONS */}

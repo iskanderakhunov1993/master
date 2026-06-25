@@ -1,0 +1,12 @@
+{
+  "name": "Мастер рядом",
+  "short_name": "Мастер рядом",
+  "description": "Сфоткай — починим. Сервис бытовых заявок без комиссий.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#00c896",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

@@ -20,6 +20,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#00c896" />
+        <link rel="apple-touch-icon" href="/icons/icon.svg" />
+      </head>
       <body className={inter.className}>{children}</body>
     </html>
   );
