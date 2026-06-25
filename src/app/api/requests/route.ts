@@ -15,6 +15,8 @@ const createSchema = z.object({
   preferredTimeFrom: z.string().optional(),
   preferredTimeTo: z.string().optional(),
   urgency: z.enum(["NORMAL", "URGENT"]).default("NORMAL"),
+  district: z.string().optional(),
+  street: z.string().optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -82,13 +84,36 @@ export async function POST(request: Request) {
   if (!parsed.data) return fail(parsed.error);
 
   try {
+    let addressId = parsed.data.addressId;
+
+    if (!addressId || addressId === "placeholder" || addressId === "new") {
+      const existingAddress = await prisma.address.findFirst({
+        where: { userId: user.id },
+      });
+      if (existingAddress) {
+        addressId = existingAddress.id;
+      } else {
+        const newAddress = await prisma.address.create({
+          data: {
+            userId: user.id,
+            title: "Мой адрес",
+            city: parsed.data.district || "Москва",
+            district: parsed.data.district || "Не указан",
+            street: parsed.data.street || "Не указана",
+            house: "—",
+          },
+        });
+        addressId = newAddress.id;
+      }
+    }
+
     const repairRequest = await prisma.repairRequest.create({
       data: {
         clientId: user.id,
         title: parsed.data.title,
         description: parsed.data.description,
         categoryId: parsed.data.categoryId,
-        addressId: parsed.data.addressId,
+        addressId,
         budgetAmount: parsed.data.budgetAmount,
         budgetType: parsed.data.budgetType,
         preferredDate: parsed.data.preferredDate ? new Date(parsed.data.preferredDate) : undefined,

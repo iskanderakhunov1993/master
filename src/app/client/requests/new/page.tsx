@@ -71,6 +71,8 @@ export default function NewRequestPage() {
         description,
         categoryId,
         addressId: "placeholder",
+        district,
+        street: addressText,
         budgetType: budget.value === "REQUEST_PRICE" ? "REQUEST_PRICE" : "FIXED",
         urgency,
       };
