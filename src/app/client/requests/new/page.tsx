@@ -14,9 +14,9 @@ interface Category {
 
 const URGENCY_OPTIONS = [
   { label: "Срочно", value: "URGENT" },
-  { label: "Сегодня", value: "TODAY" },
-  { label: "Завтра", value: "TOMORROW" },
-  { label: "Выбрать дату", value: "SCHEDULED" },
+  { label: "Сегодня", value: "NORMAL" },
+  { label: "Завтра", value: "NORMAL" },
+  { label: "Не срочно", value: "NORMAL" },
 ];
 
 const BUDGET_OPTIONS = [
