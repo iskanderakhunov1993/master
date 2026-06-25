@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Брендинг — 3 концепции</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+  :root{--bg:#08090f;--card:#111827;--card2:#1a2332;--border:rgba(255,255,255,.08);--text:#f1f5f9;--muted:#94a3b8;--dim:#64748b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .page{max-width:1200px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:clamp(32px,5vw,52px);font-weight:900;letter-spacing:-.04em;line-height:1;margin-bottom:8px}
+  .subtitle{color:var(--muted);font-size:18px;margin-bottom:56px;max-width:600px;line-height:1.6}
+  .concept{margin-bottom:80px;border:1px solid var(--border);border-radius:32px;overflow:hidden;background:var(--card)}
+  .concept-header{padding:48px 48px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap}
+  .concept-num{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;border-radius:999px;flex-shrink:0}
+  .concept-body{padding:32px 48px 48px}
+  .logo-area{display:flex;align-items:center;justify-content:center;min-height:220px;border-radius:24px;margin-bottom:32px;position:relative;overflow:hidden}
+  .logo-dark{background:linear-gradient(135deg,#0a0e1a,#111d2e)}
+  .logo-light{background:linear-gradient(135deg,#f0fdfa,#e0f7fa)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+  @media(max-width:700px){.row{grid-template-columns:1fr}.concept-header{padding:32px 24px 0}.concept-body{padding:24px}}
+  .info-block h3{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+  .info-block p{font-size:16px;line-height:1.5}
+  .slogan{font-size:clamp(24px,3.5vw,36px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:6px}
+  .slogan-sub{color:var(--muted);font-size:15px}
+  .palette{display:flex;gap:10px;flex-wrap:wrap}
+  .swatch{width:56px;height:56px;border-radius:16px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font-size:9px;font-weight:700;letter-spacing:.03em;border:1px solid rgba(255,255,255,.06)}
+  .typo-sample{font-weight:900;letter-spacing:-.04em}
+  .phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:24px}
+  .phone-mini{border-radius:28px;border:1px solid rgba(255,255,255,.12);overflow:hidden;aspect-ratio:9/16;display:flex;flex-direction:column}
+  .phone-status{height:24px;padding:6px 16px 0;display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.5)}
+  .phone-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;gap:12px}
+  .phone-nav{height:48px;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:repeat(4,1fr);align-items:center;text-align:center;font-size:9px;color:rgba(255,255,255,.4)}
+  .icon-logo{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;font-size:24px;font-weight:900;box-shadow:0 12px 32px rgba(0,0,0,.4)}
+  .tag{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid}
+  .pros{display:grid;gap:8px;margin-top:12px}
+  .pro{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:var(--muted)}.pro b{color:var(--text);font-weight:700}
+  .section-title{font-size:20px;font-weight:900;letter-spacing:-.03em;margin-bottom:16px;margin-top:8px}
+
+  /* Concept 1 colors */
+  .c1-accent{color:#14b8a6}.c1-bg{background:#14b8a6}
+  .c1 .concept-num{background:rgba(20,184,166,.15);color:#5eead4;border:1px solid rgba(20,184,166,.3)}
+  .c1 .logo-area{background:linear-gradient(145deg,#021a17,#0a2e2a 40%,#0d1b2a)}
+  .c1 .phone-mini{background:linear-gradient(180deg,#0c1a1f,#0a1520)}
+
+  /* Concept 2 colors */
+  .c2-accent{color:#fb923c}.c2-bg{background:#fb923c}
+  .c2 .concept-num{background:rgba(251,146,60,.15);color:#fdba74;border:1px solid rgba(251,146,60,.3)}
+  .c2 .logo-area{background:linear-gradient(145deg,#1a0d04,#2a1608 40%,#1a1020)}
+  .c2 .phone-mini{background:linear-gradient(180deg,#140e08,#110c14)}
+
+  /* Concept 3 colors */
+  .c3-accent{color:#818cf8}.c3-bg{background:#818cf8}
+  .c3 .concept-num{background:rgba(129,140,248,.15);color:#a5b4fc;border:1px solid rgba(129,140,248,.3)}
+  .c3 .logo-area{background:linear-gradient(145deg,#0c0c20,#12143a 40%,#0d1b2a)}
+  .c3 .phone-mini{background:linear-gradient(180deg,#0e0e1e,#0a1020)}
+
+  .verdict{background:var(--card2);border:1px solid var(--border);border-radius:24px;padding:32px 40px;margin-top:16px}
+  .verdict h2{font-size:24px;font-weight:900;letter-spacing:-.03em;margin-bottom:12px}
+  .compare-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
+  .compare-table th{text-align:left;padding:10px 12px;color:var(--dim);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+  .compare-table td{padding:10px 12px;border-bottom:1px solid var(--border)}
+  .compare-table tr:last-child td{border-bottom:0}
+  .star{color:#fbbf24}
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>Брендинг: 3 концепции</h1>
+<p class="subtitle">Три направления с разным характером. Каждое решает одну задачу: сервис, где клиент фотографирует проблему, а проверенные мастера рядом откликаются.</p>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- CONCEPT 1: MASTAK -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="concept c1">
+  <div class="concept-header">
+    <div>
+      <span class="concept-num">Концепция 1</span>
+    </div>
+  </div>
+  <div class="concept-body">
+
+    <div class="logo-area">
+      <div style="text-align:center">
+        <svg width="280" height="80" viewBox="0 0 280 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- M with wrench cut -->
+          <text x="0" y="62" font-family="Inter,system-ui" font-weight="900" font-size="64" letter-spacing="-3" fill="#14b8a6">М</text>
+          <!-- wrench integrated into М stroke -->
+          <circle cx="22" cy="14" r="7" stroke="#5eead4" stroke-width="2.5" fill="none"/>
+          <text x="48" y="62" font-family="Inter,system-ui" font-weight="900" font-size="64" letter-spacing="-3" fill="white">астак</text>
+          <!-- dot accent -->
+          <circle cx="268" cy="52" r="6" fill="#14b8a6"/>
+        </svg>
+        <div style="color:#5eead4;font-size:14px;font-weight:700;letter-spacing:.15em;margin-top:8px">СФОТКАЙ — ПОЧИНИМ</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div class="slogan">Мастак</div>
+        <div class="slogan-sub" style="margin-bottom:16px">/ mas·tak / — разг. мастер своего дела, умелец</div>
+        <div class="info-block">
+          <h3>Почему это имя</h3>
+          <div class="pros">
+            <div class="pro"><b>Уникальное.</b> Нет конкурентов с таким именем</div>
+            <div class="pro"><b>Русское.</b> Знакомое слово, вызывает доверие</div>
+            <div class="pro"><b>6 букв.</b> Короткое, легко набрать</div>
+            <div class="pro"><b>Характер.</b> Уверенный эксперт, на которого можно положиться</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="info-block">
+          <h3>Слоган</h3>
+          <p style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Сфоткай — починим</p>
+          <p style="color:var(--muted);font-size:14px">Два действия. Одно предложение. Суть продукта.</p>
+        </div>
+        <div class="info-block" style="margin-top:20px">
+          <h3>Палитра</h3>
+          <div class="palette">
+            <div class="swatch" style="background:#0a0f1a;color:#475569">0a0f1a</div>
+            <div class="swatch" style="background:#14b8a6;color:#021a17">14b8a6</div>
+            <div class="swatch" style="background:#5eead4;color:#042f2e">5eead4</div>
+            <div class="swatch" style="background:#f0fdfa;color:#134e4a">f0fdfa</div>
+            <div class="swatch" style="background:#fb923c;color:#431407">fb923c</div>
+          </div>
+        </div>
+        <div class="info-block" style="margin-top:20px">
+          <h3>Тон коммуникации</h3>
+          <p>Уверенный, прямой, без воды. «Мы знаем, что делаем. Покажи проблему — решим.»</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">App Icon + экраны</div>
+    <div class="phones">
+      <div class="phone-mini">
+        <div class="phone-status"><span>9:41</span><span>5G</span></div>
+        <div class="phone-content" style="background:linear-gradient(180deg,#0d2924,#0a1a1f);justify-content:flex-end;padding-bottom:32px;align-items:flex-start;padding-left:24px">
+          <div class="icon-logo" style="background:linear-gradient(135deg,#14b8a6,#0d9488);color:#042f2e;margin-bottom:12px">М</div>
+          <div style="font-size:32px;font-weight:900;letter-spacing:-.04em;line-height:1">Мастак</div>
+          <div style="color:#5eead4;font-size:13px;margin-top:4px">Сфоткай — починим</div>
+          <div style="margin-top:16px;width:100%;padding-right:24px">
+            <div style="background:#14b8a6;color:#042f2e;border-radius:16px;padding:14px;text-align:center;font-weight:800;font-size:15px">Создать заявку</div>
+            <div style="border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:14px;text-align:center;font-weight:700;font-size:15px;margin-top:8px;color:rgba(255,255,255,.8)">Я мастер</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-mini">
+        <div class="phone-status"><span>9:41</span><span>5G</span></div>
+        <div class="phone-content" style="align-items:stretch;justify-content:flex-start;padding-top:12px;gap:8px">
+          <div style="text-align:left;padding:4px 0"><span style="font-size:20px;font-weight:900;letter-spacing:-.03em">Что нужно?</span><br><span style="font-size:12px;color:var(--muted)">Выберите категорию</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.3);border-radius:16px;padding:12px;text-align:left"><div style="font-size:20px">🔧</div><div style="font-size:13px;font-weight:700;margin-top:6px">Сантехника</div></div>
+            <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px;text-align:left"><div style="font-size:20px">⚡</div><div style="font-size:13px;font-weight:700;margin-top:6px">Электрика</div></div>
+            <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px;text-align:left"><div style="font-size:20px">🪑</div><div style="font-size:13px;font-weight:700;margin-top:6px">Мебель</div></div>
+            <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px;text-align:left"><div style="font-size:20px">🧺</div><div style="font-size:13px;font-weight:700;margin-top:6px">Техника</div></div>
+          </div>
+        </div>
+        <div class="phone-nav"><span style="color:#5eead4">🏠 Заявки</span><span>💬 Чат</span><span>⭐ Отзывы</span><span>👤 Профиль</span></div>
+      </div>
+      <div class="phone-mini">
+        <div class="phone-status"><span>9:41</span><span>5G</span></div>
+        <div class="phone-content" style="align-items:stretch;justify-content:flex-start;padding-top:12px;gap:8px">
+          <div style="text-align:left;padding:4px 0"><span style="font-size:20px;font-weight:900;letter-spacing:-.03em">Отклики</span><br><span style="font-size:12px;color:var(--muted)">3 мастера готовы</span></div>
+          <div style="display:grid;gap:8px">
+            <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:12px;display:flex;gap:10px;align-items:center;text-align:left">
+              <div style="width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,#14b8a6,#0d9488);display:grid;place-items:center;font-weight:900;color:#042f2e;flex-shrink:0">А</div>
+              <div><div style="font-size:14px;font-weight:800">Алексей · 4.9</div><div style="font-size:11px;color:var(--muted);margin-top:2px">148 заказов · 2 800 ₽</div></div>
+            </div>
+            <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:12px;display:flex;gap:10px;align-items:center;text-align:left">
+              <div style="width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,#fb923c,#f97316);display:grid;place-items:center;font-weight:900;color:#431407;flex-shrink:0">М</div>
+              <div><div style="font-size:14px;font-weight:800">Михаил · 4.8</div><div style="font-size:11px;color:var(--muted);margin-top:2px">73 заказа · 3 200 ₽</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-nav"><span style="color:#5eead4">🏠 Заявки</span><span>💬 Чат</span><span>⭐ Отзывы</span><span>👤 Профиль</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- CONCEPT 2: ZOVI -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="concept c2">
+  <div class="concept-header">
+    <div>
+      <span class="concept-num">Концепция 2</span>
+    </div>
+  </div>
+  <div class="concept-body">
+
+    <div class="logo-area">
+      <div style="text-align:center">
+        <svg width="240" height="80" viewBox="0 0 240 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="0" y="62" font-family="Inter,system-ui" font-weight="900" font-size="64" letter-spacing="-2" fill="#fb923c">З</text>
+          <text x="42" y="62" font-family="Inter,system-ui" font-weight="900" font-size="64" letter-spacing="-2" fill="white">ови</text>
+          <!-- location pin -->
+          <g transform="translate(175,8)">
+            <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 28 16 28s16-16 16-28C32 7.16 24.84 0 16 0z" fill="#fb923c" opacity=".9"/>
+            <circle cx="16" cy="15" r="6" fill="#1a0d04"/>
+          </g>
+        </svg>
+        <div style="color:#fdba74;font-size:14px;font-weight:700;letter-spacing:.15em;margin-top:8px">МАСТЕР УЖЕ РЯДОМ</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div class="slogan">Зови</div>
+        <div class="slogan-sub" style="margin-bottom:16px">/ zo·vi / — повелит. «позвать, вызвать»</div>
+        <div class="info-block">
+          <h3>Почему это имя</h3>
+          <div class="pros">
+            <div class="pro"><b>4 буквы.</b> Ультра-короткое, как Uber, Bolt</div>
+            <div class="pro"><b>Действие.</b> Не описывает — командует. «Зови!»</div>
+            <div class="pro"><b>Скорость.</b> Одно слово = быстрый сервис</div>
+            <div class="pro"><b>Универсальное.</b> Подходит для любых услуг, не только ремонта</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="info-block">
+          <h3>Слоган</h3>
+          <p style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Мастер уже рядом</p>
+          <p style="color:var(--muted);font-size:14px">Ощущение что помощь близко. Uber-вайб.</p>
+        </div>
+        <div class="info-block" style="margin-top:20px">
+          <h3>Палитра</h3>
+          <div class="palette">
+            <div class="swatch" style="background:#0f0a14;color:#475569">0f0a14</div>
+            <div class="swatch" style="background:#fb923c;color:#431407">fb923c</div>
+            <div class="swatch" style="background:#fdba74;color:#7c2d12">fdba74</div>
+            <div class="swatch" style="background:#fef3c7;color:#78350f">fef3c7</div>
+            <div class="swatch" style="background:#8b5cf6;color:white">8b5cf6</div>
+          </div>
+        </div>
+        <div class="info-block" style="margin-top:20px">
+          <h3>Тон коммуникации</h3>
+          <p>Энергичный, быстрый, современный. «Зачем ждать? Зови — и мастер уже едет.»</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">App Icon + экраны</div>
+    <div class="phones">
+      <div class="phone-mini">
+        <div class="phone-status"><span>9:41</span><span>5G</span></div>
+        <div class="phone-content" style="background:linear-gradient(180deg,#1a1008,#140a10);justify-content:flex-end;padding-bottom:32px;align-items:flex-start;padding-left:24px">
+          <div class="icon-logo" style="background:linear-gradient(135deg,#fb923c,#f97316);color:#431407;margin-bottom:12px">З</div>
+          <div style="font-size:34px;font-weight:900;letter-spacing:-.04em;line-height:1">Зови</div>
+          <div style="color:#fdba74;font-size:13px;margin-top:4px">Мастер уже рядом</div>
+          <div style="margin-top:16px;width:100%;padding-right:24px">
+            <div style="background:linear-gradient(135deg,#fb923c,#f97316);color:#431407;border-radius:16px;padding:14px;text-align:center;font-weight:800;font-size:15px">Создать заявку</div>
+            <div style="border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:14px;text-align:center;font-weight:700;font-size:15px;margin-top:8px;color:rgba(255,255,255,.8)">Я мастер</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-mini">
+        <div class="phone-status"><span>9:41</span><span>5G</span></div>
+        <div class="phone-content" style="align-items:stretch;justify-content:flex-start;padding-top:12px;gap:8px">
+          <div style="text-align:left;padding:4px 0"><span style="font-size:20px;font-weight:900;letter-spacing:-.03em">Новая заявка</span><br><span style="font-size:12px;color:var(--muted)">2.4 км от вас</span></div>
+          <div style="background:linear-gradient(135deg,rgba(251,146,60,.15),rgba(139,92,246,.08));border:1px solid rgba(251,146,60,.2);border-radius:20px;overflow:hidden">
+            <div style="height:80px;background:linear-gradient(135deg,rgba(251,146,60,.2),rgba(139,92,246,.1));display:flex;align-items:center;padding:0 16px"><span style="background:rgba(251,146,60,.2);border:1px solid rgba(251,146,60,.3);border-radius:999px;padding:4px 10px;font-size:11px;font-weight:700;color:#fdba74">Сантехника · 2.4 км</span></div>
+            <div style="padding:14px;text-align:left">
+              <div style="font-weight:800;font-size:15px">Течёт смеситель</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">Бюджет до 3000 ₽ · сегодня</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+                <div style="border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center;font-weight:700;font-size:13px">Пропустить</div>
+                <div style="background:linear-gradient(135deg,#fb923c,#f97316);color:#431407;border-radius:12px;padding:10px;text-align:center;font-weight:800;font-size:13px">Откликнуться</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-nav"><span style="color:#fdba74">📋 Заявки</span><span>🧰 Работа</span><span>⭐ Рейтинг</span><span>👤 Профиль</span></div>
+      </div>
+      <div class="phone-mini">
+        <div class="phone-status"><span>9:41</span><span>5G</span></div>
+        <div class="phone-content" style="justify-content:flex-start;align-items:stretch;padding-top:12px;gap:6px">
+          <div style="text-align:left"><span style="font-size:18px;font-weight:900;letter-spacing:-.03em">Чат заказа</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+            <div style="background:rgba(255,255,255,.08);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:12px;max-width:85%;align-self:flex-start;text-align:left">По фото — нужна замена прокладки. Приеду в 18:30?</div>
+            <div style="background:linear-gradient(135deg,rgba(251,146,60,.85),rgba(249,115,22,.75));color:#1a0d04;border-radius:14px 14px 4px 14px;padding:10px 12px;font-size:12px;max-width:75%;align-self:flex-end;text-align:left">Да, жду. Спасибо!</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <div style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:10px;font-size:12px;color:var(--muted)">Сообщение...</div>
+            <div style="width:38px;height:38px;border-radius:14px;background:linear-gradient(135deg,#fb923c,#f97316);display:grid;place-items:center;color:#431407;font-weight:900;font-size:14px">▶</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- CONCEPT 3: NALADIM -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="concept c3">
+  <div class="concept-header">
+    <div>
+      <span class="concept-num">Концепция 3</span>
+    </div>
+  </div>
+  <div class="concept-body">
+
+    <div class="logo-area">
+      <div style="text-align:center">
+        <svg width="320" height="80" viewBox="0 0 320 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="0" y="62" font-family="Inter,system-ui" font-weight="900" font-size="64" letter-spacing="-3" fill="white">Нала</text>
+          <text x="168" y="62" font-family="Inter,system-ui" font-weight="900" font-size="64" letter-spacing="-3" fill="#818cf8">дим</text>
+          <!-- checkmark -->
+          <g transform="translate(290,20)">
+            <circle cx="14" cy="14" r="14" fill="#818cf8" opacity=".2"/>
+            <path d="M8 14l4 4 8-8" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+        </svg>
+        <div style="color:#a5b4fc;font-size:14px;font-weight:700;letter-spacing:.15em;margin-top:8px">ПОКАЖИ — РЕШИМ</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div class="slogan">Наладим</div>
+        <div class="slogan-sub" style="margin-bottom:16px">/ na·la·dim / — «мы наладим, мы починим, мы решим»</div>
+        <div class="info-block">
+          <h3>Почему это имя</h3>
+          <div class="pros">
+            <div class="pro"><b>Мы-форма.</b> Не «я починю», а «мы наладим» — команда, сообщество</div>
+            <div class="pro"><b>Обещание.</b> Само слово — это уже гарантия результата</div>
+            <div class="pro"><b>Тёплое.</b> Дружелюбное, не корпоративное</div>
+            <div class="pro"><b>Широкое.</b> Наладить можно всё — от крана до жизни</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="info-block">
+          <h3>Слоган</h3>
+          <p style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Покажи — решим</p>
+          <p style="color:var(--muted);font-size:14px">Мягко, но уверенно. Ты покажешь, мы решим.</p>
+        </div>
+        <div class="info-block" style="margin-top:20px">
+          <h3>Палитра</h3>
+          <div class="palette">
+            <div class="swatch" style="background:#0b0d1e;color:#475569">0b0d1e</div>
+            <div class="swatch" style="background:#818cf8;color:white">818cf8</div>
+            <div class="swatch" style="background:#a5b4fc;color:#1e1b4b">a5b4fc</div>
+            <div class="swatch" style="background:#e0e7ff;color:#312e81">e0e7ff</div>
+            <div class="swatch" style="background:#34d399;color:#022c22">34d399</div>
+          </div>
+        </div>
+        <div class="info-block" style="margin-top:20px">
+          <h3>Тон коммуникации</h3>
+          <p>Заботливый, спокойный, уверенный. «Не переживай. Покажи что случилось — мы наладим.»</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">App Icon + экраны</div>
+    <div class="phones">
+      <div class="phone-mini">
+        <div class="phone-status"><span>9:41</span><span>5G</span></div>
+        <div class="phone-content" style="background:linear-gradient(180deg,#10103a,#0c0e20);justify-content:flex-end;padding-bottom:32px;align-items:flex-start;padding-left:24px">
+          <div class="icon-logo" style="background:linear-gradient(135deg,#818cf8,#6366f1);color:white;margin-bottom:12px">Н</div>
+          <div style="font-size:32px;font-weight:900;letter-spacing:-.04em;line-height:1">Наладим</div>
+          <div style="color:#a5b4fc;font-size:13px;margin-top:4px">Покажи — решим</div>
+          <div style="margin-top:16px;width:100%;padding-right:24px">
+            <div style="background:linear-gradient(135deg,#818cf8,#6366f1);color:white;border-radius:16px;padding:14px;text-align:center;font-weight:800;font-size:15px">Создать заявку</div>
+            <div style="border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:14px;text-align:center;font-weight:700;font-size:15px;margin-top:8px;color:rgba(255,255,255,.8)">Я мастер</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-mini">
+        <div class="phone-status"><span>9:41</span><span>5G</span></div>
+        <div class="phone-content" style="align-items:stretch;justify-content:flex-start;padding-top:12px;gap:8px">
+          <div style="text-align:left;padding:4px 0"><span style="font-size:20px;font-weight:900;letter-spacing:-.03em">Фото проблемы</span><br><span style="font-size:12px;color:var(--muted)">Мастеру будет проще оценить</span></div>
+          <div style="height:100px;border-radius:20px;border:1px dashed rgba(129,140,248,.4);background:linear-gradient(135deg,rgba(129,140,248,.08),rgba(99,102,241,.04));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+            <div style="font-size:28px">📷</div>
+            <div style="font-size:13px;font-weight:700">Добавить фото</div>
+            <div style="font-size:11px;color:var(--muted)">до 10 фото или видео</div>
+          </div>
+          <div style="text-align:left">
+            <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px">ОПИСАНИЕ</div>
+            <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;font-size:13px;color:var(--muted);text-align:left">Течёт смеситель на кухне...</div>
+          </div>
+        </div>
+        <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.08)">
+          <div style="background:linear-gradient(135deg,#818cf8,#6366f1);color:white;border-radius:14px;padding:12px;text-align:center;font-weight:800;font-size:14px">Продолжить</div>
+        </div>
+      </div>
+      <div class="phone-mini">
+        <div class="phone-status"><span>9:41</span><span>5G</span></div>
+        <div class="phone-content" style="align-items:stretch;justify-content:flex-start;padding-top:12px;gap:8px">
+          <div style="text-align:left;padding:4px 0"><span style="font-size:20px;font-weight:900;letter-spacing:-.03em">Подписка</span><br><span style="font-size:12px;color:var(--muted)">3 бесплатных отклика закончились</span></div>
+          <div style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:flex-start;text-align:left">
+            <div style="width:10px;height:10px;border-radius:50%;background:#34d399;margin-top:4px;flex-shrink:0;box-shadow:0 0 0 4px rgba(52,211,153,.15)"></div>
+            <div><div style="font-size:13px;font-weight:700">Вы попробовали сервис</div><div style="font-size:11px;color:var(--muted);margin-top:2px">14 заявок · 3 отклика · 1 заказ</div></div>
+          </div>
+          <div style="display:grid;gap:6px">
+            <div style="border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;display:flex;justify-content:space-between;text-align:left"><div><div style="font-weight:700;font-size:13px">Start</div><div style="font-size:11px;color:var(--muted)">5 откликов</div></div><div style="font-weight:900;color:#a5b4fc">99 ₽</div></div>
+            <div style="border:1px solid rgba(129,140,248,.4);background:rgba(129,140,248,.08);border-radius:14px;padding:12px;display:flex;justify-content:space-between;text-align:left"><div><div style="font-weight:700;font-size:13px">Basic</div><div style="font-size:11px;color:var(--muted)">30 откликов · чат</div></div><div style="font-weight:900;color:#a5b4fc">499 ₽</div></div>
+            <div style="border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;display:flex;justify-content:space-between;text-align:left"><div><div style="font-weight:700;font-size:13px">Pro</div><div style="font-size:11px;color:var(--muted)">100 откликов · приоритет</div></div><div style="font-weight:900;color:#a5b4fc">1 490 ₽</div></div>
+          </div>
+        </div>
+        <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.08)">
+          <div style="background:linear-gradient(135deg,#818cf8,#6366f1);color:white;border-radius:14px;padding:12px;text-align:center;font-weight:800;font-size:14px">Подключить Basic</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- COMPARISON -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="verdict">
+  <h2>Сравнение концепций</h2>
+  <table class="compare-table">
+    <tr><th>Критерий</th><th>Мастак</th><th>Зови</th><th>Наладим</th></tr>
+    <tr><td>Длина</td><td>6 букв</td><td><b>4 буквы</b> <span class="star">★</span></td><td>7 букв</td></tr>
+    <tr><td>Уникальность</td><td><b>Высокая</b> <span class="star">★</span></td><td>Средняя</td><td>Высокая</td></tr>
+    <tr><td>Понятность сути</td><td>Сразу понятно — мастер</td><td>Нужен контекст</td><td><b>Сразу понятно</b> <span class="star">★</span></td></tr>
+    <tr><td>Масштабируемость</td><td>Бытовые услуги</td><td><b>Любые услуги</b> <span class="star">★</span></td><td>Любые услуги</td></tr>
+    <tr><td>Тон</td><td>Уверенный эксперт</td><td>Быстрый, Uber-стиль</td><td><b>Тёплый, заботливый</b></td></tr>
+    <tr><td>Запоминаемость</td><td><b>Сильная</b> <span class="star">★</span></td><td>Сильная</td><td>Средняя</td></tr>
+    <tr><td>Палитра</td><td>Teal (доверие)</td><td>Orange (энергия)</td><td>Indigo (спокойствие)</td></tr>
+    <tr><td>Ассоциация</td><td>«Этот мужик — мастак»</td><td>«Зови, не стесняйся»</td><td>«Мы всё наладим»</td></tr>
+  </table>
+
+  <div style="margin-top:24px;padding:20px;background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.2);border-radius:16px">
+    <div style="font-weight:900;font-size:16px;margin-bottom:6px">💡 Рекомендация</div>
+    <div style="color:var(--muted);font-size:14px;line-height:1.6">
+      <b style="color:var(--text)">Мастак</b> — самый сильный вариант для MVP в России. Уникальное имя, мгновенная ассоциация с мастерством, teal-палитра вызывает доверие. Слоган «Сфоткай — починим» — два слова, вся суть продукта.<br><br>
+      <b style="color:var(--text)">Зови</b> — если планируется масштабирование за пределы ремонта (клининг, переезд, курьеры). Более универсальное, но менее уникальное.<br><br>
+      <b style="color:var(--text)">Наладим</b> — если важен тёплый, дружелюбный тон. Хорош для аудитории 35+.
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

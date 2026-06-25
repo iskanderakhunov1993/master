@@ -2,8 +2,15 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { Send, Star } from "lucide-react";
+
+interface MasterProfile {
+  id: string;
+  completedOrders?: number;
+  avgResponseMinutes?: number;
+}
 
 interface MasterUser {
   id: string;
@@ -11,6 +18,7 @@ interface MasterUser {
   avatarUrl?: string;
   ratingAvg: number;
   ratingCount: number;
+  masterProfile?: MasterProfile;
 }
 
 interface Offer {
@@ -19,7 +27,8 @@ interface Offer {
   comment: string;
   guaranteeDays: number;
   status: string;
-  master: { user: MasterUser };
+  createdAt?: string;
+  master: { id?: string; user: MasterUser };
 }
 
 interface Message {
@@ -62,6 +71,8 @@ const STATUS_LABELS: Record<string, { label: string; cls: string }> = {
   COMPLETED: { label: "Завершена", cls: "pill-green" },
   CANCELLED: { label: "Отменена", cls: "pill" },
 };
+
+const PHOTO_PLACEHOLDERS = ["#e8f5e9", "#e3f2fd", "#fff3e0", "#fce4ec"];
 
 export default function ClientRequestPage() {
   const { id } = useParams<{ id: string }>();
@@ -160,7 +171,8 @@ export default function ClientRequestPage() {
   if (loading) {
     return (
       <AppShell role="CLIENT">
-        <div className="skeleton" style={{ height: 300, borderRadius: "var(--radius-md)" }} />
+        <div className="skeleton" style={{ height: 120, borderRadius: "var(--radius-md)", marginBottom: 16 }} />
+        <div className="skeleton" style={{ height: 200, borderRadius: "var(--radius-md)" }} />
       </AppShell>
     );
   }
@@ -178,36 +190,38 @@ export default function ClientRequestPage() {
   const statusInfo = STATUS_LABELS[request.status] || { label: request.status, cls: "pill" };
   const hasMyReview = request.reviews.some((r) => r.reviewer.id === currentUserId);
   const showReviewForm = request.status === "COMPLETED" && !hasMyReview;
+  const hasPhotos = request.photos && request.photos.length > 0;
 
   return (
     <AppShell role="CLIENT">
-      {/* Header */}
+      {/* Header with status */}
       <div className="page-head">
         <div>
-          <div className="flex items-center gap-2" style={{ marginBottom: 8 }}>
-            <span className={statusInfo.cls}>{statusInfo.label}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <span className={statusInfo.cls} style={{ fontSize: "0.9rem" }}>{statusInfo.label}</span>
             <span className="pill">{request.category.icon} {request.category.name}</span>
+            {request.urgency === "URGENT" && <span className="pill-orange">Срочно</span>}
           </div>
-          <h1>{request.title}</h1>
+          <h1 style={{ margin: 0 }}>{request.title}</h1>
         </div>
       </div>
 
       {/* Info cards */}
       <div className="grid-3" style={{ marginBottom: 16 }}>
-        <article className="card" style={{ padding: 20 }}>
-          <span className="muted" style={{ fontSize: "0.8rem" }}>Бюджет</span>
+        <article className="stat-card">
+          <span className="muted" style={{ fontSize: 13 }}>Бюджет</span>
           <div style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: 4 }}>
             {request.budgetAmount != null ? `${request.budgetAmount.toLocaleString("ru-RU")} ₽` : "Не указан"}
           </div>
         </article>
-        <article className="card" style={{ padding: 20 }}>
-          <span className="muted" style={{ fontSize: "0.8rem" }}>Район</span>
+        <article className="stat-card">
+          <span className="muted" style={{ fontSize: 13 }}>Район</span>
           <div style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: 4 }}>
             {request.address?.district || "Не указан"}
           </div>
         </article>
-        <article className="card" style={{ padding: 20 }}>
-          <span className="muted" style={{ fontSize: "0.8rem" }}>Когда</span>
+        <article className="stat-card">
+          <span className="muted" style={{ fontSize: 13 }}>Когда</span>
           <div style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: 4 }}>
             {request.preferredTimeFrom || "Гибко"}
           </div>
@@ -217,21 +231,14 @@ export default function ClientRequestPage() {
       {/* Description */}
       <div className="card" style={{ padding: 20, marginBottom: 16 }}>
         <p style={{ margin: 0 }}>{request.description}</p>
-        {request.urgency && (
-          <div className="request-meta" style={{ marginTop: 12 }}>
-            <span className="pill-orange" style={{ fontSize: "0.8rem" }}>
-              {request.urgency === "URGENT" ? "Срочно" : request.urgency}
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Photos */}
-      {request.photos && request.photos.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <h3 style={{ marginBottom: 12 }}>Фото</h3>
-          <div className="flex gap-2" style={{ overflowX: "auto" }}>
-            {request.photos.map((photo, i) => (
+      <div style={{ marginBottom: 16 }}>
+        <h3 style={{ marginBottom: 12 }}>Фото</h3>
+        <div style={{ display: "flex", gap: 8, overflowX: "auto" }}>
+          {hasPhotos ? (
+            request.photos!.map((photo, i) => (
               <div
                 key={i}
                 style={{
@@ -242,12 +249,32 @@ export default function ClientRequestPage() {
                   flexShrink: 0,
                 }}
               />
-            ))}
-          </div>
+            ))
+          ) : (
+            PHOTO_PLACEHOLDERS.map((color, i) => (
+              <div
+                key={i}
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: "var(--radius-sm)",
+                  background: color,
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "1.5rem",
+                  color: "var(--muted)",
+                }}
+              >
+                📷
+              </div>
+            ))
+          )}
         </div>
-      )}
+      </div>
 
-      {/* Offers */}
+      {/* Offers — rich master mini-profiles */}
       {request.offers.length > 0 && (
         <section style={{ marginBottom: 16 }}>
           <h3 style={{ marginBottom: 12 }}>
@@ -256,53 +283,88 @@ export default function ClientRequestPage() {
               {request.offers.length}
             </span>
           </h3>
-          <div className="request-list">
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {request.offers.map((offer) => {
               const master = offer.master.user;
+              const masterProfileId = master.masterProfile?.id || offer.master.id;
+              const initials = master.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+              const orders = master.masterProfile?.completedOrders ?? master.ratingCount ?? 0;
+              const responseTime = master.masterProfile?.avgResponseMinutes;
+              const timeSince = offer.createdAt
+                ? (() => {
+                    const mins = Math.floor((Date.now() - new Date(offer.createdAt).getTime()) / 60000);
+                    if (mins < 60) return `${mins} мин назад`;
+                    if (mins < 1440) return `${Math.floor(mins / 60)} ч назад`;
+                    return `${Math.floor(mins / 1440)} дн назад`;
+                  })()
+                : null;
+
               return (
-                <article className="card" key={offer.id} style={{ padding: 20, marginBottom: 12 }}>
-                  <div className="flex gap-3" style={{ alignItems: "flex-start" }}>
-                    <div className="avatar avatar-md" style={{
-                      background: "var(--accent)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#fff",
-                      fontWeight: 700,
+                <article className="card" key={offer.id} style={{ padding: 20 }}>
+                  <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    {/* Avatar */}
+                    <div className="avatar" style={{
+                      width: 48,
+                      height: 48,
                       fontSize: 18,
                       flexShrink: 0,
                     }}>
-                      {master.name.charAt(0).toUpperCase()}
+                      {initials}
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div className="flex justify-between items-center">
-                        <h4 style={{ margin: 0 }}>{master.name}</h4>
-                        <span className="muted" style={{ fontSize: "0.85rem" }}>
-                          ⭐ {master.ratingAvg?.toFixed(1) || "—"} ({master.ratingCount})
-                        </span>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      {/* Name + rating row */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+                        <div>
+                          <h4 style={{ margin: 0, display: "inline" }}>{master.name}</h4>
+                          <span className="muted" style={{ fontSize: 13, marginLeft: 8 }}>
+                            ⭐ {master.ratingAvg?.toFixed(1) || "—"} ({master.ratingCount})
+                          </span>
+                        </div>
+                        {/* Price */}
+                        <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--accent)" }}>
+                          {offer.price.toLocaleString("ru-RU")} ₽
+                        </div>
                       </div>
-                      <div style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: 4, color: "var(--accent)" }}>
-                        {offer.price.toLocaleString("ru-RU")} ₽
+
+                      {/* Stats row */}
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+                        <span className="pill" style={{ fontSize: 12 }}>{orders} заказов</span>
+                        {offer.guaranteeDays > 0 && (
+                          <span className="pill-green" style={{ fontSize: 12 }}>Гарантия {offer.guaranteeDays} дн.</span>
+                        )}
+                        {responseTime && (
+                          <span className="pill" style={{ fontSize: 12 }}>Ответ: {responseTime} мин</span>
+                        )}
+                        {timeSince && (
+                          <span className="muted" style={{ fontSize: 12 }}>{timeSince}</span>
+                        )}
                       </div>
-                      {offer.guaranteeDays > 0 && (
-                        <span className="pill-green" style={{ fontSize: "0.75rem", marginTop: 8, display: "inline-block" }}>
-                          Гарантия {offer.guaranteeDays} дн.
-                        </span>
-                      )}
+
+                      {/* Comment */}
                       {offer.comment && (
-                        <p className="muted" style={{ margin: "8px 0 0", fontSize: "0.9rem" }}>
-                          {offer.comment}
-                        </p>
+                        <p className="muted" style={{ margin: "8px 0 0", fontSize: 14 }}>{offer.comment}</p>
                       )}
-                      {offer.status === "PENDING" && (
-                        <button
-                          className="btn-primary"
-                          style={{ marginTop: 12 }}
-                          onClick={() => acceptOffer(offer.id)}
-                        >
-                          Выбрать мастера
+
+                      {/* Action buttons */}
+                      <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+                        {offer.status === "PENDING" && (
+                          <button className="btn-primary btn-sm" onClick={() => acceptOffer(offer.id)}>
+                            Выбрать мастера
+                          </button>
+                        )}
+                        {masterProfileId && (
+                          <Link href={`/masters/${masterProfileId}`} className="btn-secondary btn-sm">
+                            Профиль
+                          </Link>
+                        )}
+                        <button className="btn-secondary btn-sm" onClick={() => {
+                          const el = document.querySelector(".chat-box");
+                          el?.scrollIntoView({ behavior: "smooth" });
+                        }}>
+                          Написать
                         </button>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -312,12 +374,20 @@ export default function ClientRequestPage() {
         </section>
       )}
 
+      {request.offers.length === 0 && request.status === "PUBLISHED" && (
+        <div className="card" style={{ padding: 24, textAlign: "center", marginBottom: 16 }}>
+          <div style={{ fontSize: "2.5rem", marginBottom: 8 }}>⏳</div>
+          <h3 style={{ margin: "0 0 4px" }}>Ожидаем предложения</h3>
+          <p className="muted" style={{ margin: 0 }}>Мастера увидят вашу заявку и предложат свою цену</p>
+        </div>
+      )}
+
       {/* Chat */}
       <section className="card" style={{ padding: 20, marginBottom: 16 }}>
         <h3 style={{ marginBottom: 12 }}>Чат</h3>
         <div className="chat-box">
           {request.messages.length === 0 && (
-            <p className="muted text-center" style={{ padding: 24 }}>
+            <p className="muted" style={{ padding: 24, textAlign: "center" }}>
               Нет сообщений
             </p>
           )}
@@ -340,7 +410,7 @@ export default function ClientRequestPage() {
           ))}
           <div ref={chatEndRef} />
         </div>
-        <div className="flex gap-2" style={{ marginTop: 12 }}>
+        <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
           <input
             type="text"
             className="input"
@@ -364,9 +434,9 @@ export default function ClientRequestPage() {
 
       {/* Review form */}
       {showReviewForm && (
-        <div className="card animate-fadeIn" style={{ padding: 20, marginBottom: 16 }}>
+        <div className="card" style={{ padding: 20, marginBottom: 16 }}>
           <h3 style={{ marginBottom: 16 }}>Оставить отзыв</h3>
-          <div className="flex gap-2" style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
             {[1, 2, 3, 4, 5].map((n) => (
               <button
                 key={n}
@@ -397,10 +467,10 @@ export default function ClientRequestPage() {
           </label>
           <button
             type="button"
-            className="btn-primary w-full"
+            className="btn-primary"
             onClick={submitReview}
             disabled={submittingReview}
-            style={{ marginTop: 12, opacity: submittingReview ? 0.6 : 1 }}
+            style={{ width: "100%", marginTop: 12, opacity: submittingReview ? 0.6 : 1 }}
           >
             {submittingReview ? "Отправка..." : "Отправить отзыв"}
           </button>
@@ -413,7 +483,7 @@ export default function ClientRequestPage() {
           <h3 style={{ marginBottom: 12 }}>Отзывы</h3>
           {request.reviews.map((rev) => (
             <div key={rev.id} className="card" style={{ padding: 16, marginBottom: 8 }}>
-              <div className="flex justify-between items-center">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <strong>{rev.reviewer.name}</strong>
                 <span style={{ color: "var(--orange)" }}>
                   {"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}
