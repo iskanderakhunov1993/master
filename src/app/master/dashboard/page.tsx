@@ -116,13 +116,16 @@ export default function MasterDashboardPage() {
         <div className="stat-card">
           <span className="muted">Откликов осталось</span>
           <strong style={{ fontSize: "1.5rem", color: totalResponses > 0 ? "var(--green)" : "var(--red)" }}>
-            {totalResponses}
+            {mp.subscription?.plan === "PREMIUM" ? "∞" : totalResponses}
           </strong>
         </div>
-        <div className="stat-card">
+        <Link href="/master/subscription" className="stat-card" style={{ textDecoration: "none", color: "inherit" }}>
           <span className="muted">Тариф</span>
           <strong style={{ fontSize: "1.5rem" }}>{plan}</strong>
-        </div>
+          <span style={{ fontSize: 12, color: "var(--accent)" }}>
+            {mp.subscription?.isActive ? "Управить →" : "Оформить →"}
+          </span>
+        </Link>
       </div>
 
       {mp.categories.length > 0 && (

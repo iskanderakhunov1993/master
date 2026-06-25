@@ -192,7 +192,16 @@ export default function MasterProfilePage() {
       <div className="card" style={{ padding: 20, marginTop: 16 }}>
         <h3 className="section-title" style={{ fontSize: 20, marginBottom: 16 }}>Подписка</h3>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-          <span style={{ fontWeight: 600 }}>{sub?.plan ?? "Бесплатный"}</span>
+          <span style={{ fontWeight: 600 }}>
+            {sub ? (
+              <>
+                {sub.plan === "START" ? "Стартовая" : sub.plan === "BASIC" ? "Базовая" : sub.plan === "PREMIUM" ? "Премиум" : sub.plan}
+                <span className="muted" style={{ fontWeight: 400, marginLeft: 8, fontSize: 14 }}>
+                  {sub.plan === "START" ? "990 ₽/мес" : sub.plan === "BASIC" ? "1 990 ₽/мес" : sub.plan === "PREMIUM" ? "3 990 ₽/мес" : ""}
+                </span>
+              </>
+            ) : "Бесплатный"}
+          </span>
           {sub?.isActive ? (
             <span className="pill-green">Активна</span>
           ) : (
@@ -202,28 +211,34 @@ export default function MasterProfilePage() {
         <div style={{ marginBottom: 8 }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 6 }}>
             <span className="muted">{sub ? "Откликов осталось" : "Бесплатных откликов"}</span>
-            <strong>{responsesLeft} из {responsesMax}</strong>
+            <strong>
+              {sub?.plan === "PREMIUM" ? "Безлимит ∞" : `${responsesLeft} из ${responsesMax}`}
+            </strong>
           </div>
-          <div style={{ height: 6, borderRadius: 3, background: "var(--line)", overflow: "hidden" }}>
-            <div style={{
-              width: `${(responsesLeft / responsesMax) * 100}%`,
-              height: "100%",
-              background: responsesLeft > 0 ? "var(--green)" : "var(--red)",
-              borderRadius: 3,
-              transition: "width .3s",
-            }} />
-          </div>
+          {sub?.plan !== "PREMIUM" && (
+            <div style={{ height: 6, borderRadius: 3, background: "var(--line)", overflow: "hidden" }}>
+              <div style={{
+                width: `${(responsesLeft / responsesMax) * 100}%`,
+                height: "100%",
+                background: responsesLeft > 0 ? "var(--green)" : "var(--red)",
+                borderRadius: 3,
+                transition: "width .3s",
+              }} />
+            </div>
+          )}
         </div>
         {sub?.expiresAt && (
           <p className="muted" style={{ margin: "8px 0 0", fontSize: 13 }}>
             Действует до {new Date(sub.expiresAt).toLocaleDateString("ru-RU")}
           </p>
         )}
-        {!sub && (
-          <button className="btn-primary" style={{ width: "100%", marginTop: 12 }}>
-            Оформить подписку
-          </button>
-        )}
+        <Link
+          href="/master/subscription"
+          className={sub ? "btn-secondary" : "btn-primary"}
+          style={{ width: "100%", marginTop: 12, textAlign: "center", display: "block" }}
+        >
+          {sub ? "Управить подпиской" : "Оформить подписку"}
+        </Link>
       </div>
 
       {/* PORTFOLIO */}
