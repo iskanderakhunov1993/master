@@ -39,7 +39,7 @@ export default function NewRequestPage() {
   const [categoryId, setCategoryId] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [urgency, setUrgency] = useState("TODAY");
+  const [urgency, setUrgency] = useState("NORMAL");
   const [hasPhoto, setHasPhoto] = useState(false);
   const [budgetIdx, setBudgetIdx] = useState(0);
   const [district, setDistrict] = useState("");
