@@ -60,6 +60,7 @@ export async function GET(request: NextRequest) {
         include: {
           category: true,
           address: { select: { id: true, title: true, city: true, district: true } },
+          client: { select: { id: true, name: true, avatarUrl: true, ratingAvg: true, ratingCount: true } },
           _count: { select: { offers: true } },
           selectedMaster: { select: { id: true, name: true, avatarUrl: true, ratingAvg: true } },
         },
