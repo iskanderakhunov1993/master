@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { ReactNode } from 'react'
 import { Brand } from './Brand'
+import NewRequestPopup from './NewRequestPopup'
 
 type Role = 'CLIENT' | 'MASTER' | 'ADMIN'
 
@@ -92,6 +93,9 @@ export function AppShell({
 
       {/* ---- Main content ---- */}
       <main className="app-main">{children}</main>
+
+      {/* ---- New request popup for masters ---- */}
+      {role === 'MASTER' && <NewRequestPopup />}
 
       {/* ---- Mobile bottom nav ---- */}
       <nav className="bottom-nav">
