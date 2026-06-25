@@ -288,7 +288,7 @@ export default function ClientRequestPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {request.offers.map((offer) => {
               const master = offer.master.user;
-              const masterProfileId = master.masterProfile?.id || offer.master.id;
+              const masterProfileId = offer.master.id;
               const initials = master.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
               const orders = master.masterProfile?.completedOrders ?? master.ratingCount ?? 0;
               const responseTime = master.masterProfile?.avgResponseMinutes;

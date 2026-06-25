@@ -16,7 +16,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         offers: {
           include: {
             master: {
-              include: {
+              select: {
+                id: true,
+                userId: true,
+                guaranteeDays: true,
+                isVerified: true,
                 user: { select: { id: true, name: true, avatarUrl: true, ratingAvg: true, ratingCount: true } },
               },
             },
