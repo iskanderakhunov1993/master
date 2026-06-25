@@ -88,23 +88,40 @@ export async function POST(request: Request) {
     let addressId = parsed.data.addressId;
 
     if (!addressId || addressId === "placeholder" || addressId === "new") {
-      const existingAddress = await prisma.address.findFirst({
-        where: { userId: user.id },
-      });
-      if (existingAddress) {
-        addressId = existingAddress.id;
-      } else {
+      const district = parsed.data.district?.trim();
+      const street = parsed.data.street?.trim();
+
+      if (district || street) {
         const newAddress = await prisma.address.create({
           data: {
             userId: user.id,
-            title: "Мой адрес",
-            city: parsed.data.district || "Москва",
-            district: parsed.data.district || "Не указан",
-            street: parsed.data.street || "Не указана",
+            title: district || "Мой адрес",
+            city: "Москва",
+            district: district || "Не указан",
+            street: street || "Не указана",
             house: "—",
           },
         });
         addressId = newAddress.id;
+      } else {
+        const existingAddress = await prisma.address.findFirst({
+          where: { userId: user.id },
+        });
+        if (existingAddress) {
+          addressId = existingAddress.id;
+        } else {
+          const newAddress = await prisma.address.create({
+            data: {
+              userId: user.id,
+              title: "Мой адрес",
+              city: "Москва",
+              district: "Не указан",
+              street: "Не указана",
+              house: "—",
+            },
+          });
+          addressId = newAddress.id;
+        }
       }
     }
 
