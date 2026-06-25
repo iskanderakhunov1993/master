@@ -85,6 +85,8 @@ export default function ClientRequestPage() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [masterConfirmed, setMasterConfirmed] = useState(false);
+  const [masterRejected, setMasterRejected] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   async function loadData() {
@@ -381,6 +383,89 @@ export default function ClientRequestPage() {
           <p className="muted" style={{ margin: 0 }}>Мастера увидят вашу заявку и предложат свою цену</p>
         </div>
       )}
+
+      {/* Master meeting card — shown when master is assigned */}
+      {request.status === "ASSIGNED" || request.status === "IN_PROGRESS" ? (() => {
+        const acceptedOffer = request.offers.find((o) => o.status === "ACCEPTED");
+        if (!acceptedOffer) return null;
+        const master = acceptedOffer.master.user;
+        const initials = master.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+        const orders = master.masterProfile?.completedOrders ?? master.ratingCount ?? 0;
+
+        return (
+          <div className="card" style={{ padding: 24, marginBottom: 16, border: "2px solid var(--accent)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+              <span style={{ fontSize: 20 }}>🚗</span>
+              <h3 style={{ margin: 0 }}>
+                {masterConfirmed ? "Мастер на месте ✅" : masterRejected ? "Заказ приостановлен" : "Мастер едет к вам"}
+              </h3>
+            </div>
+
+            <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 16 }}>
+              <div className="avatar" style={{ width: 56, height: 56, fontSize: 20, flexShrink: 0 }}>
+                {initials}
+              </div>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 16 }}>{master.name}</div>
+                <div className="muted" style={{ fontSize: 14 }}>
+                  ⭐ {master.ratingAvg?.toFixed(1) || "—"} · {orders} заказов
+                </div>
+                <span className="pill-green" style={{ fontSize: 12, marginTop: 4, display: "inline-block" }}>✅ Проверен</span>
+              </div>
+            </div>
+
+            {masterRejected ? (
+              <div style={{
+                padding: 16,
+                background: "#fce4ec",
+                borderRadius: "var(--radius-sm)",
+                textAlign: "center",
+                color: "var(--red)",
+                fontWeight: 600,
+              }}>
+                Заказ приостановлен. Мы свяжемся с вами.
+              </div>
+            ) : masterConfirmed ? (
+              <div style={{
+                padding: 16,
+                background: "#e8f5e9",
+                borderRadius: "var(--radius-sm)",
+                textAlign: "center",
+                color: "var(--green)",
+                fontWeight: 600,
+              }}>
+                Мастер на месте. Работа началась!
+              </div>
+            ) : (
+              <>
+                <p className="muted" style={{ margin: "0 0 16px", fontSize: 14 }}>
+                  Убедитесь, что перед вами этот человек
+                </p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button
+                    className="btn-primary"
+                    style={{ flex: 1 }}
+                    onClick={() => setMasterConfirmed(true)}
+                  >
+                    ✅ Да, впустил мастера
+                  </button>
+                  <button
+                    className="btn-secondary"
+                    style={{ flex: 1 }}
+                    onClick={() => {
+                      if (confirm("Вы уверены? Заказ будет приостановлен.")) {
+                        setMasterRejected(true);
+                      }
+                    }}
+                  >
+                    ❌ Это не тот человек
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        );
+      })() : null}
 
       {/* Chat */}
       <section className="card" style={{ padding: 20, marginBottom: 16 }}>
