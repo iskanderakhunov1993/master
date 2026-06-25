@@ -33,15 +33,31 @@ async function main() {
   const adminPasswordHash = await bcrypt.hash('admin123', 10)
 
   // --- Categories ---
-  const [catPlumbing, catElectrical, catFurniture, catAppliances, catCleaning, catMoving] =
-    await Promise.all([
-      prisma.category.create({ data: { name: 'Сантехника', slug: 'plumbing', icon: '🔧' } }),
-      prisma.category.create({ data: { name: 'Электрика', slug: 'electrical', icon: '⚡' } }),
-      prisma.category.create({ data: { name: 'Сборка мебели', slug: 'furniture', icon: '🪑' } }),
-      prisma.category.create({ data: { name: 'Бытовая техника', slug: 'appliances', icon: '🧺' } }),
-      prisma.category.create({ data: { name: 'Клининг', slug: 'cleaning', icon: '🧹' } }),
-      prisma.category.create({ data: { name: 'Переезд', slug: 'moving', icon: '🚛' } }),
-    ])
+  const [
+    catPlumbing, catElectrical, catClimate,
+    catHandyman, catFinishing,
+    catAppliances, catElectronics,
+    catCleaning, catDryCleaning,
+    catMoving, catFurniture,
+  ] = await Promise.all([
+    // 🔌 Инженерные системы и коммуникации
+    prisma.category.create({ data: { name: 'Сантехника', slug: 'plumbing', icon: '🔧', group: 'Инженерные системы', description: 'Устранение засоров, замена смесителей, установка унитазов, подключение бойлеров' } }),
+    prisma.category.create({ data: { name: 'Электрика', slug: 'electrical', icon: '⚡', group: 'Инженерные системы', description: 'Монтаж розеток, замена проводки, сборка электрощитов, установка светильников' } }),
+    prisma.category.create({ data: { name: 'Климат и кондиционеры', slug: 'climate', icon: '❄️', group: 'Инженерные системы', description: 'Установка, чистка и заправка кондиционеров фреоном' } }),
+    // 🛠 Ремонт и обустройство
+    prisma.category.create({ data: { name: 'Муж на час', slug: 'handyman', icon: '🔨', group: 'Ремонт и обустройство', description: 'Сборка мебели, навешивание полок, зеркал, телевизоров и карнизов' } }),
+    prisma.category.create({ data: { name: 'Отделочные работы', slug: 'finishing', icon: '🎨', group: 'Ремонт и обустройство', description: 'Поклейка обоев, укладка ламината, укладка плитки, косметический ремонт' } }),
+    // 📺 Ремонт техники
+    prisma.category.create({ data: { name: 'Бытовая техника', slug: 'appliances', icon: '🧺', group: 'Ремонт техники', description: 'Ремонт стиральных и посудомоечных машин, холодильников, духовых шкафов' } }),
+    prisma.category.create({ data: { name: 'Ремонт электроники', slug: 'electronics', icon: '📱', group: 'Ремонт техники', description: 'Замена экранов смартфонов, ремонт ноутбуков, чистка ПК от пыли' } }),
+    // 🧹 Клининг и хозяйственные услуги
+    prisma.category.create({ data: { name: 'Уборка', slug: 'cleaning', icon: '🧹', group: 'Клининг', description: 'Поддерживающая и генеральная уборка квартир, мытьё окон, уборка после ремонта' } }),
+    prisma.category.create({ data: { name: 'Химчистка мебели', slug: 'dry-cleaning', icon: '🛋️', group: 'Клининг', description: 'Профессиональная чистка диванов, матрасов, кресел и ковров на дому' } }),
+    // 📦 Грузоперевозки и логистика
+    prisma.category.create({ data: { name: 'Переезды', slug: 'moving', icon: '📦', group: 'Грузоперевозки', description: 'Квартирные и офисные переезды, услуги грузчиков, перевозка крупногабаритных вещей' } }),
+    // Keep furniture for backward compat with existing requests
+    prisma.category.create({ data: { name: 'Сборка мебели', slug: 'furniture', icon: '🪑', group: 'Ремонт и обустройство', description: 'Сборка кухонь, шкафов-купе, кроватей, стеллажей IKEA и других' } }),
+  ])
 
   // --- Users ---
   const elena = await prisma.user.create({

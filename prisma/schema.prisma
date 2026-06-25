@@ -162,10 +162,12 @@ model VerificationDocument {
 }
 
 model Category {
-  id   String @id @default(cuid())
-  name String
-  slug String @unique
-  icon String
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  icon        String
+  description String?
+  group       String?
 
   masters    MasterCategory[]
   requests   RepairRequest[]

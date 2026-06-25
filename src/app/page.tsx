@@ -17,13 +17,43 @@ import {
   Check,
 } from "lucide-react";
 
-const categories = [
-  { name: "Сантехника", icon: "🔧", desc: "Краны, трубы, унитазы, стиралки" },
-  { name: "Электрика", icon: "⚡", desc: "Розетки, проводка, щитки, свет" },
-  { name: "Сборка мебели", icon: "🪑", desc: "IKEA, шкафы, кухни, полки" },
-  { name: "Бытовая техника", icon: "🧺", desc: "Стиралки, посудомойки, бойлеры" },
-  { name: "Клининг", icon: "🧹", desc: "Уборка квартир, после ремонта" },
-  { name: "Переезд", icon: "🚛", desc: "Грузчики, перевозка, упаковка" },
+const categoryGroups = [
+  {
+    group: "🔌 Инженерные системы",
+    items: [
+      { name: "Сантехника", icon: "🔧", desc: "Засоры, смесители, унитазы, бойлеры" },
+      { name: "Электрика", icon: "⚡", desc: "Розетки, проводка, щитки, светильники" },
+      { name: "Климат", icon: "❄️", desc: "Установка и чистка кондиционеров" },
+    ],
+  },
+  {
+    group: "🛠 Ремонт и обустройство",
+    items: [
+      { name: "Муж на час", icon: "🔨", desc: "Полки, зеркала, карнизы, мелкий ремонт" },
+      { name: "Отделочные работы", icon: "🎨", desc: "Обои, ламинат, плитка, покраска" },
+      { name: "Сборка мебели", icon: "🪑", desc: "IKEA, шкафы, кухни, кровати" },
+    ],
+  },
+  {
+    group: "📺 Ремонт техники",
+    items: [
+      { name: "Бытовая техника", icon: "🧺", desc: "Стиралки, холодильники, посудомойки" },
+      { name: "Электроника", icon: "📱", desc: "Смартфоны, ноутбуки, чистка ПК" },
+    ],
+  },
+  {
+    group: "🧹 Клининг",
+    items: [
+      { name: "Уборка", icon: "🧹", desc: "Генеральная уборка, мытьё окон, после ремонта" },
+      { name: "Химчистка мебели", icon: "🛋️", desc: "Диваны, матрасы, кресла, ковры на дому" },
+    ],
+  },
+  {
+    group: "📦 Грузоперевозки",
+    items: [
+      { name: "Переезды", icon: "📦", desc: "Квартирные, офисные, грузчики, упаковка" },
+    ],
+  },
 ];
 
 const advantages = [
@@ -426,7 +456,7 @@ export default function HomePage() {
       {/* ═══════════ CATEGORIES ═══════════ */}
       <section style={{ padding: "80px 0", background: "var(--bg-section)" }}>
         <div className="section">
-          <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
             <h2
               style={{
                 fontSize: "clamp(1.6rem, 4vw, 2.2rem)",
@@ -437,26 +467,42 @@ export default function HomePage() {
             >
               Категории услуг
             </h2>
-            <p className="lead" style={{ maxWidth: 460, margin: "0 auto" }}>
-              Начинаем с самых востребованных — масштабируем по мере роста
+            <p className="lead" style={{ maxWidth: 500, margin: "0 auto" }}>
+              11 категорий — от сантехники до переездов. Начинаем с самых востребованных.
             </p>
           </div>
-          <div className="grid-3" style={{ gap: 20 }}>
-            {categories.map((c) => (
-              <Link
-                href="/register"
-                className="card"
-                key={c.name}
-                style={{ padding: 28, display: "flex", gap: 16, alignItems: "center" }}
+
+          {categoryGroups.map((g) => (
+            <div key={g.group} style={{ marginBottom: 32 }}>
+              <h3
+                style={{
+                  fontSize: 17,
+                  fontWeight: 700,
+                  marginBottom: 14,
+                  color: "var(--text)",
+                  letterSpacing: "-0.02em",
+                }}
               >
-                <span style={{ fontSize: 36 }}>{c.icon}</span>
-                <div>
-                  <span style={{ fontWeight: 700, display: "block", fontSize: 16 }}>{c.name}</span>
-                  <span className="muted" style={{ fontSize: 13 }}>{c.desc}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+                {g.group}
+              </h3>
+              <div className="grid-3" style={{ gap: 16 }}>
+                {g.items.map((c) => (
+                  <Link
+                    href="/register"
+                    className="card"
+                    key={c.name}
+                    style={{ padding: "20px 24px", display: "flex", gap: 16, alignItems: "center" }}
+                  >
+                    <span style={{ fontSize: 32, flexShrink: 0 }}>{c.icon}</span>
+                    <div>
+                      <span style={{ fontWeight: 700, display: "block", fontSize: 15 }}>{c.name}</span>
+                      <span className="muted" style={{ fontSize: 13, lineHeight: 1.4 }}>{c.desc}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
