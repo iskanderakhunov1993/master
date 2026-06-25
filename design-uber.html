@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Мастер рядом — Uber Design Principles</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --f:'Inter',system-ui,sans-serif;
+  --bg:#f6f6f6;--wh:#ffffff;
+  --bk:#000000;--tx:#1a1a1a;--sub:#6b6b6b;--hint:#999;
+  --ln:#e5e5e5;--soft:#f2f2f2;
+  --pr:#6c5ce7;--pr-l:#f0edff;
+  --gr:#06c167;--gr-l:#e6f9ef;
+  --or:#ff8c00;--rd:#ff3b30;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased}
+.page{max-width:1400px;margin:0 auto;padding:40px 20px 80px}
+.hd{text-align:center;margin-bottom:48px}
+.hd h1{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.hd p{color:var(--sub);font-size:14px;margin-top:6px}
+.principles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:48px}
+.principle{background:var(--wh);border-radius:16px;padding:16px;display:flex;align-items:flex-start;gap:10px}
+.principle .num{width:28px;height:28px;border-radius:50%;background:var(--bk);color:var(--wh);display:grid;place-items:center;font-size:12px;font-weight:800;flex-shrink:0}
+.principle .txt{font-size:12px;font-weight:600;line-height:1.4}
+
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:20px}
+@media(max-width:1200px){.g5{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.g5{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:440px){.g5{grid-template-columns:1fr;max-width:400px;margin:0 auto}}
+.cap{text-align:center;font-size:11px;font-weight:600;color:var(--hint);margin-top:10px}
+.note{font-size:10px;color:var(--pr);font-weight:600;margin-top:4px;text-align:center}
+
+/* Phone */
+.ph{aspect-ratio:390/844;border-radius:48px;padding:10px;background:linear-gradient(180deg,#e0e0e0,#ccc);box-shadow:0 2px 4px rgba(0,0,0,.06),0 12px 28px rgba(0,0,0,.08);display:flex}
+.sc{flex:1;border-radius:40px;overflow:hidden;display:flex;flex-direction:column;background:var(--wh)}
+.di{width:120px;height:34px;background:var(--bk);border-radius:0 0 22px 22px;margin:0 auto;z-index:2;position:relative}
+.sb{display:flex;justify-content:space-between;padding:0 24px;font-size:12px;font-weight:600;margin-top:-28px;z-index:3;position:relative}
+
+/* Uber-style bottom sheet */
+.sheet{
+  background:var(--wh);
+  border-radius:28px 28px 0 0;
+  padding:20px;
+  box-shadow:0 -4px 20px rgba(0,0,0,.06);
+  display:flex;flex-direction:column;gap:14px;
+  flex:1;
+  position:relative;
+}
+.sheet::before{
+  content:'';width:40px;height:4px;border-radius:4px;
+  background:#ddd;margin:0 auto 8px;display:block;
+}
+
+/* Uber top area (dark/map) */
+.top-area{
+  background:linear-gradient(180deg,#f0edff 0%,#e8e4ff 100%);
+  padding:20px;flex-shrink:0;
+  display:flex;flex-direction:column;gap:8px;
+}
+
+/* Body */
+.bd{flex:1;overflow:hidden;padding:20px;display:flex;flex-direction:column;gap:14px}
+
+/* Tab */
+.tb{height:58px;display:grid;grid-template-columns:repeat(4,1fr);background:var(--wh);border-top:1px solid var(--ln);flex-shrink:0}
+.ti{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;font-weight:600;color:var(--hint)}
+.ti.on{color:var(--bk)}
+.ti svg{width:22px;height:22px}
+
+/* ═══ Uber Components ═══ */
+
+/* Large heading — Uber uses VERY large, bold text */
+.uber-h{font-size:28px;font-weight:900;letter-spacing:-.04em;line-height:1.1;color:var(--bk)}
+.uber-h2{font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--bk)}
+
+/* Uber button — black, full width, large */
+.uber-btn{
+  width:100%;border-radius:12px;padding:18px;
+  text-align:center;font-weight:700;font-size:16px;
+  background:var(--bk);color:var(--wh);border:none;
+  font-family:var(--f);cursor:pointer;
+}
+.uber-btn-pr{background:var(--pr);color:var(--wh)}
+.uber-btn-o{
+  width:100%;border-radius:12px;padding:16px;
+  text-align:center;font-weight:700;font-size:15px;
+  background:var(--soft);color:var(--tx);border:none;
+}
+
+/* Uber input — minimal, underline or light bg */
+.uber-inp{
+  width:100%;background:var(--soft);border:none;border-radius:12px;
+  padding:16px 18px;font-size:16px;color:var(--tx);
+  font-family:var(--f);
+}
+.uber-inp::placeholder{color:var(--hint)}
+
+/* Uber row — icon + text, like Uber menu */
+.uber-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--ln)}
+.uber-row:last-child{border-bottom:none}
+.uber-row .ico{width:40px;height:40px;border-radius:50%;background:var(--soft);display:grid;place-items:center;flex-shrink:0}
+.uber-row .ico svg{width:20px;height:20px}
+.uber-row .info{flex:1}
+.uber-row .info .main{font-size:16px;font-weight:600}
+.uber-row .info .meta{font-size:13px;color:var(--sub);margin-top:1px}
+
+/* Uber option card — like ride option */
+.uber-opt{
+  display:flex;align-items:center;gap:14px;
+  padding:16px;border-radius:16px;
+  border:2px solid transparent;
+  transition:border-color .15s;
+  cursor:pointer;
+}
+.uber-opt.active{border-color:var(--bk);background:var(--soft)}
+.uber-opt .icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;flex-shrink:0}
+.uber-opt .det{flex:1}
+.uber-opt .det .name{font-size:16px;font-weight:700}
+.uber-opt .det .desc{font-size:13px;color:var(--sub);margin-top:2px}
+.uber-opt .price{font-size:20px;font-weight:800;letter-spacing:-.02em}
+
+/* Quick tags — Uber "Where to?" suggestions */
+.qtags{display:flex;gap:8px;overflow-x:auto}
+.qtag{
+  display:flex;align-items:center;gap:6px;
+  padding:10px 16px;border-radius:99px;
+  background:var(--soft);font-size:13px;font-weight:600;
+  white-space:nowrap;flex-shrink:0;color:var(--tx);
+}
+.qtag svg{width:16px;height:16px;color:var(--sub)}
+
+/* Pill */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:10px;font-size:12px;font-weight:700}
+
+/* Avatar */
+.av{border-radius:50%;display:grid;place-items:center;font-weight:700;flex-shrink:0}
+
+/* Stat */
+.st{text-align:center}
+.st small{display:block;font-size:11px;color:var(--sub);margin-bottom:2px}
+.st b{display:block;font-size:20px;font-weight:800}
+
+/* Chat */
+.ml{max-width:80%;padding:14px 18px;border-radius:20px 20px 20px 4px;background:var(--soft);font-size:14px;line-height:1.5}
+.mr2{max-width:78%;padding:14px 18px;border-radius:20px 20px 4px 20px;background:var(--bk);color:var(--wh);font-size:14px;line-height:1.5;align-self:flex-end}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hd"><h1>В стиле Uber — 7 принципов</h1><p>Минимализм · иерархия · одна рука · лучший вариант сверху</p></div>
+
+<!-- 7 Principles -->
+<div class="principles">
+  <div class="principle"><div class="num">1</div><div class="txt">Визуальные подсказки — иконки быстрее текста</div></div>
+  <div class="principle"><div class="num">2</div><div class="txt">Иконка + текст — сканируем глазами</div></div>
+  <div class="principle"><div class="num">3</div><div class="txt">Подсказки — быстрые ссылки и история</div></div>
+  <div class="principle"><div class="num">4</div><div class="txt">Простота — строгая иерархия</div></div>
+  <div class="principle"><div class="num">5</div><div class="txt">Крупные заголовки + CTA</div></div>
+  <div class="principle"><div class="num">6</div><div class="txt">Одна рука — действия внизу</div></div>
+  <div class="principle"><div class="num">7</div><div class="txt">Лучший вариант сверху</div></div>
+</div>
+
+<div class="g5">
+
+<!-- ═══ 1. HOME — Uber "Where to?" style ═══ -->
+<div>
+<div class="ph"><div class="sc">
+  <div class="di"></div>
+  <div class="sb"><span style="color:white">9:41</span><span style="color:white">5G</span></div>
+
+  <!-- Top: gradient area (like Uber map) -->
+  <div class="top-area">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="uber-h" style="font-size:24px">Мастер рядом</div>
+      <div class="av" style="width:40px;height:40px;background:var(--bk);color:var(--wh);font-size:14px">ЕП</div>
+    </div>
+  </div>
+
+  <!-- Bottom sheet — Uber pattern -->
+  <div class="sheet">
+    <!-- "Where to?" → "What to fix?" -->
+    <div class="uber-inp" style="font-weight:600;font-size:17px;color:var(--hint);padding:18px 20px">
+      <span style="display:flex;align-items:center;gap:10px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Что нужно починить?
+      </span>
+    </div>
+
+    <!-- Principle 3: Quick tags (like Uber suggestions) -->
+    <div class="qtags">
+      <div class="qtag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14.9A7 7 0 1 1 18 9"/><path d="M12 12v6M8 18h8"/></svg>Сантехника</div>
+      <div class="qtag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Электрика</div>
+      <div class="qtag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Ремонт</div>
+    </div>
+
+    <!-- Principle 3: Recent/saved -->
+    <div>
+      <div class="uber-row">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--tx)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <div class="info"><div class="main">Течёт смеситель</div><div class="meta">Сантехника · вчера</div></div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <div class="uber-row">
+        <div class="ico" style="background:var(--gr-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gr)" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></div>
+        <div class="info"><div class="main">Розетка — выполнено</div><div class="meta">Электрика · 2 дня назад</div></div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+    </div>
+
+    <!-- Principle 6: CTA at bottom (thumb zone) -->
+    <div style="margin-top:auto"><button class="uber-btn">Создать заявку</button></div>
+  </div>
+
+  <div class="tb">
+    <div class="ti on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/></svg>Главная</div>
+    <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Заявки</div>
+    <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Чат</div>
+    <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</div>
+  </div>
+</div></div>
+<div class="cap">Главная</div>
+<div class="note">Принципы: 3, 5, 6</div>
+</div>
+
+<!-- ═══ 2. SELECT MASTER — Uber ride options style ═══ -->
+<div>
+<div class="ph"><div class="sc">
+  <div class="di"></div>
+  <div class="sb"><span style="color:white">9:41</span><span style="color:white">5G</span></div>
+
+  <div class="top-area" style="padding:16px 20px">
+    <div style="font-size:14px;color:var(--sub)">Течёт смеситель · до 3 000₽</div>
+    <div class="uber-h2">Выберите мастера</div>
+  </div>
+
+  <div class="sheet">
+    <!-- Principle 7: Best option on top, highlighted -->
+    <div class="uber-opt active">
+      <div class="icon" style="background:var(--pr);border-radius:50%"><div style="color:white;font-weight:800;font-size:18px">А</div></div>
+      <div class="det">
+        <div class="name">Алексей С.</div>
+        <div class="desc">★ 4.9 · 148 заказов · 30дн гарантия</div>
+      </div>
+      <div class="price" style="color:var(--bk)">2 800₽</div>
+    </div>
+
+    <div class="uber-opt">
+      <div class="icon" style="background:var(--gr);border-radius:50%"><div style="color:white;font-weight:800;font-size:18px">М</div></div>
+      <div class="det">
+        <div class="name">Михаил В.</div>
+        <div class="desc">★ 4.8 · 73 заказа · через 40 мин</div>
+      </div>
+      <div class="price">3 200₽</div>
+    </div>
+
+    <div class="uber-opt">
+      <div class="icon" style="background:var(--or);border-radius:50%"><div style="color:white;font-weight:800;font-size:18px">И</div></div>
+      <div class="det">
+        <div class="name">Игорь Н.</div>
+        <div class="desc">★ 4.7 · 42 заказа</div>
+      </div>
+      <div class="price" style="color:var(--sub)">—</div>
+    </div>
+
+    <div style="text-align:center;color:var(--sub);font-size:13px;font-weight:500;padding:4px 0">Ещё 2 мастера ↓</div>
+
+    <!-- Principle 6: Action at bottom -->
+    <div style="margin-top:auto"><button class="uber-btn-pr">Выбрать Алексея · 2 800₽</button></div>
+  </div>
+
+  <div class="tb">
+    <div class="ti on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/></svg>Главная</div>
+    <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Заявки</div>
+    <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Чат</div>
+    <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</div>
+  </div>
+</div></div>
+<div class="cap">Выбор мастера</div>
+<div class="note">Принцип 7: лучший сверху</div>
+</div>
+
+<!-- ═══ 3. POPUP — Uber ride request for driver ═══ -->
+<div>
+<div class="ph"><div class="sc" style="background:rgba(0,0,0,.4);backdrop-filter:blur(6px)">
+  <div class="di"></div>
+  <div class="sb"><span style="color:rgba(255,255,255,.5)">9:41</span><span style="color:rgba(255,255,255,.5)">5G</span></div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:16px">
+    <div style="background:white;border-radius:28px;padding:24px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,.15)">
+      <!-- Timer ring — Uber uses circular timer -->
+      <div style="display:flex;justify-content:center;margin-bottom:16px">
+        <div style="width:64px;height:64px;border-radius:50%;border:4px solid var(--ln);border-top-color:var(--pr);display:grid;place-items:center;font-size:22px;font-weight:900;color:var(--bk)">22</div>
+      </div>
+
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:20px;font-weight:800;letter-spacing:-.03em">Новая заявка</div>
+        <div style="color:var(--sub);font-size:14px;margin-top:4px">Сантехника · 2.4 км</div>
+      </div>
+
+      <!-- Principle 4: Simplicity — only essential info -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+        <div class="st"><small>Бюджет</small><b>3 000₽</b></div>
+        <div class="st"><small>Район</small><b style="font-size:16px">Центр.</b></div>
+        <div class="st"><small>Клиент</small><b style="font-size:16px">★ 4.8</b></div>
+      </div>
+
+      <div style="font-size:15px;font-weight:600;text-align:center;color:var(--tx);margin-bottom:16px">Течёт смеситель на кухне</div>
+
+      <!-- Principle 6: Actions at bottom -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button class="uber-btn-o">Пропустить</button>
+        <button class="uber-btn">Принять</button>
+      </div>
+    </div>
+  </div>
+</div></div>
+<div class="cap">Popup (мастер)</div>
+<div class="note">Принципы: 4, 6</div>
+</div>
+
+<!-- ═══ 4. MASTER PROFILE — Uber driver profile style ═══ -->
+<div>
+<div class="ph"><div class="sc">
+  <div class="di"></div>
+  <div class="sb"><span style="color:white">9:41</span><span style="color:white">5G</span></div>
+  <div class="bd" style="gap:16px">
+    <!-- Uber driver profile: centered avatar, large name, rating -->
+    <div style="text-align:center;padding:8px 0 16px;border-bottom:1px solid var(--ln)">
+      <div class="av" style="width:80px;height:80px;background:var(--bk);color:var(--wh);font-size:30px;margin:0 auto 12px">А</div>
+      <div style="font-size:24px;font-weight:800;letter-spacing:-.03em">Алексей С.</div>
+      <div style="color:var(--sub);font-size:14px;margin-top:4px">Сантехник · Проверен ✓</div>
+      <!-- Uber-style large rating -->
+      <div style="font-size:36px;font-weight:900;margin-top:8px;letter-spacing:-.04em">4.9 <span style="font-size:16px;color:var(--sub);font-weight:500">★</span></div>
+    </div>
+
+    <!-- Principle 2: Icon + text rows -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div class="st"><small>Заказов</small><b>148</b></div>
+      <div class="st"><small>Ответ</small><b style="font-size:18px">7 мин</b></div>
+      <div class="st"><small>Гарантия</small><b style="font-size:18px">30 дн</b></div>
+    </div>
+
+    <!-- Principle 2: Menu rows with icons -->
+    <div>
+      <div class="uber-row">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--tx)" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <div class="info"><div class="main">Портфолио</div><div class="meta">4 подтверждённых работы</div></div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <div class="uber-row">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--tx)" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="info"><div class="main">Отзывы</div><div class="meta">96 отзывов</div></div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <div class="uber-row">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--tx)" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="info"><div class="main">Гарантия</div><div class="meta">30 дней на все работы</div></div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+    </div>
+
+    <div style="margin-top:auto"><button class="uber-btn-pr">Выбрать мастера</button></div>
+  </div>
+</div></div>
+<div class="cap">Профиль мастера</div>
+<div class="note">Принцип 2: иконка + текст</div>
+</div>
+
+<!-- ═══ 5. CHAT — Uber messaging style ═══ -->
+<div>
+<div class="ph"><div class="sc">
+  <div class="di"></div>
+  <div class="sb"><span style="color:white">9:41</span><span style="color:white">5G</span></div>
+  <div class="bd" style="gap:10px">
+    <!-- Uber-style header: minimal -->
+    <div style="display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--ln)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bk)" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+      <div class="av" style="width:44px;height:44px;background:var(--bk);color:var(--wh);font-size:16px">А</div>
+      <div>
+        <div style="font-weight:700;font-size:16px">Алексей С.</div>
+        <div style="font-size:12px;color:var(--gr)">В сети</div>
+      </div>
+    </div>
+
+    <!-- Uber info card in chat -->
+    <div style="background:var(--soft);border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--pr)" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      <div><div style="font-size:13px;font-weight:600">Сантехника · 2 800₽</div><div style="font-size:11px;color:var(--sub)">Гарантия 30 дней</div></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;flex:1;justify-content:flex-end">
+      <div class="ml">По фото — нужна замена прокладки. Могу приехать в 18:30?</div>
+      <div class="mr2">Да, жду! Спасибо</div>
+      <div class="ml">Отлично, буду вовремя! 👍</div>
+    </div>
+
+    <!-- Uber-style input bar -->
+    <div style="display:flex;gap:10px">
+      <input class="uber-inp" placeholder="Сообщение..." style="border-radius:99px;padding:14px 20px;font-size:15px"/>
+      <div style="width:50px;height:50px;border-radius:50%;background:var(--bk);display:grid;place-items:center;flex-shrink:0;cursor:pointer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </div>
+    </div>
+  </div>
+</div></div>
+<div class="cap">Чат</div>
+<div class="note">Принцип 1: визуальные подсказки</div>
+</div>
+
+</div>
+</div>
+</body>
+</html>

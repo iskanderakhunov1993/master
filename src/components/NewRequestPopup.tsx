@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { MapPin, Banknote, Star, ShieldCheck, X, Clock, ChevronRight } from "lucide-react";
+import { MapPin, Banknote, Star, ShieldCheck, X, ChevronRight } from "lucide-react";
 
 interface ClientInfo {
   id: string;
@@ -29,6 +29,10 @@ interface IncomingRequest {
 
 const POLL_INTERVAL = 12000;
 const POPUP_TIMEOUT = 30;
+const CIRCLE_SIZE = 72;
+const CIRCLE_STROKE = 4;
+const CIRCLE_RADIUS = (CIRCLE_SIZE - CIRCLE_STROKE) / 2;
+const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * CIRCLE_RADIUS;
 
 export default function NewRequestPopup() {
   const router = useRouter();
@@ -93,7 +97,9 @@ export default function NewRequestPopup() {
 
   if (!visible || !request) return null;
 
-  const progress = (timer / POPUP_TIMEOUT) * 100;
+  const progress = timer / POPUP_TIMEOUT;
+  const strokeDashoffset = CIRCLE_CIRCUMFERENCE * (1 - progress);
+  const timerColor = timer > 10 ? "#000" : timer > 5 ? "var(--orange)" : "var(--red)";
   const budget = request.budgetAmount
     ? `${request.budgetAmount.toLocaleString()} ₽`
     : "Ждёт цену";
@@ -122,60 +128,63 @@ export default function NewRequestPopup() {
           animation: "popupScale .35s cubic-bezier(.16,1,.3,1)",
         }}>
 
-          {/* Timer bar at top */}
-          <div style={{ height: 5, background: "var(--line)" }}>
-            <div style={{
-              height: "100%",
-              width: `${progress}%`,
-              background: timer > 10 ? "var(--accent)" : timer > 5 ? "var(--orange)" : "var(--red)",
-              transition: "width 1s linear, background .3s",
-            }} />
-          </div>
+          <div style={{ padding: "28px 24px 20px" }}>
 
-          <div style={{ padding: "24px 24px 20px" }}>
-
-            {/* Top: category + timer + close */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span className="pill" style={{ fontSize: 13 }}>
-                  {request.category.icon} {request.category.name}
-                </span>
-                {request.urgency === "URGENT" && (
-                  <span className="pill" style={{ background: "rgba(255,71,87,.1)", color: "var(--red)", fontSize: 13 }}>
-                    🔥 Срочно
-                  </span>
-                )}
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 13, color: timer > 10 ? "var(--muted)" : "var(--red)", fontWeight: 700 }}>
-                  <Clock size={14} style={{ display: "inline", verticalAlign: -2, marginRight: 4 }} />
-                  {timer}с
-                </span>
-                <button onClick={dismiss} style={{
-                  background: "var(--bg-soft)", border: "none", borderRadius: 10,
-                  width: 32, height: 32, display: "grid", placeItems: "center",
-                  cursor: "pointer", color: "var(--muted)",
+            {/* Circular timer at top center */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+              <div style={{ position: "relative", width: CIRCLE_SIZE, height: CIRCLE_SIZE }}>
+                <svg width={CIRCLE_SIZE} height={CIRCLE_SIZE} style={{ transform: "rotate(-90deg)" }}>
+                  <circle
+                    cx={CIRCLE_SIZE / 2}
+                    cy={CIRCLE_SIZE / 2}
+                    r={CIRCLE_RADIUS}
+                    fill="none"
+                    stroke="var(--line)"
+                    strokeWidth={CIRCLE_STROKE}
+                  />
+                  <circle
+                    cx={CIRCLE_SIZE / 2}
+                    cy={CIRCLE_SIZE / 2}
+                    r={CIRCLE_RADIUS}
+                    fill="none"
+                    stroke={timerColor}
+                    strokeWidth={CIRCLE_STROKE}
+                    strokeDasharray={CIRCLE_CIRCUMFERENCE}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    style={{ transition: "stroke-dashoffset 1s linear, stroke .3s" }}
+                  />
+                </svg>
+                <div style={{
+                  position: "absolute", inset: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 22, fontWeight: 800, color: timerColor,
                 }}>
-                  <X size={16} />
-                </button>
+                  {timer}
+                </div>
               </div>
             </div>
 
-            {/* Title + description */}
+            {/* Category + urgency */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, justifyContent: "center" }}>
+              <span className="pill" style={{ fontSize: 13 }}>
+                {request.category.icon} {request.category.name}
+              </span>
+              {request.urgency === "URGENT" && (
+                <span className="pill" style={{ background: "rgba(255,71,87,.1)", color: "var(--red)", fontSize: 13 }}>
+                  Срочно
+                </span>
+              )}
+            </div>
+
+            {/* Title */}
             <h3 style={{
               fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em",
               marginBottom: 8, color: "var(--text)", lineHeight: 1.2,
+              textAlign: "center",
             }}>
               {request.title}
             </h3>
-            <p style={{
-              color: "var(--muted)", fontSize: 14, lineHeight: 1.55,
-              marginBottom: 20,
-              display: "-webkit-box", WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical", overflow: "hidden",
-            }}>
-              {request.description}
-            </p>
 
             {/* Info grid: budget, district, offers */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
@@ -190,7 +199,7 @@ export default function NewRequestPopup() {
                     background: "var(--bg-soft)", borderRadius: 14,
                     padding: "12px 10px", textAlign: "center",
                   }}>
-                    <Icon size={16} style={{ color: "var(--accent)", marginBottom: 4 }} />
+                    <Icon size={16} style={{ color: "var(--muted)", marginBottom: 4 }} />
                     <div style={{ fontWeight: 800, fontSize: 15, color: "var(--text)" }}>{item.value}</div>
                     <div style={{ fontSize: 11, color: "var(--muted)" }}>{item.label}</div>
                   </div>
@@ -206,8 +215,8 @@ export default function NewRequestPopup() {
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
-                  width: 44, height: 44, borderRadius: 14,
-                  background: "var(--accent)", color: "white",
+                  width: 44, height: 44, borderRadius: "50%",
+                  background: "#000", color: "white",
                   display: "grid", placeItems: "center",
                   fontWeight: 800, fontSize: 18, flexShrink: 0,
                 }}>
@@ -226,7 +235,7 @@ export default function NewRequestPopup() {
                       {clientOrders} {clientOrders === 1 ? "заказ" : clientOrders < 5 ? "заказа" : "заказов"}
                     </span>
                     {clientOrders >= 3 && (
-                      <span style={{ fontSize: 12, color: "var(--accent)", display: "flex", alignItems: "center", gap: 3 }}>
+                      <span style={{ fontSize: 12, color: "var(--green)", display: "flex", alignItems: "center", gap: 3 }}>
                         <ShieldCheck size={12} /> Надёжный
                       </span>
                     )}
@@ -251,7 +260,7 @@ export default function NewRequestPopup() {
               </button>
               <button onClick={accept} className="btn-primary"
                 style={{ width: "100%", justifyContent: "center", minHeight: 52 }}>
-                Откликнуться
+                Принять
               </button>
             </div>
           </div>

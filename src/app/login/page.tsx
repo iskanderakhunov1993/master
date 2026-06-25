@@ -44,35 +44,32 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="landing flex flex-col" style={{ minHeight: "100vh", background: "var(--bg-soft)" }}>
-      <header className="landing-nav">
+    <div style={{ minHeight: "100vh", background: "#fff", display: "flex", flexDirection: "column" }}>
+      <header style={{ padding: "20px 24px" }}>
         <Brand size="default" />
       </header>
 
-      <main className="section flex items-center justify-center" style={{ flex: 1, padding: "40px 16px" }}>
-        <div className="card animate-fadeIn" style={{ width: "100%", maxWidth: 420, padding: 32 }}>
-          <div className="text-center" style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: "2.5rem", marginBottom: 8 }}>👋</div>
-            <h2 style={{ marginBottom: 8, fontSize: "1.5rem" }}>Вход</h2>
-            <p className="muted">Войдите, чтобы продолжить работу</p>
-          </div>
+      <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" }}>
+        <div style={{ width: "100%", maxWidth: 400 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.04em", marginBottom: 8 }}>Вход</h1>
+          <p className="muted" style={{ marginBottom: 28 }}>Войдите, чтобы продолжить работу</p>
 
           {error && (
             <div style={{
-              padding: "10px 14px",
-              borderRadius: 8,
+              padding: "12px 16px",
+              borderRadius: 12,
               marginBottom: 16,
-              fontSize: "0.9rem",
-              background: "var(--accent-light)",
+              fontSize: 14,
+              background: "#fef2f2",
               color: "var(--red)",
             }}>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <label className="field">
-              <span className="muted" style={{ fontSize: "0.85rem" }}>Email</span>
+              <span className="muted" style={{ fontSize: 13, marginBottom: 4 }}>Email</span>
               <input
                 type="email"
                 className="input"
@@ -84,7 +81,7 @@ export default function LoginPage() {
             </label>
 
             <label className="field">
-              <span className="muted" style={{ fontSize: "0.85rem" }}>Пароль</span>
+              <span className="muted" style={{ fontSize: 13, marginBottom: 4 }}>Пароль</span>
               <input
                 type="password"
                 className="input"
@@ -95,14 +92,14 @@ export default function LoginPage() {
               />
             </label>
 
-            <button type="submit" className="btn-primary w-full" disabled={loading} style={{ marginTop: 8 }}>
+            <button type="submit" className="btn-primary" disabled={loading} style={{ width: "100%", marginTop: 8, minHeight: 52 }}>
               {loading ? <><Loader2 size={18} className="spin" /> Вход...</> : "Войти"}
             </button>
           </form>
 
-          <p className="muted text-center" style={{ marginTop: 20, fontSize: "0.9rem" }}>
+          <p className="muted" style={{ marginTop: 24, fontSize: 14, textAlign: "center" }}>
             Нет аккаунта?{" "}
-            <Link href="/register" style={{ color: "var(--accent)" }}>
+            <Link href="/register" style={{ color: "#000", fontWeight: 600 }}>
               Зарегистрироваться
             </Link>
           </p>

@@ -59,7 +59,7 @@ export function AppShell({
   return (
     <div className="app-layout">
       {/* ---- Topbar ---- */}
-      <header className="topbar">
+      <header className="topbar" style={{ background: '#fff', height: 64, borderBottom: '1px solid var(--line)' }}>
         <Brand size="small" />
         <div className="flex items-center gap-3">
           <span className="pill">{roleLabels[role]}</span>
@@ -67,7 +67,7 @@ export function AppShell({
       </header>
 
       {/* ---- Desktop sidebar ---- */}
-      <aside className="sidebar">
+      <aside className="sidebar" style={{ background: '#fff' }}>
         <Brand />
         <div className="mt-2 mb-4">
           <span className="pill">{roleLabels[role]}</span>
@@ -78,6 +78,7 @@ export function AppShell({
               key={item.href}
               href={item.href}
               className={`nav-item ${isActive(item.href) ? 'nav-item-active' : ''}`}
+              style={isActive(item.href) ? { color: '#000', fontWeight: 700 } : {}}
             >
               <span>{item.icon}</span>
               {item.label}
@@ -98,17 +99,33 @@ export function AppShell({
       {role === 'MASTER' && <NewRequestPopup />}
 
       {/* ---- Mobile bottom nav ---- */}
-      <nav className="bottom-nav">
-        {items.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`bottom-nav-item ${isActive(item.href) ? 'bottom-nav-item-active' : ''}`}
-          >
-            <span className="text-lg">{item.icon}</span>
-            <span>{item.label}</span>
-          </Link>
-        ))}
+      <nav className="bottom-nav" style={{ background: '#fff', borderTop: '1px solid var(--line)' }}>
+        {items.map((item) => {
+          const active = isActive(item.href)
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`bottom-nav-item ${active ? 'bottom-nav-item-active' : ''}`}
+              style={active ? { color: '#000', fontWeight: 700, position: 'relative' } : { position: 'relative' }}
+            >
+              {active && (
+                <span style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 24,
+                  height: 2,
+                  background: '#000',
+                  borderRadius: 1,
+                }} />
+              )}
+              <span className="text-lg">{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          )
+        })}
       </nav>
     </div>
   )

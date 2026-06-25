@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Мастер рядом — Soft Premium концепт</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f8;color:#1a1d2e;-webkit-font-smoothing:antialiased}
+.page{max-width:1400px;margin:0 auto;padding:40px 20px 100px}
+h1{font-size:36px;font-weight:900;letter-spacing:-.04em;text-align:center;margin-bottom:6px}
+.sub{text-align:center;color:#8b92a8;margin-bottom:16px;font-size:16px}
+.palette-row{display:flex;justify-content:center;gap:8px;margin-bottom:48px;flex-wrap:wrap}
+.psw{width:64px;height:64px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:4px;font-size:8px;font-weight:700;border:1px solid rgba(0,0,0,.04)}
+.grid-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:48px}
+@media(max-width:1100px){.grid-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.grid-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:440px){.grid-row{grid-template-columns:1fr}}
+.section-label{font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section-label span{font-size:13px;color:#8b92a8;font-weight:500}
+
+/* Phone */
+.phone{border-radius:40px;padding:8px;aspect-ratio:9/19.5;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(145deg,#e2e6f0,#c8cee0);box-shadow:0 8px 32px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.6)}
+.inner{flex:1;border-radius:33px;overflow:hidden;display:flex;flex-direction:column;background:#f6f7fb;position:relative}
+.notch{width:90px;height:28px;margin:0 auto;background:#1a1d2e;border-radius:0 0 18px 18px;position:relative;z-index:2}
+.sbar{padding:0 20px;display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-top:-22px;position:relative;z-index:3;color:#1a1d2e}
+.pc{flex:1;overflow:hidden;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.bnav{height:56px;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;text-align:center;font-size:9px;font-weight:600;flex-shrink:0;background:white;border-top:1px solid #eef0f5}
+.bnav span{display:flex;flex-direction:column;align-items:center;gap:2px;color:#b0b7cc}
+.bnav .active{color:#4f6ef7}
+.bnav .active-dot{width:5px;height:5px;border-radius:50%;background:#4f6ef7;margin-top:2px}
+
+/* Components */
+.mc{border-radius:18px;padding:14px}
+.mb{border-radius:14px;padding:12px;text-align:center;font-weight:700;font-size:13px;cursor:pointer}
+.mp{display:inline-flex;padding:4px 10px;border-radius:10px;font-size:10px;font-weight:700}
+.mr{display:flex;gap:10px;align-items:center}
+.ma{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:15px;flex-shrink:0}
+.ms{border-radius:14px;padding:10px;text-align:center}
+.ms small{display:block;font-size:9px;color:#8b92a8;margin-bottom:2px}
+.ms b{display:block;font-size:16px;font-weight:800}
+.cap{text-align:center;color:#8b92a8;font-size:12px;margin-top:10px;line-height:1.3;font-weight:500}
+
+/* Category colors */
+.cat-plumb{background:#e8f4fd;color:#2196f3}.cat-plumb .ci{background:#2196f3;color:white}
+.cat-elec{background:#fff3e0;color:#ff9800}.cat-elec .ci{background:#ff9800;color:white}
+.cat-repair{background:#e8f5e9;color:#4caf50}.cat-repair .ci{background:#4caf50;color:white}
+.cat-clean{background:#f3e5f5;color:#9c27b0}.cat-clean .ci{background:#9c27b0;color:white}
+.cat-tech{background:#fce4ec;color:#e91e63}.cat-tech .ci{background:#e91e63;color:white}
+.cat-move{background:#e0f2f1;color:#009688}.cat-move .ci{background:#009688;color:white}
+.ci{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-size:18px}
+
+/* Accent */
+.accent{color:#4f6ef7}
+.accent-bg{background:linear-gradient(135deg,#4f6ef7,#7c5cf7)}
+.accent-soft{background:#eef1ff;color:#4f6ef7}
+
+.features{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px;margin-bottom:48px}
+@media(max-width:700px){.features{grid-template-columns:1fr}}
+.feature-card{background:white;border-radius:20px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.feature-card h3{font-size:16px;font-weight:800;margin-bottom:6px}
+.feature-card p{font-size:14px;color:#8b92a8;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>Soft Premium — финальная концепция</h1>
+<p class="sub">Bold Blue + мягкие формы + цветные категории + тактильные кнопки</p>
+
+<!-- Palette -->
+<div class="palette-row">
+  <div class="psw" style="background:#f6f7fb;color:#8b92a8">BG<br>F6F7FB</div>
+  <div class="psw" style="background:#ffffff;color:#8b92a8">Card<br>FFFFFF</div>
+  <div class="psw" style="background:#1a1d2e;color:#fff">Text<br>1A1D2E</div>
+  <div class="psw" style="background:#8b92a8;color:#fff">Muted<br>8B92A8</div>
+  <div class="psw" style="background:#4f6ef7;color:#fff">Primary<br>4F6EF7</div>
+  <div class="psw" style="background:#7c5cf7;color:#fff">Accent2<br>7C5CF7</div>
+  <div class="psw" style="background:#eef1ff;color:#4f6ef7">Soft<br>EEF1FF</div>
+  <div class="psw" style="background:#22c55e;color:#fff">Success<br>22C55E</div>
+  <div class="psw" style="background:#f97316;color:#fff">Warning<br>F97316</div>
+  <div class="psw" style="background:#ef4444;color:#fff">Danger<br>EF4444</div>
+</div>
+
+<!-- Design features -->
+<div class="features">
+  <div class="feature-card">
+    <h3>🎨 Цветные категории</h3>
+    <p>Каждая категория — свой цвет и фон. Визуально различимы, легко сканировать. Не скучный монохром.</p>
+  </div>
+  <div class="feature-card">
+    <h3>✨ Градиентные кнопки</h3>
+    <p>CTA с мягким градиентом blue→purple и тенью. Хочется нажать. Тактильная обратная связь.</p>
+  </div>
+  <div class="feature-card">
+    <h3>☁️ Мягкие тени</h3>
+    <p>Карточки "парят" над фоном. Многослойные тени (2px+12px). Глубина без тяжести.</p>
+  </div>
+  <div class="feature-card">
+    <h3>🫧 Rounded everywhere</h3>
+    <p>Всё скруглённое: карточки 18-24px, кнопки 14-16px, аватары 14px. Мягко и дружелюбно.</p>
+  </div>
+</div>
+
+<!-- SCREENS -->
+<div class="section-label">📱 Экраны <span>10 ключевых экранов приложения</span></div>
+
+<div class="grid-row">
+
+<!-- 1. Home Client -->
+<div>
+  <div class="phone">
+    <div class="inner">
+      <div class="notch"></div>
+      <div class="sbar"><span style="color:white">9:41</span><span style="color:white">●●● 5G</span></div>
+      <div class="pc" style="padding-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:13px;color:#8b92a8">Привет! 👋</div><div style="font-size:20px;font-weight:800;letter-spacing:-.03em">Что починить?</div></div>
+          <div class="ma" style="background:#eef1ff;color:#4f6ef7;border-radius:50%;width:38px;height:38px;font-size:13px">ЕП</div>
+        </div>
+
+        <!-- Search -->
+        <div style="background:white;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+          <span style="color:#b0b7cc">🔍</span>
+          <span style="color:#b0b7cc;font-size:13px">Поиск услуги...</span>
+        </div>
+
+        <!-- Categories -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div class="mc cat-plumb" style="text-align:center;padding:12px 8px">
+            <div class="ci" style="margin:0 auto 6px">🔧</div>
+            <div style="font-size:11px;font-weight:700">Сантехника</div>
+          </div>
+          <div class="mc cat-elec" style="text-align:center;padding:12px 8px">
+            <div class="ci" style="margin:0 auto 6px">⚡</div>
+            <div style="font-size:11px;font-weight:700">Электрика</div>
+          </div>
+          <div class="mc cat-repair" style="text-align:center;padding:12px 8px">
+            <div class="ci" style="margin:0 auto 6px">🔨</div>
+            <div style="font-size:11px;font-weight:700">Ремонт</div>
+          </div>
+          <div class="mc cat-clean" style="text-align:center;padding:12px 8px">
+            <div class="ci" style="margin:0 auto 6px">🧹</div>
+            <div style="font-size:11px;font-weight:700">Клининг</div>
+          </div>
+          <div class="mc cat-tech" style="text-align:center;padding:12px 8px">
+            <div class="ci" style="margin:0 auto 6px">📱</div>
+            <div style="font-size:11px;font-weight:700">Техника</div>
+          </div>
+          <div class="mc cat-move" style="text-align:center;padding:12px 8px">
+            <div class="ci" style="margin:0 auto 6px">📦</div>
+            <div style="font-size:11px;font-weight:700">Переезд</div>
+          </div>
+        </div>
+
+        <!-- Active order -->
+        <div style="font-size:13px;font-weight:700;color:#8b92a8;margin-top:2px">АКТИВНЫЕ ЗАЯВКИ</div>
+        <div class="mc" style="background:white;box-shadow:0 2px 12px rgba(0,0,0,.05);padding:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span class="mp cat-plumb" style="font-size:9px;border-radius:8px">🔧 Сантехника</span>
+            <span class="mp" style="background:#e8f5e9;color:#22c55e;font-size:9px;border-radius:8px">В работе</span>
+          </div>
+          <div style="font-weight:700;font-size:14px">Течёт смеситель</div>
+          <div style="color:#8b92a8;font-size:11px;margin-top:2px">Алексей · 2 800 ₽ · Сегодня</div>
+        </div>
+
+        <!-- CTA -->
+        <div style="margin-top:auto">
+          <div class="mb accent-bg" style="color:white;border-radius:16px;padding:15px;box-shadow:0 6px 20px rgba(79,110,247,.3);font-size:15px">📷 Создать заявку</div>
+        </div>
+      </div>
+      <div class="bnav">
+        <span class="active">🏠<br>Главная<div class="active-dot"></div></span>
+        <span>💬<br>Чат</span>
+        <span>📋<br>Заявки</span>
+        <span>👤<br>Профиль</span>
+      </div>
+    </div>
+  </div>
+  <div class="cap">Главная клиента</div>
+</div>
+
+<!-- 2. Popup -->
+<div>
+  <div class="phone">
+    <div class="inner" style="background:rgba(26,29,46,.6);backdrop-filter:blur(8px)">
+      <div class="notch"></div>
+      <div class="sbar"><span style="color:rgba(255,255,255,.6)">9:41</span><span style="color:rgba(255,255,255,.6)"></span></div>
+      <div class="pc" style="justify-content:center;padding:12px">
+        <div style="background:white;border-radius:24px;padding:20px;box-shadow:0 16px 48px rgba(0,0,0,.2);animation:none">
+          <!-- Timer -->
+          <div style="height:4px;background:#eef1ff;border-radius:4px;margin-bottom:14px;overflow:hidden"><div style="height:100%;width:72%;background:linear-gradient(90deg,#4f6ef7,#7c5cf7);border-radius:4px"></div></div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="display:flex;gap:6px">
+              <span class="mp cat-plumb" style="border-radius:8px;font-size:9px">🔧 Сантехника</span>
+              <span class="mp" style="background:#fef2f2;color:#ef4444;border-radius:8px;font-size:9px">🔥 Срочно</span>
+            </div>
+            <span style="font-size:12px;color:#8b92a8;font-weight:700">⏱ 22с</span>
+          </div>
+
+          <div style="font-size:18px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Течёт смеситель</div>
+          <div style="color:#8b92a8;font-size:12px;margin-bottom:14px">Капает снизу, нужна замена прокладки</div>
+
+          <!-- Info chips -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+            <div style="background:#f6f7fb;border-radius:12px;padding:10px;text-align:center"><div style="font-weight:800;font-size:14px;color:#4f6ef7">3 000₽</div><div style="font-size:9px;color:#8b92a8">бюджет</div></div>
+            <div style="background:#f6f7fb;border-radius:12px;padding:10px;text-align:center"><div style="font-weight:800;font-size:13px">Центр.</div><div style="font-size:9px;color:#8b92a8">район</div></div>
+            <div style="background:#f6f7fb;border-radius:12px;padding:10px;text-align:center"><div style="font-weight:800;font-size:14px">2</div><div style="font-size:9px;color:#8b92a8">откликов</div></div>
+          </div>
+
+          <!-- Client -->
+          <div class="mr" style="padding:10px;background:#f6f7fb;border-radius:14px;margin-bottom:14px">
+            <div class="ma" style="background:linear-gradient(135deg,#4f6ef7,#7c5cf7);color:white;border-radius:12px">Е</div>
+            <div style="flex:1"><div style="font-weight:700;font-size:13px">Елена · ⭐4.8</div><div style="font-size:10px;color:#8b92a8">6 заказов · 🛡 Надёжный</div></div>
+            <span style="color:#b0b7cc;font-size:16px">›</span>
+          </div>
+
+          <!-- Buttons -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="mb" style="border:2px solid #eef1ff;color:#8b92a8;background:white">Пропустить</div>
+            <div class="mb accent-bg" style="color:white;box-shadow:0 4px 14px rgba(79,110,247,.3)">Откликнуться</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap">Popup новой заявки</div>
+</div>
+
+<!-- 3. Master Profile -->
+<div>
+  <div class="phone">
+    <div class="inner">
+      <div class="notch"></div>
+      <div class="sbar"><span style="color:white">9:41</span><span style="color:white"></span></div>
+      <div class="pc" style="background:white;padding-top:6px">
+        <!-- Header gradient -->
+        <div style="background:linear-gradient(135deg,#4f6ef7,#7c5cf7);border-radius:20px;padding:18px;color:white;margin:-14px -16px 0;border-radius:0 0 24px 24px">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="width:56px;height:56px;border-radius:18px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:22px;font-weight:900">А</div>
+            <div>
+              <div style="font-size:18px;font-weight:800">Алексей</div>
+              <div style="opacity:.8;font-size:12px">Сантехник · ✅ Проверен</div>
+              <div style="display:flex;gap:4px;margin-top:4px">
+                <span style="background:rgba(255,255,255,.2);padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">⭐ 4.9</span>
+                <span style="background:rgba(255,255,255,.2);padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">148 заказов</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px">
+          <div class="ms" style="background:#f6f7fb;border-radius:14px"><small>Рейтинг</small><b class="accent">4.9</b></div>
+          <div class="ms" style="background:#f6f7fb;border-radius:14px"><small>Ответ</small><b>7м</b></div>
+          <div class="ms" style="background:#f6f7fb;border-radius:14px"><small>Гарантия</small><b style="color:#22c55e">30дн</b></div>
+        </div>
+
+        <!-- Portfolio -->
+        <div style="font-size:12px;font-weight:700;color:#8b92a8;margin-top:8px">ПОРТФОЛИО</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="height:56px;border-radius:14px;background:linear-gradient(135deg,#e8f4fd,#eef1ff);padding:6px 8px;display:flex;align-items:flex-end"><span style="font-size:9px;font-weight:700;color:#4f6ef7">Замена крана ✅</span></div>
+          <div style="height:56px;border-radius:14px;background:linear-gradient(135deg,#fff3e0,#fce4ec);padding:6px 8px;display:flex;align-items:flex-end"><span style="font-size:9px;font-weight:700;color:#e91e63">Устранение течи</span></div>
+        </div>
+
+        <!-- Review -->
+        <div style="font-size:12px;font-weight:700;color:#8b92a8;margin-top:6px">ОТЗЫВЫ</div>
+        <div class="mc" style="background:#f6f7fb">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div class="mr" style="gap:6px"><div class="ma" style="width:28px;height:28px;font-size:11px;background:#e8f5e9;color:#4caf50;border-radius:8px">Е</div><span style="font-size:12px;font-weight:700">Елена</span></div>
+            <span style="font-size:11px;color:#f97316">⭐⭐⭐⭐⭐</span>
+          </div>
+          <div style="font-size:11px;color:#5a6178;line-height:1.4">"Приехал быстро, цену не менял, всё аккуратно"</div>
+        </div>
+
+        <div style="margin-top:auto"><div class="mb accent-bg" style="color:white;box-shadow:0 4px 14px rgba(79,110,247,.3)">Выбрать мастера</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cap">Профиль мастера</div>
+</div>
+
+<!-- 4. Offers -->
+<div>
+  <div class="phone">
+    <div class="inner">
+      <div class="notch"></div>
+      <div class="sbar"><span style="color:white">9:41</span><span style="color:white"></span></div>
+      <div class="pc" style="padding-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:20px;font-weight:800">Отклики</div>
+          <span class="mp accent-soft" style="border-radius:10px;font-size:12px;font-weight:800">3</span>
+        </div>
+        <div style="font-size:12px;color:#8b92a8">Течёт смеситель · до 3 000₽</div>
+
+        <!-- Offer 1 -->
+        <div class="mc" style="background:white;box-shadow:0 2px 12px rgba(0,0,0,.05);border:2px solid #eef1ff">
+          <div class="mr" style="margin-bottom:8px">
+            <div class="ma" style="background:linear-gradient(135deg,#4f6ef7,#7c5cf7);color:white">А</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:14px">Алексей</div>
+              <div style="display:flex;gap:6px;margin-top:2px">
+                <span style="font-size:11px;color:#f97316">⭐ 4.9</span>
+                <span style="font-size:11px;color:#8b92a8">148 заказов</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:800;font-size:18px;color:#4f6ef7">2 800₽</div>
+              <div style="font-size:10px;color:#22c55e;font-weight:700">🛡 30 дней</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#5a6178;margin-bottom:10px">"Похоже на прокладку, приеду в 18:30"</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+            <div class="mb" style="background:#f6f7fb;color:#8b92a8;font-size:11px;padding:9px">Профиль</div>
+            <div class="mb" style="background:#f6f7fb;color:#8b92a8;font-size:11px;padding:9px">Написать</div>
+            <div class="mb accent-bg" style="color:white;font-size:11px;padding:9px">Выбрать</div>
+          </div>
+        </div>
+
+        <!-- Offer 2 -->
+        <div class="mc" style="background:white;box-shadow:0 2px 12px rgba(0,0,0,.05)">
+          <div class="mr">
+            <div class="ma" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white">М</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:14px">Михаил</div>
+              <div style="font-size:11px;color:#8b92a8">⭐ 4.8 · 73 заказа</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:800;font-size:18px;color:#4f6ef7">3 200₽</div>
+              <div style="font-size:10px;color:#8b92a8">через 40мин</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offer 3 -->
+        <div class="mc" style="background:white;box-shadow:0 2px 12px rgba(0,0,0,.05)">
+          <div class="mr">
+            <div class="ma" style="background:linear-gradient(135deg,#f97316,#ea580c);color:white">И</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:14px">Игорь</div>
+              <div style="font-size:11px;color:#8b92a8">⭐ 4.7 · 42 заказа</div>
+            </div>
+            <div style="font-size:13px;color:#8b92a8;font-weight:600">По осмотру</div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <span class="active">🏠<br>Главная<div class="active-dot"></div></span>
+        <span>💬<br>Чат</span>
+        <span>📋<br>Заявки</span>
+        <span>👤<br>Профиль</span>
+      </div>
+    </div>
+  </div>
+  <div class="cap">Отклики мастеров</div>
+</div>
+
+<!-- 5. Create Request Wizard -->
+<div>
+  <div class="phone">
+    <div class="inner">
+      <div class="notch"></div>
+      <div class="sbar"><span style="color:white">9:41</span><span style="color:white"></span></div>
+      <div class="pc" style="padding-top:8px">
+        <!-- Steps -->
+        <div style="display:flex;align-items:center;gap:0;margin-bottom:12px;justify-content:center">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#4f6ef7,#7c5cf7);color:white;display:grid;place-items:center;font-size:11px;font-weight:800">✓</div>
+          <div style="width:28px;height:2px;background:#4f6ef7"></div>
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#4f6ef7,#7c5cf7);color:white;display:grid;place-items:center;font-size:11px;font-weight:800">2</div>
+          <div style="width:28px;height:2px;background:#eef1ff"></div>
+          <div style="width:28px;height:28px;border-radius:50%;background:#eef1ff;color:#b0b7cc;display:grid;place-items:center;font-size:11px;font-weight:700">3</div>
+        </div>
+        <div style="text-align:center;margin-bottom:10px"><div style="font-size:18px;font-weight:800">Опишите проблему</div><div style="font-size:12px;color:#8b92a8">Мастеру будет проще оценить</div></div>
+
+        <!-- Upload -->
+        <div style="border:2px dashed #c9d0e6;border-radius:18px;padding:20px;text-align:center;background:#fafaff">
+          <div style="font-size:28px;margin-bottom:4px">📷</div>
+          <div style="font-weight:700;font-size:13px;color:#4f6ef7">Добавить фото</div>
+          <div style="font-size:10px;color:#8b92a8;margin-top:2px">до 10 фото или видео</div>
+        </div>
+
+        <!-- Fields -->
+        <div style="background:white;border:1.5px solid #eef1ff;border-radius:14px;padding:12px;margin-top:6px">
+          <div style="font-size:11px;color:#8b92a8;font-weight:600;margin-bottom:4px">ЗАГОЛОВОК</div>
+          <div style="font-size:14px;color:#1a1d2e">Течёт смеситель на кухне</div>
+        </div>
+        <div style="background:white;border:1.5px solid #eef1ff;border-radius:14px;padding:12px">
+          <div style="font-size:11px;color:#8b92a8;font-weight:600;margin-bottom:4px">ОПИСАНИЕ</div>
+          <div style="font-size:13px;color:#5a6178;line-height:1.4">Капает снизу, возможно нужна замена прокладки...</div>
+        </div>
+
+        <!-- Urgency -->
+        <div style="font-size:11px;font-weight:700;color:#8b92a8">КОГДА НУЖНО?</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="padding:8px 14px;border-radius:10px;background:linear-gradient(135deg,#4f6ef7,#7c5cf7);color:white;font-size:12px;font-weight:700">Срочно</div>
+          <div style="padding:8px 14px;border-radius:10px;background:white;border:1.5px solid #eef1ff;color:#8b92a8;font-size:12px;font-weight:600">Сегодня</div>
+          <div style="padding:8px 14px;border-radius:10px;background:white;border:1.5px solid #eef1ff;color:#8b92a8;font-size:12px;font-weight:600">Завтра</div>
+        </div>
+
+        <div style="margin-top:auto"><div class="mb accent-bg" style="color:white;box-shadow:0 4px 14px rgba(79,110,247,.3)">Далее →</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cap">Wizard: описание</div>
+</div>
+
+<!-- 6. Chat -->
+<div>
+  <div class="phone">
+    <div class="inner">
+      <div class="notch"></div>
+      <div class="sbar"><span style="color:white">9:41</span><span style="color:white"></span></div>
+      <div class="pc" style="padding-top:6px">
+        <div class="mr" style="padding-bottom:10px;border-bottom:1px solid #eef1ff">
+          <span style="color:#4f6ef7;font-size:18px">‹</span>
+          <div class="ma" style="background:linear-gradient(135deg,#4f6ef7,#7c5cf7);color:white;width:36px;height:36px;font-size:13px">А</div>
+          <div><div style="font-weight:700;font-size:14px">Алексей</div><div style="font-size:10px;color:#22c55e">Онлайн</div></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px;flex:1;padding:8px 0">
+          <div style="max-width:82%;background:#f6f7fb;border-radius:16px 16px 16px 4px;padding:10px 14px;font-size:12px;line-height:1.4;color:#1a1d2e">По фото похоже на прокладку. Приеду в 18:30?</div>
+          <div style="max-width:75%;align-self:flex-end;background:linear-gradient(135deg,#4f6ef7,#7c5cf7);border-radius:16px 16px 4px 16px;padding:10px 14px;font-size:12px;line-height:1.4;color:white">Да, жду. Спасибо!</div>
+          <div style="max-width:82%;background:#f6f7fb;border-radius:16px 16px 16px 4px;padding:10px 14px;font-size:12px;line-height:1.4;color:#1a1d2e">Инструмент с собой. До встречи 👋</div>
+        </div>
+
+        <div style="display:flex;gap:8px;padding-top:8px;border-top:1px solid #eef1ff">
+          <div style="flex:1;background:#f6f7fb;border-radius:14px;padding:11px 14px;font-size:12px;color:#b0b7cc">Сообщение...</div>
+          <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#4f6ef7,#7c5cf7);display:grid;place-items:center;color:white;font-size:14px">▶</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap">Чат с мастером</div>
+</div>
+
+<!-- 7. Subscription -->
+<div>
+  <div class="phone">
+    <div class="inner">
+      <div class="notch"></div>
+      <div class="sbar"><span style="color:white">9:41</span><span style="color:white"></span></div>
+      <div class="pc" style="padding-top:8px">
+        <div style="font-size:20px;font-weight:800;margin-bottom:2px">Подписка</div>
+        <div style="font-size:12px;color:#8b92a8;margin-bottom:10px">Выберите план</div>
+
+        <!-- Plans -->
+        <div class="mc" style="background:white;box-shadow:0 2px 8px rgba(0,0,0,.04);padding:12px;margin-bottom:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:700;font-size:14px">Стартовая</div><div style="font-size:11px;color:#8b92a8">10 откликов</div></div>
+            <div style="font-weight:800;font-size:16px;color:#4f6ef7">990₽</div>
+          </div>
+        </div>
+
+        <div class="mc" style="background:white;box-shadow:0 4px 16px rgba(79,110,247,.12);border:2px solid #4f6ef7;padding:12px;position:relative;margin-bottom:6px">
+          <div style="position:absolute;top:-8px;right:12px;background:linear-gradient(135deg,#4f6ef7,#7c5cf7);color:white;padding:2px 10px;border-radius:8px;font-size:10px;font-weight:700">Популярный</div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:700;font-size:14px">Базовая</div><div style="font-size:11px;color:#8b92a8">20 откликов · чат · приоритет</div></div>
+            <div style="font-weight:800;font-size:16px;color:#4f6ef7">1 990₽</div>
+          </div>
+        </div>
+
+        <div class="mc" style="background:white;box-shadow:0 2px 8px rgba(0,0,0,.04);padding:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:700;font-size:14px">Премиум</div><div style="font-size:11px;color:#8b92a8">Безлимит · Pro бейдж</div></div>
+            <div style="font-weight:800;font-size:16px;color:#7c5cf7">3 990₽</div>
+          </div>
+        </div>
+
+        <div style="margin-top:auto"><div class="mb accent-bg" style="color:white;box-shadow:0 4px 14px rgba(79,110,247,.3)">Подключить Базовую</div></div>
+      </div>
+      <div class="bnav">
+        <span>📋<br>Заявки</span>
+        <span>🧰<br>Заказы</span>
+        <span class="active">💎<br>Подписка<div class="active-dot"></div></span>
+        <span>👤<br>Профиль</span>
+      </div>
+    </div>
+  </div>
+  <div class="cap">Подписка</div>
+</div>
+
+<!-- 8. Verification -->
+<div>
+  <div class="phone">
+    <div class="inner">
+      <div class="notch"></div>
+      <div class="sbar"><span style="color:white">9:41</span><span style="color:white"></span></div>
+      <div class="pc" style="padding-top:8px">
+        <div style="font-size:18px;font-weight:800;margin-bottom:10px">Верификация</div>
+
+        <!-- Steps -->
+        <div style="display:grid;gap:6px">
+          <div class="mr" style="padding:10px;background:white;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)">
+            <div style="width:28px;height:28px;border-radius:50%;background:#22c55e;color:white;display:grid;place-items:center;font-size:12px">✓</div>
+            <div><div style="font-weight:700;font-size:13px">Телефон</div><div style="font-size:10px;color:#22c55e">Подтверждён</div></div>
+          </div>
+
+          <div class="mr" style="padding:10px;background:white;border-radius:14px;border:2px solid #4f6ef7;box-shadow:0 2px 12px rgba(79,110,247,.1)">
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#4f6ef7,#7c5cf7);color:white;display:grid;place-items:center;font-size:12px;font-weight:800">2</div>
+            <div style="flex:1"><div style="font-weight:700;font-size:13px">Селфи + паспорт</div><div style="font-size:10px;color:#4f6ef7">Код: <b>482917</b> · 2:47</div></div>
+          </div>
+
+          <div class="mr" style="padding:10px;background:white;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)">
+            <div style="width:28px;height:28px;border-radius:50%;background:#eef1ff;color:#b0b7cc;display:grid;place-items:center;font-size:12px;font-weight:700">3</div>
+            <div><div style="font-weight:700;font-size:13px;color:#b0b7cc">Документы</div></div>
+          </div>
+
+          <div class="mr" style="padding:10px;background:white;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)">
+            <div style="width:28px;height:28px;border-radius:50%;background:#eef1ff;color:#b0b7cc;display:grid;place-items:center;font-size:12px;font-weight:700">4</div>
+            <div><div style="font-weight:700;font-size:13px;color:#b0b7cc">Категории</div></div>
+          </div>
+
+          <div class="mr" style="padding:10px;background:white;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)">
+            <div style="width:28px;height:28px;border-radius:50%;background:#eef1ff;color:#b0b7cc;display:grid;place-items:center;font-size:12px;font-weight:700">5</div>
+            <div><div style="font-weight:700;font-size:13px;color:#b0b7cc">Фото профиля</div></div>
+          </div>
+        </div>
+
+        <div style="margin-top:auto;text-align:center;font-size:12px;color:#8b92a8">1 из 5 шагов</div>
+      </div>
+    </div>
+  </div>
+  <div class="cap">Верификация</div>
+</div>
+
+<!-- 9. Master Dashboard -->
+<div>
+  <div class="phone">
+    <div class="inner">
+      <div class="notch"></div>
+      <div class="sbar"><span style="color:white">9:41</span><span style="color:white"></span></div>
+      <div class="pc" style="padding-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div><div style="font-size:13px;color:#8b92a8">Добро пожаловать</div><div style="font-size:20px;font-weight:800">Алексей 👋</div></div>
+          <div class="ma" style="background:linear-gradient(135deg,#4f6ef7,#7c5cf7);color:white;border-radius:50%;width:38px;height:38px;font-size:14px">А</div>
+        </div>
+
+        <!-- Stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="ms" style="background:white;box-shadow:0 2px 8px rgba(0,0,0,.04);border-radius:16px;padding:14px"><small>Рейтинг</small><b style="color:#f97316;font-size:20px">⭐ 4.9</b></div>
+          <div class="ms" style="background:white;box-shadow:0 2px 8px rgba(0,0,0,.04);border-radius:16px;padding:14px"><small>Заказов</small><b style="font-size:20px">148</b></div>
+          <div class="ms" style="background:white;box-shadow:0 2px 8px rgba(0,0,0,.04);border-radius:16px;padding:14px"><small>Откликов</small><b style="color:#4f6ef7;font-size:20px">14/20</b></div>
+          <div class="ms" style="background:white;box-shadow:0 2px 8px rgba(0,0,0,.04);border-radius:16px;padding:14px"><small>План</small><b style="color:#7c5cf7;font-size:16px">Базовая</b></div>
+        </div>
+
+        <!-- Active -->
+        <div style="font-size:12px;font-weight:700;color:#8b92a8;margin-top:6px">НОВЫЕ ЗАЯВКИ</div>
+        <div class="mc" style="background:white;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span class="mp cat-elec" style="border-radius:8px;font-size:9px">⚡ Электрика</span>
+            <span style="font-size:10px;color:#8b92a8">1.1 км</span>
+          </div>
+          <div style="font-weight:700;font-size:13px">Не работает розетка</div>
+          <div style="color:#8b92a8;font-size:11px">2 500 ₽ · Завтра</div>
+        </div>
+      </div>
+      <div class="bnav">
+        <span class="active">📋<br>Заявки<div class="active-dot"></div></span>
+        <span>🧰<br>Заказы</span>
+        <span>💎<br>Подписка</span>
+        <span>👤<br>Профиль</span>
+      </div>
+    </div>
+  </div>
+  <div class="cap">Дашборд мастера</div>
+</div>
+
+<!-- 10. Meeting -->
+<div>
+  <div class="phone">
+    <div class="inner">
+      <div class="notch"></div>
+      <div class="sbar"><span style="color:white">9:41</span><span style="color:white"></span></div>
+      <div class="pc" style="padding-top:8px">
+        <div style="font-size:18px;font-weight:800;margin-bottom:10px">Мастер едет 🚗</div>
+
+        <div class="mc" style="background:white;box-shadow:0 4px 16px rgba(0,0,0,.06);text-align:center;padding:24px">
+          <div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,#4f6ef7,#7c5cf7);display:grid;place-items:center;color:white;font-size:28px;font-weight:900;margin:0 auto 12px">А</div>
+          <div style="font-size:18px;font-weight:800">Алексей Соколов</div>
+          <div style="color:#8b92a8;font-size:13px;margin-top:4px">⭐ 4.9 · 148 заказов · ✅ Проверен</div>
+          <div style="margin-top:12px;padding:12px;background:#f6f7fb;border-radius:14px">
+            <div style="font-size:12px;color:#8b92a8;margin-bottom:4px">Убедитесь, что перед вами этот человек</div>
+          </div>
+        </div>
+
+        <div style="display:grid;gap:8px;margin-top:auto">
+          <div class="mb accent-bg" style="color:white;box-shadow:0 4px 14px rgba(79,110,247,.3);padding:15px;font-size:15px">✅ Да, впустил мастера</div>
+          <div class="mb" style="border:2px solid #fef2f2;color:#ef4444;background:white;padding:15px;font-size:14px">Это не тот человек</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap">Подтверждение мастера</div>
+</div>
+
+</div>
+</div>
+</body>
+</html>

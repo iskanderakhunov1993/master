@@ -46,68 +46,65 @@ export default function RegisterPage() {
     }
   }
 
-  const roles: { value: Role; label: string; desc: string; Icon: typeof User; emoji: string }[] = [
-    { value: "CLIENT", label: "Клиент", desc: "Нужно найти мастера", Icon: User, emoji: "👤" },
-    { value: "MASTER", label: "Мастер", desc: "Хочу получать заказы", Icon: Wrench, emoji: "🔧" },
+  const roles: { value: Role; label: string; desc: string; emoji: string }[] = [
+    { value: "CLIENT", label: "Клиент", desc: "Нужно найти мастера", emoji: "👤" },
+    { value: "MASTER", label: "Мастер", desc: "Хочу получать заказы", emoji: "🔧" },
   ];
 
   return (
-    <div className="landing flex flex-col" style={{ minHeight: "100vh", background: "var(--bg-soft)" }}>
-      <header className="landing-nav">
+    <div style={{ minHeight: "100vh", background: "#fff", display: "flex", flexDirection: "column" }}>
+      <header style={{ padding: "20px 24px" }}>
         <Brand size="default" />
       </header>
 
-      <main className="section flex items-center justify-center" style={{ flex: 1, padding: "40px 16px" }}>
-        <div className="card animate-fadeIn" style={{ width: "100%", maxWidth: 480, padding: 32 }}>
-          <div className="text-center" style={{ marginBottom: 24 }}>
-            <h2 style={{ marginBottom: 8, fontSize: "1.5rem" }}>Регистрация</h2>
-            <p className="muted">Создайте аккаунт и начните за 30 секунд</p>
-          </div>
+      <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" }}>
+        <div style={{ width: "100%", maxWidth: 440 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.04em", marginBottom: 8 }}>Регистрация</h1>
+          <p className="muted" style={{ marginBottom: 28 }}>Создайте аккаунт и начните за 30 секунд</p>
 
           {error && (
             <div style={{
-              background: "var(--accent-light)",
+              background: "#fef2f2",
               color: "var(--red)",
-              padding: "10px 14px",
-              borderRadius: 8,
+              padding: "12px 16px",
+              borderRadius: 12,
               marginBottom: 16,
-              fontSize: "0.9rem",
+              fontSize: 14,
             }}>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <div className="flex gap-3">
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {/* Role selection as uber-option */}
+            <div style={{ display: "flex", gap: 12 }}>
               {roles.map((r) => (
                 <button
                   key={r.value}
                   type="button"
                   onClick={() => setRole(r.value)}
-                  className="card"
+                  className="uber-option"
                   style={{
                     flex: 1,
                     padding: 20,
                     textAlign: "center",
                     cursor: "pointer",
-                    border: role === r.value
-                      ? "2px solid var(--accent)"
-                      : "2px solid transparent",
-                    background: role === r.value
-                      ? "var(--accent-light)"
-                      : undefined,
+                    background: role === r.value ? "#000" : "var(--soft, #f2f2f2)",
+                    color: role === r.value ? "#fff" : "var(--text)",
+                    border: "none",
+                    borderRadius: 16,
                     transition: "all .2s",
                   }}
                 >
                   <div style={{ fontSize: "1.75rem", marginBottom: 8 }}>{r.emoji}</div>
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>{r.label}</div>
-                  <div className="muted" style={{ fontSize: "0.8rem" }}>{r.desc}</div>
+                  <div style={{ fontWeight: 700, marginBottom: 4 }}>{r.label}</div>
+                  <div style={{ fontSize: 13, opacity: 0.7 }}>{r.desc}</div>
                 </button>
               ))}
             </div>
 
             <label className="field">
-              <span className="muted" style={{ fontSize: "0.85rem" }}>Имя</span>
+              <span className="muted" style={{ fontSize: 13, marginBottom: 4 }}>Имя</span>
               <input
                 type="text"
                 className="input"
@@ -119,7 +116,7 @@ export default function RegisterPage() {
             </label>
 
             <label className="field">
-              <span className="muted" style={{ fontSize: "0.85rem" }}>Email</span>
+              <span className="muted" style={{ fontSize: 13, marginBottom: 4 }}>Email</span>
               <input
                 type="email"
                 className="input"
@@ -131,7 +128,7 @@ export default function RegisterPage() {
             </label>
 
             <label className="field">
-              <span className="muted" style={{ fontSize: "0.85rem" }}>Телефон</span>
+              <span className="muted" style={{ fontSize: 13, marginBottom: 4 }}>Телефон</span>
               <input
                 type="tel"
                 className="input"
@@ -143,7 +140,7 @@ export default function RegisterPage() {
             </label>
 
             <label className="field">
-              <span className="muted" style={{ fontSize: "0.85rem" }}>Пароль</span>
+              <span className="muted" style={{ fontSize: 13, marginBottom: 4 }}>Пароль</span>
               <input
                 type="password"
                 className="input"
@@ -154,14 +151,14 @@ export default function RegisterPage() {
               />
             </label>
 
-            <button type="submit" className="btn-primary w-full" disabled={loading} style={{ marginTop: 8 }}>
+            <button type="submit" className="btn-primary" disabled={loading} style={{ width: "100%", marginTop: 8, minHeight: 52 }}>
               {loading ? <><Loader2 size={18} className="spin" /> Регистрация...</> : "Создать аккаунт"}
             </button>
           </form>
 
-          <p className="muted text-center" style={{ marginTop: 20, fontSize: "0.9rem" }}>
+          <p className="muted" style={{ marginTop: 24, fontSize: 14, textAlign: "center" }}>
             Уже есть аккаунт?{" "}
-            <Link href="/login" style={{ color: "var(--accent)" }}>
+            <Link href="/login" style={{ color: "#000", fontWeight: 600 }}>
               Войти
             </Link>
           </p>

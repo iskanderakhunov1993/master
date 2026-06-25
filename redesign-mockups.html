@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Мастер рядом — Мокапы 5 концепций</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#f0f0f2;color:#1d1d1f;-webkit-font-smoothing:antialiased}
+.page{max-width:1300px;margin:0 auto;padding:40px 20px 100px}
+h1{font-size:36px;font-weight:900;letter-spacing:-.04em;text-align:center;margin-bottom:6px}
+.sub{text-align:center;color:#86868b;margin-bottom:48px;font-size:16px}
+.concept-section{margin-bottom:72px}
+.concept-label{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.concept-label h2{font-size:24px;font-weight:800;letter-spacing:-.03em}
+.concept-label .tag{padding:4px 14px;border-radius:99px;font-size:12px;font-weight:700}
+.concept-label p{color:#86868b;font-size:14px;width:100%;margin-top:4px}
+.mockup-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;overflow-x:auto}
+@media(max-width:900px){.mockup-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.mockup-row{grid-template-columns:1fr}}
+
+/* Phone frame */
+.phone{border-radius:36px;padding:8px;aspect-ratio:9/19.5;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.phone-inner{flex:1;border-radius:29px;overflow:hidden;display:flex;flex-direction:column}
+.notch{width:80px;height:5px;border-radius:99px;margin:6px auto 0;opacity:.3}
+.sbar{padding:6px 18px 0;display:flex;justify-content:space-between;font-size:11px;font-weight:600;flex-shrink:0}
+.pcontent{flex:1;overflow:hidden;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.pnav{height:50px;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;text-align:center;font-size:9px;font-weight:600;flex-shrink:0;gap:0}
+.pnav span{display:flex;flex-direction:column;align-items:center;gap:2px}
+.caption{text-align:center;color:#86868b;font-size:12px;margin-top:8px;line-height:1.3}
+
+/* Mini components */
+.mcard{border-radius:14px;padding:12px}
+.mbtn{border-radius:12px;padding:11px;text-align:center;font-weight:700;font-size:13px}
+.mpill{display:inline-flex;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mrow{display:flex;gap:8px;align-items:center}
+.mavatar{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;flex-shrink:0}
+.mstat{border-radius:10px;padding:8px;text-align:center}
+.mstat small{display:block;font-size:9px;opacity:.6}
+.mstat b{display:block;font-size:15px;font-weight:800}
+</style>
+</head>
+<body>
+<div class="page">
+<h1>5 концепций: мокапы экранов</h1>
+<p class="sub">Главная · Заявка мастеру (popup) · Профиль мастера · Отклики</p>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 1. CLEAN MINIMAL -->
+<!-- ════════════════════════════════════════════ -->
+<div class="concept-section">
+  <div class="concept-label">
+    <span class="tag" style="background:#f5f5f7;color:#1d1d1f">01</span>
+    <h2>Clean Minimal</h2>
+    <p>Apple / Airbnb — белый, чёрный, один акцент. Фокус на контенте.</p>
+  </div>
+  <div class="mockup-row">
+
+    <!-- Screen 1: Home -->
+    <div>
+      <div class="phone" style="background:#e5e5ea">
+        <div class="phone-inner" style="background:#ffffff">
+          <div class="notch" style="background:#1d1d1f"></div>
+          <div class="sbar" style="color:#1d1d1f"><span>9:41</span><span>●●●</span></div>
+          <div class="pcontent">
+            <div style="font-size:24px;font-weight:800;letter-spacing:-.04em;color:#1d1d1f;line-height:1.1;margin-top:8px">Что нужно<br>починить?</div>
+            <p style="color:#86868b;font-size:12px;margin-bottom:8px">Сфотографируйте — мастера откликнутся</p>
+            <div class="mgrid">
+              <div class="mcard" style="background:#f5f5f7;text-align:center"><div style="font-size:22px">🔧</div><div style="font-size:11px;font-weight:600;margin-top:4px">Сантехника</div></div>
+              <div class="mcard" style="background:#f5f5f7;text-align:center"><div style="font-size:22px">⚡</div><div style="font-size:11px;font-weight:600;margin-top:4px">Электрика</div></div>
+              <div class="mcard" style="background:#f5f5f7;text-align:center"><div style="font-size:22px">🔨</div><div style="font-size:11px;font-weight:600;margin-top:4px">Ремонт</div></div>
+              <div class="mcard" style="background:#f5f5f7;text-align:center"><div style="font-size:22px">🧹</div><div style="font-size:11px;font-weight:600;margin-top:4px">Клининг</div></div>
+            </div>
+            <div style="margin-top:auto">
+              <div class="mbtn" style="background:#1d1d1f;color:white">Создать заявку</div>
+            </div>
+          </div>
+          <div class="pnav" style="background:#f5f5f7;color:#86868b;border-top:1px solid #e5e5ea">
+            <span style="color:#0071e3">🏠<br>Заявки</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Главная</div>
+    </div>
+
+    <!-- Screen 2: Popup -->
+    <div>
+      <div class="phone" style="background:#e5e5ea">
+        <div class="phone-inner" style="background:rgba(0,0,0,.4)">
+          <div class="sbar" style="color:white"><span>9:41</span><span></span></div>
+          <div class="pcontent" style="justify-content:center;padding:10px">
+            <div class="mcard" style="background:white;padding:18px;border-radius:20px">
+              <div style="display:flex;gap:6px;margin-bottom:8px">
+                <span class="mpill" style="background:#f5f5f7;color:#1d1d1f">🔧 Сантехника</span>
+                <span class="mpill" style="background:#fef2f2;color:#ef4444">🔥 Срочно</span>
+              </div>
+              <div style="font-size:17px;font-weight:800;color:#1d1d1f;margin-bottom:4px">Течёт смеситель</div>
+              <div style="color:#86868b;font-size:12px;margin-bottom:12px">до 3 000 ₽ · Центральный · Сегодня</div>
+              <div class="mrow" style="padding:10px;background:#f5f5f7;border-radius:12px;margin-bottom:12px">
+                <div class="mavatar" style="background:#0071e3;color:white;border-radius:50%">Е</div>
+                <div><div style="font-size:13px;font-weight:700">Елена · ⭐4.8</div><div style="font-size:10px;color:#86868b">6 заказов</div></div>
+              </div>
+              <div class="mgrid">
+                <div class="mbtn" style="border:1.5px solid #e5e5ea;color:#86868b">Пропустить</div>
+                <div class="mbtn" style="background:#1d1d1f;color:white">Откликнуться</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Popup заявки</div>
+    </div>
+
+    <!-- Screen 3: Master profile -->
+    <div>
+      <div class="phone" style="background:#e5e5ea">
+        <div class="phone-inner" style="background:#ffffff">
+          <div class="notch" style="background:#1d1d1f"></div>
+          <div class="sbar" style="color:#1d1d1f"><span>9:41</span><span></span></div>
+          <div class="pcontent">
+            <div class="mrow">
+              <div class="mavatar" style="background:#0071e3;color:white;width:48px;height:48px;border-radius:50%;font-size:18px">А</div>
+              <div><div style="font-weight:800;font-size:16px">Алексей</div><div style="color:#86868b;font-size:11px">⭐4.9 · 148 заказов · ✅</div></div>
+            </div>
+            <div class="mgrid" style="margin-top:4px">
+              <div class="mstat" style="background:#f5f5f7"><small>Рейтинг</small><b>4.9</b></div>
+              <div class="mstat" style="background:#f5f5f7"><small>Ответ</small><b>7м</b></div>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:#86868b;margin-top:4px">ПОРТФОЛИО</div>
+            <div class="mgrid">
+              <div style="height:50px;border-radius:10px;background:#f5f5f7;padding:6px;display:flex;align-items:flex-end"><span style="font-size:9px;font-weight:700;color:#86868b">Замена крана</span></div>
+              <div style="height:50px;border-radius:10px;background:#f5f5f7;padding:6px;display:flex;align-items:flex-end"><span style="font-size:9px;font-weight:700;color:#86868b">Устранение течи</span></div>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:#86868b;margin-top:4px">ОТЗЫВЫ</div>
+            <div class="mcard" style="background:#f5f5f7;padding:10px">
+              <div style="font-size:12px;margin-bottom:2px">⭐⭐⭐⭐⭐</div>
+              <div style="font-size:11px;color:#515154">"Приехал быстро, всё аккуратно"</div>
+              <div style="font-size:10px;color:#86868b;margin-top:2px">Елена</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Профиль мастера</div>
+    </div>
+
+    <!-- Screen 4: Offers -->
+    <div>
+      <div class="phone" style="background:#e5e5ea">
+        <div class="phone-inner" style="background:#ffffff">
+          <div class="notch" style="background:#1d1d1f"></div>
+          <div class="sbar" style="color:#1d1d1f"><span>9:41</span><span></span></div>
+          <div class="pcontent">
+            <div style="font-size:20px;font-weight:800;color:#1d1d1f">Отклики <span class="mpill" style="background:#f5f5f7;color:#1d1d1f;font-size:12px">3</span></div>
+            <div class="mcard" style="background:#f5f5f7">
+              <div class="mrow">
+                <div class="mavatar" style="background:#0071e3;color:white;border-radius:50%">А</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:700">Алексей · ⭐4.9</div><div style="font-size:10px;color:#86868b">148 заказов · 30дн гарантия</div></div>
+                <div style="font-weight:800;font-size:15px;color:#0071e3">2 800₽</div>
+              </div>
+            </div>
+            <div class="mcard" style="background:#f5f5f7">
+              <div class="mrow">
+                <div class="mavatar" style="background:#34c759;color:white;border-radius:50%">М</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:700">Михаил · ⭐4.8</div><div style="font-size:10px;color:#86868b">73 заказа · через 40мин</div></div>
+                <div style="font-weight:800;font-size:15px;color:#0071e3">3 200₽</div>
+              </div>
+            </div>
+            <div class="mcard" style="background:#f5f5f7">
+              <div class="mrow">
+                <div class="mavatar" style="background:#ff9500;color:white;border-radius:50%">И</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:700">Игорь · ⭐4.7</div><div style="font-size:10px;color:#86868b">42 заказа · после осмотра</div></div>
+                <div style="font-weight:800;font-size:15px;color:#86868b">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="pnav" style="background:#f5f5f7;color:#86868b;border-top:1px solid #e5e5ea">
+            <span style="color:#0071e3">🏠<br>Заявки</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Отклики мастеров</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 2. WARM SUNSET -->
+<!-- ════════════════════════════════════════════ -->
+<div class="concept-section">
+  <div class="concept-label">
+    <span class="tag" style="background:#fff5f0;color:#ea580c">02</span>
+    <h2>Warm Sunset</h2>
+    <p>Headspace / Calm — тёплые градиенты, дружелюбный, снижает стресс</p>
+  </div>
+  <div class="mockup-row">
+    <div>
+      <div class="phone" style="background:#e7ded6">
+        <div class="phone-inner" style="background:linear-gradient(180deg,#fffbf5,#fff0e6)">
+          <div class="notch" style="background:#78716c"></div>
+          <div class="sbar" style="color:#44403c"><span>9:41</span><span>●●●</span></div>
+          <div class="pcontent">
+            <div style="font-size:22px;font-weight:800;color:#1c1917;line-height:1.15;margin-top:8px">Привет! 👋<br>Что случилось?</div>
+            <p style="color:#a8a29e;font-size:12px">Покажите проблему — мы найдём мастера</p>
+            <div style="background:linear-gradient(135deg,#f97316,#ea580c);border-radius:18px;padding:16px;color:white;text-align:center;margin-top:4px">
+              <div style="font-size:24px;margin-bottom:4px">📷</div>
+              <div style="font-weight:700;font-size:14px">Сфотографировать</div>
+              <div style="font-size:10px;opacity:.8;margin-top:2px">Мастер оценит по фото</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+              <div class="mcard" style="background:white;box-shadow:0 2px 6px rgba(0,0,0,.04);text-align:center;padding:10px"><div style="font-size:20px">🔧</div><div style="font-size:10px;font-weight:600;margin-top:3px">Сантехника</div></div>
+              <div class="mcard" style="background:white;box-shadow:0 2px 6px rgba(0,0,0,.04);text-align:center;padding:10px"><div style="font-size:20px">⚡</div><div style="font-size:10px;font-weight:600;margin-top:3px">Электрика</div></div>
+              <div class="mcard" style="background:white;box-shadow:0 2px 6px rgba(0,0,0,.04);text-align:center;padding:10px"><div style="font-size:20px">🔨</div><div style="font-size:10px;font-weight:600;margin-top:3px">Ремонт</div></div>
+            </div>
+          </div>
+          <div class="pnav" style="background:white;color:#a8a29e;border-top:1px solid #f5ebe0">
+            <span style="color:#f97316">🏠<br>Главная</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Главная</div>
+    </div>
+
+    <div>
+      <div class="phone" style="background:#e7ded6">
+        <div class="phone-inner" style="background:rgba(28,25,23,.5)">
+          <div class="sbar" style="color:rgba(255,255,255,.6)"><span>9:41</span><span></span></div>
+          <div class="pcontent" style="justify-content:center;padding:10px">
+            <div style="background:white;border-radius:22px;padding:18px;box-shadow:0 8px 32px rgba(0,0,0,.12)">
+              <div style="height:4px;background:#f5ebe0;border-radius:4px;margin-bottom:12px;overflow:hidden"><div style="height:100%;width:70%;background:linear-gradient(90deg,#f97316,#ea580c);border-radius:4px"></div></div>
+              <div style="display:flex;gap:6px;margin-bottom:8px">
+                <span class="mpill" style="background:#fff0e6;color:#ea580c">🔧 Сантехника</span>
+                <span class="mpill" style="background:#fef2f2;color:#ef4444">🔥 Срочно</span>
+              </div>
+              <div style="font-weight:800;font-size:17px;color:#1c1917;margin-bottom:4px">Течёт смеситель</div>
+              <div style="color:#a8a29e;font-size:12px;margin-bottom:12px">3 000 ₽ · Центральный</div>
+              <div style="display:flex;align-items:center;gap:8px;padding:10px;background:#fffbf5;border-radius:12px;margin-bottom:12px">
+                <div class="mavatar" style="background:linear-gradient(135deg,#f97316,#ea580c);color:white;border-radius:50%">Е</div>
+                <div><div style="font-size:12px;font-weight:700">Елена · ⭐4.8</div><div style="font-size:10px;color:#a8a29e">🛡 Надёжный</div></div>
+              </div>
+              <div class="mgrid">
+                <div class="mbtn" style="border:1.5px solid #e7e5e4;color:#a8a29e">Пропустить</div>
+                <div class="mbtn" style="background:linear-gradient(135deg,#f97316,#ea580c);color:white">Откликнуться</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Popup заявки</div>
+    </div>
+
+    <div>
+      <div class="phone" style="background:#e7ded6">
+        <div class="phone-inner" style="background:#fffbf5">
+          <div class="notch" style="background:#78716c"></div>
+          <div class="sbar" style="color:#44403c"><span>9:41</span><span></span></div>
+          <div class="pcontent">
+            <div class="mrow">
+              <div class="mavatar" style="background:linear-gradient(135deg,#f97316,#ea580c);color:white;width:48px;height:48px;font-size:18px;border-radius:16px">А</div>
+              <div><div style="font-weight:800;font-size:16px;color:#1c1917">Алексей</div><div style="color:#a8a29e;font-size:11px">⭐4.9 · 148 заказов · ✅</div></div>
+            </div>
+            <div class="mgrid" style="margin-top:4px">
+              <div class="mstat" style="background:white;box-shadow:0 1px 4px rgba(0,0,0,.04)"><small style="color:#a8a29e">Рейтинг</small><b style="color:#f97316">4.9</b></div>
+              <div class="mstat" style="background:white;box-shadow:0 1px 4px rgba(0,0,0,.04)"><small style="color:#a8a29e">Гарантия</small><b style="color:#ea580c">30дн</b></div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#a8a29e;margin-top:4px">ПОРТФОЛИО</div>
+            <div class="mgrid">
+              <div style="height:50px;border-radius:14px;background:linear-gradient(135deg,rgba(249,115,22,.12),rgba(234,88,12,.06));padding:6px;display:flex;align-items:flex-end"><span style="font-size:9px;font-weight:700;color:#78716c">Замена крана ✅</span></div>
+              <div style="height:50px;border-radius:14px;background:linear-gradient(135deg,rgba(234,88,12,.08),rgba(249,115,22,.04));padding:6px;display:flex;align-items:flex-end"><span style="font-size:9px;font-weight:700;color:#78716c">Устранение течи</span></div>
+            </div>
+            <div class="mcard" style="background:white;box-shadow:0 1px 4px rgba(0,0,0,.04);padding:10px;margin-top:2px">
+              <div style="font-size:11px;margin-bottom:2px">⭐⭐⭐⭐⭐</div>
+              <div style="font-size:11px;color:#44403c">"Приехал быстро, цену не менял"</div>
+              <div style="font-size:10px;color:#a8a29e;margin-top:2px">Елена · подтверждённый заказ</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Профиль мастера</div>
+    </div>
+
+    <div>
+      <div class="phone" style="background:#e7ded6">
+        <div class="phone-inner" style="background:#fffbf5">
+          <div class="notch" style="background:#78716c"></div>
+          <div class="sbar" style="color:#44403c"><span>9:41</span><span></span></div>
+          <div class="pcontent">
+            <div style="font-size:18px;font-weight:800;color:#1c1917">Отклики <span class="mpill" style="background:#fff0e6;color:#ea580c">3</span></div>
+            <div class="mcard" style="background:white;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+              <div class="mrow"><div class="mavatar" style="background:linear-gradient(135deg,#f97316,#ea580c);color:white;border-radius:50%">А</div><div style="flex:1"><div style="font-size:13px;font-weight:700">Алексей · ⭐4.9</div><div style="font-size:10px;color:#a8a29e">гарантия 30дн</div></div><div style="font-weight:800;color:#ea580c">2 800₽</div></div>
+            </div>
+            <div class="mcard" style="background:white;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+              <div class="mrow"><div class="mavatar" style="background:#22c55e;color:white;border-radius:50%">М</div><div style="flex:1"><div style="font-size:13px;font-weight:700">Михаил · ⭐4.8</div><div style="font-size:10px;color:#a8a29e">через 40 мин</div></div><div style="font-weight:800;color:#ea580c">3 200₽</div></div>
+            </div>
+            <div style="margin-top:auto">
+              <div class="mbtn" style="background:linear-gradient(135deg,#f97316,#ea580c);color:white">Выбрать мастера</div>
+            </div>
+          </div>
+          <div class="pnav" style="background:white;color:#a8a29e;border-top:1px solid #f5ebe0">
+            <span style="color:#f97316">🏠<br>Заявки</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Отклики</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 3. DARK PREMIUM -->
+<!-- ════════════════════════════════════════════ -->
+<div class="concept-section">
+  <div class="concept-label">
+    <span class="tag" style="background:#1e1b4b;color:#a78bfa">03</span>
+    <h2>Dark Premium</h2>
+    <p>Vercel / Linear — тёмная тема, неоновые акценты, glass-morphism</p>
+  </div>
+  <div class="mockup-row">
+    <div>
+      <div class="phone" style="background:#27272a">
+        <div class="phone-inner" style="background:#09090b">
+          <div class="notch" style="background:rgba(255,255,255,.2)"></div>
+          <div class="sbar" style="color:#71717a"><span>9:41</span><span>5G</span></div>
+          <div class="pcontent" style="color:#e4e4e7">
+            <div style="font-size:22px;font-weight:800;letter-spacing:-.03em;color:#fafafa;line-height:1.1;margin-top:8px">Мастер<br><span style="background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent">рядом</span></div>
+            <p style="color:#71717a;font-size:11px">Сфоткай — починим</p>
+            <div class="mgrid" style="margin-top:4px">
+              <div class="mcard" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);text-align:center"><div style="font-size:20px">🔧</div><div style="font-size:10px;color:#a1a1aa;margin-top:3px">Сантехника</div></div>
+              <div class="mcard" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);text-align:center"><div style="font-size:20px">⚡</div><div style="font-size:10px;color:#a1a1aa;margin-top:3px">Электрика</div></div>
+              <div class="mcard" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);text-align:center"><div style="font-size:20px">🔨</div><div style="font-size:10px;color:#a1a1aa;margin-top:3px">Ремонт</div></div>
+              <div class="mcard" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);text-align:center"><div style="font-size:20px">🧹</div><div style="font-size:10px;color:#a1a1aa;margin-top:3px">Клининг</div></div>
+            </div>
+            <div style="margin-top:auto"><div class="mbtn" style="background:linear-gradient(135deg,#a78bfa,#22d3ee);color:#09090b;font-weight:800">Создать заявку</div></div>
+          </div>
+          <div class="pnav" style="background:rgba(255,255,255,.03);color:#71717a;border-top:1px solid rgba(255,255,255,.08)">
+            <span style="color:#a78bfa">🏠<br>Заявки</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Главная</div>
+    </div>
+
+    <div>
+      <div class="phone" style="background:#27272a">
+        <div class="phone-inner" style="background:rgba(0,0,0,.7)">
+          <div class="sbar" style="color:rgba(255,255,255,.4)"><span>9:41</span><span></span></div>
+          <div class="pcontent" style="justify-content:center;padding:10px">
+            <div style="background:#18181b;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.4)">
+              <div style="height:3px;background:rgba(255,255,255,.06);border-radius:3px;margin-bottom:12px"><div style="height:100%;width:75%;background:linear-gradient(90deg,#a78bfa,#22d3ee);border-radius:3px"></div></div>
+              <div style="display:flex;gap:6px;margin-bottom:8px">
+                <span class="mpill" style="background:rgba(167,139,250,.15);color:#a78bfa">🔧 Сантехника</span>
+              </div>
+              <div style="font-weight:800;font-size:16px;color:#fafafa;margin-bottom:4px">Течёт смеситель</div>
+              <div style="color:#71717a;font-size:11px;margin-bottom:10px">3 000 ₽ · Центральный</div>
+              <div class="mrow" style="padding:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:12px">
+                <div class="mavatar" style="background:linear-gradient(135deg,#a78bfa,#22d3ee);color:#09090b;border-radius:10px">Е</div>
+                <div><div style="font-size:12px;font-weight:700;color:#e4e4e7">Елена · ⭐4.8</div><div style="font-size:10px;color:#71717a">Надёжный клиент</div></div>
+              </div>
+              <div class="mgrid">
+                <div class="mbtn" style="border:1px solid rgba(255,255,255,.1);color:#a1a1aa;background:transparent">Пропустить</div>
+                <div class="mbtn" style="background:linear-gradient(135deg,#a78bfa,#22d3ee);color:#09090b;font-weight:800">Откликнуться</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Popup заявки</div>
+    </div>
+
+    <div>
+      <div class="phone" style="background:#27272a">
+        <div class="phone-inner" style="background:#09090b">
+          <div class="notch" style="background:rgba(255,255,255,.2)"></div>
+          <div class="sbar" style="color:#71717a"><span>9:41</span><span></span></div>
+          <div class="pcontent" style="color:#e4e4e7">
+            <div class="mrow"><div class="mavatar" style="background:linear-gradient(135deg,#a78bfa,#22d3ee);color:#09090b;width:48px;height:48px;font-size:18px;border-radius:14px">А</div><div><div style="font-weight:800;font-size:15px;color:#fafafa">Алексей</div><div style="color:#71717a;font-size:11px">⭐4.9 · ✅ Проверен</div></div></div>
+            <div class="mgrid">
+              <div class="mstat" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)"><small style="color:#71717a">Заказов</small><b style="color:#a78bfa">148</b></div>
+              <div class="mstat" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)"><small style="color:#71717a">Гарантия</small><b style="color:#22d3ee">30дн</b></div>
+            </div>
+            <div class="mgrid">
+              <div style="height:48px;border-radius:10px;background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(34,211,238,.06));border:1px solid rgba(255,255,255,.06);padding:5px;display:flex;align-items:flex-end"><span style="font-size:9px;color:#a1a1aa">Замена крана</span></div>
+              <div style="height:48px;border-radius:10px;background:linear-gradient(135deg,rgba(34,211,238,.12),rgba(167,139,250,.06));border:1px solid rgba(255,255,255,.06);padding:5px;display:flex;align-items:flex-end"><span style="font-size:9px;color:#a1a1aa">Течь трубы</span></div>
+            </div>
+            <div class="mcard" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);padding:10px">
+              <div style="font-size:11px;color:#a78bfa">⭐⭐⭐⭐⭐</div>
+              <div style="font-size:11px;color:#a1a1aa;margin-top:2px">"Всё отлично, рекомендую"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Профиль мастера</div>
+    </div>
+
+    <div>
+      <div class="phone" style="background:#27272a">
+        <div class="phone-inner" style="background:#09090b">
+          <div class="notch" style="background:rgba(255,255,255,.2)"></div>
+          <div class="sbar" style="color:#71717a"><span>9:41</span><span></span></div>
+          <div class="pcontent" style="color:#e4e4e7">
+            <div style="font-size:18px;font-weight:800;color:#fafafa">Отклики <span class="mpill" style="background:rgba(167,139,250,.15);color:#a78bfa">3</span></div>
+            <div class="mcard" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)">
+              <div class="mrow"><div class="mavatar" style="background:linear-gradient(135deg,#a78bfa,#22d3ee);color:#09090b;border-radius:10px">А</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#fafafa">Алексей · ⭐4.9</div><div style="font-size:10px;color:#71717a">30дн гарантия</div></div><div style="font-weight:800;color:#a78bfa">2 800₽</div></div>
+            </div>
+            <div class="mcard" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)">
+              <div class="mrow"><div class="mavatar" style="background:#22d3ee;color:#09090b;border-radius:10px">М</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#fafafa">Михаил · ⭐4.8</div><div style="font-size:10px;color:#71717a">через 40мин</div></div><div style="font-weight:800;color:#22d3ee">3 200₽</div></div>
+            </div>
+            <div style="margin-top:auto"><div class="mbtn" style="background:linear-gradient(135deg,#a78bfa,#22d3ee);color:#09090b;font-weight:800">Выбрать</div></div>
+          </div>
+          <div class="pnav" style="background:rgba(255,255,255,.03);color:#71717a;border-top:1px solid rgba(255,255,255,.08)">
+            <span style="color:#a78bfa">🏠<br>Заявки</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Отклики</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 4. FRESH GREEN (current) -->
+<!-- ════════════════════════════════════════════ -->
+<div class="concept-section">
+  <div class="concept-label">
+    <span class="tag" style="background:#ecfdf5;color:#059669">04</span>
+    <h2>Fresh Green <span style="font-size:14px;font-weight:500;color:#86868b">(текущий стиль)</span></h2>
+    <p>inDrive / Grab — текущая тема, доработанная с лучшей визуальной глубиной</p>
+  </div>
+  <div class="mockup-row">
+    <div>
+      <div class="phone" style="background:#d1d5db">
+        <div class="phone-inner" style="background:#fff">
+          <div class="notch" style="background:#374151"></div>
+          <div class="sbar" style="color:#1f2937"><span>9:41</span><span>●●●</span></div>
+          <div class="pcontent">
+            <div style="font-size:22px;font-weight:800;color:#1a1a2e;line-height:1.15;margin-top:8px">Что нужно<br><span style="color:#00c896">починить?</span></div>
+            <p style="color:#7a8599;font-size:12px">Сфоткай — починим</p>
+            <div class="mgrid" style="margin-top:4px">
+              <div class="mcard" style="background:#f7f8fa;text-align:center"><div style="font-size:20px">🔧</div><div style="font-size:10px;font-weight:600;margin-top:3px">Сантехника</div></div>
+              <div class="mcard" style="background:#f7f8fa;text-align:center"><div style="font-size:20px">⚡</div><div style="font-size:10px;font-weight:600;margin-top:3px">Электрика</div></div>
+              <div class="mcard" style="background:#f7f8fa;text-align:center"><div style="font-size:20px">🔨</div><div style="font-size:10px;font-weight:600;margin-top:3px">Ремонт</div></div>
+              <div class="mcard" style="background:#f7f8fa;text-align:center"><div style="font-size:20px">🧹</div><div style="font-size:10px;font-weight:600;margin-top:3px">Клининг</div></div>
+            </div>
+            <div style="margin-top:auto"><div class="mbtn" style="background:#00c896;color:white">Создать заявку</div></div>
+          </div>
+          <div class="pnav" style="background:#fff;color:#7a8599;border-top:1px solid #e8ebf0">
+            <span style="color:#00c896">🏠<br>Заявки</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Главная</div>
+    </div>
+    <div>
+      <div class="phone" style="background:#d1d5db">
+        <div class="phone-inner" style="background:rgba(0,0,0,.45)">
+          <div class="sbar" style="color:rgba(255,255,255,.5)"><span>9:41</span><span></span></div>
+          <div class="pcontent" style="justify-content:center;padding:10px">
+            <div style="background:white;border-radius:20px;padding:18px;box-shadow:0 8px 32px rgba(0,0,0,.15)">
+              <div style="height:4px;background:#e8ebf0;border-radius:4px;margin-bottom:12px"><div style="height:100%;width:80%;background:#00c896;border-radius:4px"></div></div>
+              <div style="display:flex;gap:6px;margin-bottom:8px">
+                <span class="mpill" style="background:#e6faf4;color:#00c896">🔧 Сантехника</span>
+              </div>
+              <div style="font-weight:800;font-size:16px;color:#1a1a2e;margin-bottom:4px">Течёт смеситель</div>
+              <div style="color:#7a8599;font-size:11px;margin-bottom:10px">3 000 ₽ · Центральный</div>
+              <div class="mrow" style="padding:8px;background:#f7f8fa;border-radius:10px;margin-bottom:12px">
+                <div class="mavatar" style="background:#00c896;color:white;border-radius:50%">Е</div>
+                <div><div style="font-size:12px;font-weight:700">Елена · ⭐4.8</div><div style="font-size:10px;color:#7a8599">Надёжный</div></div>
+              </div>
+              <div class="mgrid">
+                <div class="mbtn" style="border:1.5px solid #e8ebf0;color:#7a8599">Пропустить</div>
+                <div class="mbtn" style="background:#00c896;color:white">Откликнуться</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Popup заявки</div>
+    </div>
+    <div>
+      <div class="phone" style="background:#d1d5db">
+        <div class="phone-inner" style="background:#fff">
+          <div class="notch" style="background:#374151"></div>
+          <div class="sbar" style="color:#1f2937"><span>9:41</span><span></span></div>
+          <div class="pcontent">
+            <div class="mrow"><div class="mavatar" style="background:#00c896;color:white;width:48px;height:48px;font-size:18px;border-radius:14px">А</div><div><div style="font-weight:800;font-size:15px">Алексей</div><div style="color:#7a8599;font-size:11px">⭐4.9 · 148 заказов · ✅</div></div></div>
+            <div class="mgrid"><div class="mstat" style="background:#f7f8fa"><small style="color:#7a8599">Рейтинг</small><b style="color:#00c896">4.9</b></div><div class="mstat" style="background:#f7f8fa"><small style="color:#7a8599">Гарантия</small><b>30дн</b></div></div>
+            <div class="mgrid"><div style="height:48px;border-radius:12px;background:#e6faf4;padding:5px;display:flex;align-items:flex-end"><span style="font-size:9px;font-weight:700;color:#059669">Замена крана ✅</span></div><div style="height:48px;border-radius:12px;background:#f7f8fa;padding:5px;display:flex;align-items:flex-end"><span style="font-size:9px;font-weight:700;color:#7a8599">Течь трубы</span></div></div>
+            <div class="mcard" style="background:#f7f8fa;padding:10px"><div style="font-size:11px">⭐⭐⭐⭐⭐</div><div style="font-size:11px;color:#515154;margin-top:2px">"Приехал быстро"</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Профиль мастера</div>
+    </div>
+    <div>
+      <div class="phone" style="background:#d1d5db">
+        <div class="phone-inner" style="background:#fff">
+          <div class="notch" style="background:#374151"></div>
+          <div class="sbar" style="color:#1f2937"><span>9:41</span><span></span></div>
+          <div class="pcontent">
+            <div style="font-size:18px;font-weight:800;color:#1a1a2e">Отклики <span class="mpill" style="background:#e6faf4;color:#00c896">3</span></div>
+            <div class="mcard" style="background:#f7f8fa"><div class="mrow"><div class="mavatar" style="background:#00c896;color:white;border-radius:50%">А</div><div style="flex:1"><div style="font-size:12px;font-weight:700">Алексей · ⭐4.9</div><div style="font-size:10px;color:#7a8599">30дн гарантия</div></div><div style="font-weight:800;color:#00c896">2 800₽</div></div></div>
+            <div class="mcard" style="background:#f7f8fa"><div class="mrow"><div class="mavatar" style="background:#ff8c42;color:white;border-radius:50%">М</div><div style="flex:1"><div style="font-size:12px;font-weight:700">Михаил · ⭐4.8</div><div style="font-size:10px;color:#7a8599">через 40мин</div></div><div style="font-weight:800;color:#00c896">3 200₽</div></div></div>
+            <div style="margin-top:auto"><div class="mbtn" style="background:#00c896;color:white">Выбрать мастера</div></div>
+          </div>
+          <div class="pnav" style="background:#fff;color:#7a8599;border-top:1px solid #e8ebf0"><span style="color:#00c896">🏠<br>Заявки</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span></div>
+        </div>
+      </div>
+      <div class="caption">Отклики</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 5. BOLD BLUE -->
+<!-- ════════════════════════════════════════════ -->
+<div class="concept-section">
+  <div class="concept-label">
+    <span class="tag" style="background:#eff6ff;color:#2563eb">05</span>
+    <h2>Bold Blue</h2>
+    <p>Revolut / Stripe — профессиональный, надёжный, строгий</p>
+  </div>
+  <div class="mockup-row">
+    <div>
+      <div class="phone" style="background:#cbd5e1">
+        <div class="phone-inner" style="background:#fff">
+          <div class="notch" style="background:#334155"></div>
+          <div class="sbar" style="color:#0f172a"><span>9:41</span><span>●●●</span></div>
+          <div class="pcontent">
+            <div style="font-size:22px;font-weight:800;color:#0f172a;line-height:1.15;margin-top:8px">Заявки<br><span style="color:#2563eb">рядом</span></div>
+            <div style="display:flex;gap:6px;margin:6px 0"><span class="mpill" style="background:#eff6ff;color:#2563eb">Все</span><span style="color:#94a3b8;font-size:11px;padding:3px 8px">Срочные</span><span style="color:#94a3b8;font-size:11px;padding:3px 8px">Сегодня</span></div>
+            <div class="mcard" style="border:1px solid #e2e8f0;padding:12px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span class="mpill" style="background:#eff6ff;color:#2563eb;font-size:9px">🔧 Сантехника</span><span style="font-size:10px;color:#94a3b8">2.4км</span></div>
+              <div style="font-weight:700;font-size:14px;color:#0f172a">Течёт смеситель</div>
+              <div style="color:#94a3b8;font-size:11px;margin-top:2px">3 000₽ · Сегодня</div>
+              <div class="mgrid" style="margin-top:8px">
+                <div class="mbtn" style="border:1px solid #e2e8f0;color:#94a3b8;font-size:12px;padding:8px">Пропустить</div>
+                <div class="mbtn" style="background:#2563eb;color:white;font-size:12px;padding:8px">Откликнуться</div>
+              </div>
+            </div>
+            <div class="mcard" style="border:1px solid #e2e8f0;padding:12px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span class="mpill" style="background:#eff6ff;color:#2563eb;font-size:9px">⚡ Электрика</span><span style="font-size:10px;color:#94a3b8">1.1км</span></div>
+              <div style="font-weight:700;font-size:14px;color:#0f172a">Не работает розетка</div>
+              <div style="color:#94a3b8;font-size:11px;margin-top:2px">2 500₽ · Завтра</div>
+            </div>
+          </div>
+          <div class="pnav" style="background:#f8fafc;color:#94a3b8;border-top:1px solid #e2e8f0"><span style="color:#2563eb">📋<br>Заявки</span><span>🧰<br>Заказы</span><span>💎<br>План</span><span>👤<br>Профиль</span></div>
+        </div>
+      </div>
+      <div class="caption">Главная (мастер)</div>
+    </div>
+    <div>
+      <div class="phone" style="background:#cbd5e1">
+        <div class="phone-inner" style="background:rgba(15,23,42,.5)">
+          <div class="sbar" style="color:rgba(255,255,255,.4)"><span>9:41</span><span></span></div>
+          <div class="pcontent" style="justify-content:center;padding:10px">
+            <div style="background:white;border-radius:18px;padding:18px;box-shadow:0 8px 32px rgba(0,0,0,.15)">
+              <div style="height:3px;background:#e2e8f0;border-radius:3px;margin-bottom:12px"><div style="height:100%;width:65%;background:#2563eb;border-radius:3px"></div></div>
+              <span class="mpill" style="background:#eff6ff;color:#2563eb;margin-bottom:8px;display:inline-flex">🔧 Сантехника</span>
+              <div style="font-weight:800;font-size:16px;color:#0f172a;margin-bottom:4px">Течёт смеситель</div>
+              <div style="color:#94a3b8;font-size:11px;margin-bottom:10px">3 000₽ · Центральный</div>
+              <div class="mrow" style="padding:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:12px">
+                <div class="mavatar" style="background:#2563eb;color:white;border-radius:50%">Е</div>
+                <div><div style="font-size:12px;font-weight:700;color:#0f172a">Елена · ⭐4.8</div><div style="font-size:10px;color:#94a3b8">6 заказов</div></div>
+              </div>
+              <div class="mgrid">
+                <div class="mbtn" style="border:1.5px solid #e2e8f0;color:#94a3b8">Пропустить</div>
+                <div class="mbtn" style="background:#2563eb;color:white">Откликнуться</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Popup заявки</div>
+    </div>
+    <div>
+      <div class="phone" style="background:#cbd5e1">
+        <div class="phone-inner" style="background:#fff">
+          <div class="notch" style="background:#334155"></div>
+          <div class="sbar" style="color:#0f172a"><span>9:41</span><span></span></div>
+          <div class="pcontent">
+            <div class="mrow"><div class="mavatar" style="background:#2563eb;color:white;width:48px;height:48px;font-size:18px;border-radius:50%">А</div><div><div style="font-weight:800;font-size:15px;color:#0f172a">Алексей</div><div style="color:#94a3b8;font-size:11px">⭐4.9 · 148 заказов · ✅</div></div></div>
+            <div class="mgrid"><div class="mstat" style="background:#f8fafc;border:1px solid #e2e8f0"><small style="color:#94a3b8">Рейтинг</small><b style="color:#2563eb">4.9</b></div><div class="mstat" style="background:#f8fafc;border:1px solid #e2e8f0"><small style="color:#94a3b8">Гарантия</small><b>30дн</b></div></div>
+            <div class="mgrid"><div style="height:48px;border-radius:10px;background:#eff6ff;border:1px solid #dbeafe;padding:5px;display:flex;align-items:flex-end"><span style="font-size:9px;font-weight:700;color:#1d4ed8">Замена крана ✅</span></div><div style="height:48px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;padding:5px;display:flex;align-items:flex-end"><span style="font-size:9px;font-weight:700;color:#94a3b8">Течь трубы</span></div></div>
+            <div class="mcard" style="border:1px solid #e2e8f0;padding:10px"><div style="font-size:11px">⭐⭐⭐⭐⭐</div><div style="font-size:11px;color:#475569;margin-top:2px">"Профессионал"</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Профиль мастера</div>
+    </div>
+    <div>
+      <div class="phone" style="background:#cbd5e1">
+        <div class="phone-inner" style="background:#fff">
+          <div class="notch" style="background:#334155"></div>
+          <div class="sbar" style="color:#0f172a"><span>9:41</span><span></span></div>
+          <div class="pcontent">
+            <div style="font-size:18px;font-weight:800;color:#0f172a">Отклики <span class="mpill" style="background:#eff6ff;color:#2563eb">3</span></div>
+            <div class="mcard" style="border:1px solid #e2e8f0"><div class="mrow"><div class="mavatar" style="background:#2563eb;color:white;border-radius:50%">А</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#0f172a">Алексей · ⭐4.9</div><div style="font-size:10px;color:#94a3b8">30дн гарантия</div></div><div style="font-weight:800;color:#2563eb">2 800₽</div></div></div>
+            <div class="mcard" style="border:1px solid #e2e8f0"><div class="mrow"><div class="mavatar" style="background:#f59e0b;color:white;border-radius:50%">М</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#0f172a">Михаил · ⭐4.8</div><div style="font-size:10px;color:#94a3b8">через 40мин</div></div><div style="font-weight:800;color:#2563eb">3 200₽</div></div></div>
+            <div style="margin-top:auto"><div class="mbtn" style="background:#2563eb;color:white">Выбрать мастера</div></div>
+          </div>
+          <div class="pnav" style="background:#f8fafc;color:#94a3b8;border-top:1px solid #e2e8f0"><span style="color:#2563eb">📋<br>Заявки</span><span>🧰<br>Заказы</span><span>💎<br>План</span><span>👤<br>Профиль</span></div>
+        </div>
+      </div>
+      <div class="caption">Отклики</div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

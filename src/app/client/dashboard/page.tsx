@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import RequestCard from "@/components/RequestCard";
+import { ClipboardList, MessageSquare, Star } from "lucide-react";
 
 interface Category {
   name: string;
@@ -30,6 +31,7 @@ interface Request {
 interface User {
   name: string;
   ratingAvg: number;
+  avatarUrl?: string;
 }
 
 const STATUS_MAP: Record<string, string> = {
@@ -83,7 +85,7 @@ export default function ClientDashboardPage() {
         </div>
         <div className="request-list">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="skeleton" style={{ height: 120, marginBottom: 12, borderRadius: "var(--radius-md)" }} />
+            <div key={i} className="skeleton" style={{ height: 120, marginBottom: 12, borderRadius: 16 }} />
           ))}
         </div>
       </AppShell>
@@ -104,35 +106,55 @@ export default function ClientDashboardPage() {
     (r) => r.status !== "COMPLETED" && r.status !== "CANCELLED"
   );
   const totalOffers = requests.reduce((sum, r) => sum + (r._count?.offers || 0), 0);
+  const initials = user?.name?.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) || "?";
 
   return (
     <AppShell role="CLIENT">
       <div className="page-head">
-        <div>
-          <h1>Привет, {user?.name}! 👋</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: "50%",
+            background: "#000", color: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontWeight: 800, fontSize: 18, flexShrink: 0,
+          }}>
+            {initials}
+          </div>
+          <div>
+            <h1 style={{ margin: 0 }}>Привет, {user?.name}!</h1>
+          </div>
         </div>
         <Link className="btn-primary" href="/client/requests/new">Создать заявку</Link>
       </div>
 
       <div className="stats-grid">
         <div className="stat-card">
-          <span className="muted">Активные заявки</span>
-          <strong style={{ fontSize: "1.5rem" }}>{activeRequests.length}</strong>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <ClipboardList size={16} style={{ color: "var(--muted)" }} />
+            <span className="muted" style={{ fontSize: 13 }}>Активные заявки</span>
+          </div>
+          <strong style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.03em" }}>{activeRequests.length}</strong>
         </div>
         <div className="stat-card">
-          <span className="muted">Всего откликов</span>
-          <strong style={{ fontSize: "1.5rem" }}>{totalOffers}</strong>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <MessageSquare size={16} style={{ color: "var(--muted)" }} />
+            <span className="muted" style={{ fontSize: 13 }}>Всего откликов</span>
+          </div>
+          <strong style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.03em" }}>{totalOffers}</strong>
         </div>
         <div className="stat-card">
-          <span className="muted">Рейтинг</span>
-          <strong style={{ fontSize: "1.5rem" }}>{user?.ratingAvg ? `${user.ratingAvg.toFixed(1)} ⭐` : "—"}</strong>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <Star size={16} style={{ color: "var(--muted)" }} />
+            <span className="muted" style={{ fontSize: 13 }}>Рейтинг</span>
+          </div>
+          <strong style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.03em" }}>{user?.ratingAvg ? user.ratingAvg.toFixed(1) : "—"}</strong>
         </div>
       </div>
 
       {requests.length === 0 ? (
-        <div className="empty-state animate-fadeIn">
-          <div style={{ fontSize: "3rem", marginBottom: 16 }}>📋</div>
-          <h3 style={{ marginBottom: 8 }}>У вас пока нет заявок</h3>
+        <div className="empty-state animate-fadeIn" style={{ padding: 48 }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+          <h3 style={{ marginBottom: 8, fontSize: 20, fontWeight: 800 }}>У вас пока нет заявок</h3>
           <p className="muted" style={{ marginBottom: 24 }}>
             Создайте первую заявку и найдите мастера за минуты
           </p>

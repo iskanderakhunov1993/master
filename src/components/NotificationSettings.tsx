@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Bell, BellOff } from "lucide-react";
 
 type PermState = "default" | "granted" | "denied" | "unsupported";
 
@@ -26,7 +27,6 @@ export default function NotificationSettings() {
       return;
     }
     setPerm(Notification.permission as PermState);
-    // Check if already subscribed
     navigator.serviceWorker.getRegistration("/sw.js").then((reg) => {
       if (reg) {
         reg.pushManager.getSubscription().then((sub) => {
@@ -90,8 +90,15 @@ export default function NotificationSettings() {
   if (!supported) {
     return (
       <div className="card" style={{ padding: 20 }}>
-        <h3 className="section-title" style={{ fontSize: 20, marginBottom: 12 }}>Уведомления</h3>
-        <p className="muted" style={{ margin: 0 }}>Ваш браузер не поддерживает push-уведомления</p>
+        <div className="uber-row" style={{ cursor: "default" }}>
+          <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--soft, #f2f2f2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <BellOff size={18} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 600 }}>Уведомления</div>
+            <span className="muted" style={{ fontSize: 14 }}>Ваш браузер не поддерживает push-уведомления</span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -99,40 +106,39 @@ export default function NotificationSettings() {
   if (perm === "denied") {
     return (
       <div className="card" style={{ padding: 20 }}>
-        <h3 className="section-title" style={{ fontSize: 20, marginBottom: 12 }}>Уведомления</h3>
-        <p className="muted" style={{ margin: 0 }}>Уведомления заблокированы в настройках браузера</p>
+        <div className="uber-row" style={{ cursor: "default" }}>
+          <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--soft, #f2f2f2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <BellOff size={18} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 600 }}>Уведомления</div>
+            <span className="muted" style={{ fontSize: 14 }}>Заблокированы в настройках браузера</span>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="card" style={{ padding: 20 }}>
-      <h3 className="section-title" style={{ fontSize: 20, marginBottom: 12 }}>Уведомления</h3>
-      {enabled ? (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span className="pill-green">Уведомления включены</span>
-          <button
-            className="btn-secondary"
-            onClick={handleDisable}
-            disabled={loading}
-            style={{ fontSize: 14, padding: "6px 16px" }}
-          >
-            {loading ? "..." : "Выключить"}
-          </button>
+      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--soft, #f2f2f2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Bell size={18} />
         </div>
-      ) : (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span className="muted">Уведомления выключены</span>
-          <button
-            className="btn-primary"
-            onClick={handleEnable}
-            disabled={loading}
-            style={{ fontSize: 14, padding: "6px 16px" }}
-          >
-            {loading ? "..." : "Включить"}
-          </button>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 600 }}>Уведомления</div>
+          <span className="muted" style={{ fontSize: 14 }}>
+            {enabled ? "Включены" : "Выключены"}
+          </span>
         </div>
-      )}
+        <button
+          className={enabled ? "btn-secondary btn-sm" : "btn-primary btn-sm"}
+          onClick={enabled ? handleDisable : handleEnable}
+          disabled={loading}
+        >
+          {loading ? "..." : enabled ? "Выключить" : "Включить"}
+        </button>
+      </div>
     </div>
   );
 }

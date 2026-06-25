@@ -34,7 +34,7 @@ export function RequestCard({ request, href, children }: RequestCardProps) {
   const status = statusConfig[request.status] ?? { label: request.status, cls: 'pill' }
 
   return (
-    <Link href={href} className="request-card" style={{ textDecoration: 'none' }}>
+    <Link href={href} className="card" style={{ textDecoration: 'none', display: 'block', padding: 20 }}>
       {/* Top row: category + status */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <span className="pill pill-violet">
@@ -45,10 +45,10 @@ export function RequestCard({ request, href, children }: RequestCardProps) {
       </div>
 
       {/* Title */}
-      <h3>{request.title}</h3>
+      <h3 style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', margin: '10px 0 6px' }}>{request.title}</h3>
 
       {/* Description */}
-      <p>{request.description}</p>
+      <p className="muted" style={{ fontSize: 14, margin: '0 0 12px', lineHeight: 1.5 }}>{request.description}</p>
 
       {/* Info grid */}
       <div className="request-meta">

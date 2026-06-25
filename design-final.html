@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Мастер рядом — Premium Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --font:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --bg:#f5f6fa;--white:#fff;
+  --text:#16192c;--sub:#6e7191;--hint:#a0a3bd;
+  --line:#eff0f6;--soft:#f7f7fc;
+  --primary:#6c5ce7;--primary-dark:#5a4bd1;--primary-light:#f0edff;--primary-glow:rgba(108,92,231,.18);
+  --green:#00c48c;--green-light:#e6faf3;
+  --orange:#ff8a00;--orange-light:#fff4e6;
+  --red:#ff5a65;--red-light:#fff0f1;
+  --blue:#0095ff;--blue-light:#e6f4ff;
+  --pink:#ff6b8a;--pink-light:#ffecf0;
+  --teal:#00b4d8;--teal-light:#e6f9fc;
+  --r:16px;--r-lg:24px;--r-full:9999px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5}
+.page{max-width:1380px;margin:0 auto;padding:48px 20px 120px}
+.title{font-size:32px;font-weight:800;letter-spacing:-.04em;text-align:center;color:var(--text)}
+.desc{text-align:center;color:var(--sub);font-size:15px;margin:8px 0 48px;line-height:1.6;max-width:500px;margin-left:auto;margin-right:auto}
+
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-bottom:64px}
+@media(max-width:1200px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.grid{grid-template-columns:1fr;max-width:400px;margin-left:auto;margin-right:auto}}
+
+.sec{font-size:14px;font-weight:700;color:var(--sub);margin-bottom:20px;letter-spacing:.01em}
+
+.caption{text-align:center;margin-top:12px;font-size:12px;font-weight:600;color:var(--hint)}
+
+/* ═══ PHONE ═══ */
+.phone{
+  aspect-ratio:9/19.5;border-radius:48px;padding:10px;
+  background:linear-gradient(170deg,#e8eaf0 0%,#d5d8e2 100%);
+  box-shadow:0 2px 4px rgba(0,0,0,.04),0 12px 32px rgba(22,25,44,.08),0 32px 64px rgba(22,25,44,.04);
+  display:flex;
+}
+.s{flex:1;border-radius:40px;overflow:hidden;display:flex;flex-direction:column;background:var(--soft);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.06)}
+
+.di{width:100px;height:32px;background:var(--text);border-radius:0 0 22px 22px;margin:0 auto;position:relative;z-index:2}
+.sb{display:flex;justify-content:space-between;padding:0 24px;font-size:12px;font-weight:600;color:var(--text);margin-top:-26px;position:relative;z-index:3}
+.ct{flex:1;overflow:hidden;padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+
+/* Bottom nav */
+.nav{height:60px;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border-top:.5px solid var(--line);flex-shrink:0}
+.ni{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--hint);font-size:10px;font-weight:600;letter-spacing:-.01em}
+.ni.on{color:var(--primary)}
+.ni svg{width:22px;height:22px}
+
+/* ═══ COMPONENTS ═══ */
+.cd{background:var(--white);border-radius:var(--r);padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.02),0 4px 16px rgba(22,25,44,.04)}
+.bt{border-radius:14px;padding:14px;text-align:center;font-weight:700;font-size:14px;letter-spacing:-.01em}
+.bt-p{background:var(--primary);color:white;box-shadow:0 4px 16px var(--primary-glow)}
+.bt-o{background:var(--white);color:var(--sub);border:1.5px solid var(--line)}
+.pl{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700}
+.rw{display:flex;align-items:center;gap:10px}
+.av{border-radius:14px;display:grid;place-items:center;font-weight:700;flex-shrink:0}
+.st{background:var(--soft);border-radius:14px;padding:10px 12px;text-align:center}
+.st small{display:block;font-size:10px;color:var(--hint);font-weight:500;margin-bottom:1px}
+.st b{display:block;font-size:16px;font-weight:800;letter-spacing:-.02em}
+
+/* Category icons */
+.ci-wrap{border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer}
+.ci{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;margin:0 auto 8px}
+.ci svg{width:22px;height:22px}
+.ci-name{font-size:11px;font-weight:700;letter-spacing:-.01em}
+
+/* Gradient header */
+.gh{background:linear-gradient(135deg,var(--primary) 0%,#8b6cf7 60%,#a78bfa 100%);padding:24px 20px;color:white;border-radius:0 0 28px 28px;margin:-16px -20px 0}
+
+/* Chat */
+.mi{max-width:80%;padding:12px 16px;border-radius:20px 20px 20px 6px;background:var(--white);box-shadow:0 1px 4px rgba(0,0,0,.03);font-size:13px;line-height:1.5;color:var(--text)}
+.mo{max-width:78%;padding:12px 16px;border-radius:20px 20px 6px 20px;background:var(--primary);color:white;font-size:13px;line-height:1.5;align-self:flex-end}
+
+/* Popup glass */
+.popup{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-radius:28px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.06),0 32px 80px rgba(22,25,44,.12);border:.5px solid rgba(255,255,255,.8)}
+.timer{height:3px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:18px}
+.timer-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--primary),#8b6cf7)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="title">Мастер рядом</div>
+<div class="desc">Premium design concept — единый шрифт Inter, SVG-иконки, фиолетовый акцент, многослойные тени</div>
+
+<div class="sec">Экраны приложения</div>
+<div class="grid">
+
+<!-- ══════ 1. HOME ══════ -->
+<div>
+<div class="phone"><div class="s">
+  <div class="di"></div>
+  <div class="sb"><span style="color:white">9:41</span><span style="color:white">5G</span></div>
+  <div class="ct">
+    <div class="rw" style="justify-content:space-between">
+      <div>
+        <div style="font-size:13px;color:var(--sub)">Добрый день</div>
+        <div style="font-size:22px;font-weight:800;letter-spacing:-.04em">Что починить?</div>
+      </div>
+      <div class="av" style="width:42px;height:42px;background:var(--primary);color:white;font-size:15px;border-radius:50%">Е</div>
+    </div>
+
+    <div class="cd rw" style="gap:10px;padding:13px 16px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--hint)"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span style="color:var(--hint);font-size:14px;font-weight:500">Найти услугу...</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div class="ci-wrap" style="background:var(--blue-light)">
+        <div class="ci" style="background:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M4 14.9A7 7 0 1 1 18 9"/><path d="M12 12v6"/><path d="M8 18h8"/></svg></div>
+        <div class="ci-name" style="color:var(--blue)">Сантехника</div>
+      </div>
+      <div class="ci-wrap" style="background:var(--orange-light)">
+        <div class="ci" style="background:var(--orange)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="ci-name" style="color:var(--orange)">Электрика</div>
+      </div>
+      <div class="ci-wrap" style="background:var(--green-light)">
+        <div class="ci" style="background:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
+        <div class="ci-name" style="color:var(--green)">Ремонт</div>
+      </div>
+      <div class="ci-wrap" style="background:var(--pink-light)">
+        <div class="ci" style="background:var(--pink)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M9 22V12h6v10"/></svg></div>
+        <div class="ci-name" style="color:var(--pink)">Клининг</div>
+      </div>
+      <div class="ci-wrap" style="background:var(--teal-light)">
+        <div class="ci" style="background:var(--teal)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+        <div class="ci-name" style="color:var(--teal)">Техника</div>
+      </div>
+      <div class="ci-wrap" style="background:var(--primary-light)">
+        <div class="ci" style="background:var(--primary)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="1" y="6" width="22" height="12" rx="2"/><path d="M1 10h22"/></svg></div>
+        <div class="ci-name" style="color:var(--primary)">Переезд</div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:var(--hint);letter-spacing:.03em">АКТИВНАЯ ЗАЯВКА</div>
+    <div class="cd" style="padding:14px">
+      <div class="rw" style="justify-content:space-between;margin-bottom:6px">
+        <span class="pl" style="background:var(--blue-light);color:var(--blue)">Сантехника</span>
+        <span class="pl" style="background:var(--green-light);color:var(--green)">В работе</span>
+      </div>
+      <div style="font-weight:700;font-size:15px;letter-spacing:-.02em">Течёт смеситель на кухне</div>
+      <div style="color:var(--sub);font-size:12px;margin-top:4px">Алексей С. · 2 800 ₽</div>
+    </div>
+
+    <div style="margin-top:auto" class="bt bt-p" style="font-size:15px">Создать заявку</div>
+  </div>
+  <div class="nav">
+    <div class="ni on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>Главная</div>
+    <div class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Чат</div>
+    <div class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>Заявки</div>
+    <div class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</div>
+  </div>
+</div></div>
+<div class="caption">Главная</div>
+</div>
+
+<!-- ══════ 2. POPUP ══════ -->
+<div>
+<div class="phone"><div class="s" style="background:rgba(22,25,44,.55);backdrop-filter:blur(8px)">
+  <div class="di"></div>
+  <div class="sb"><span style="color:rgba(255,255,255,.5)">9:41</span><span style="color:rgba(255,255,255,.5)">5G</span></div>
+  <div class="ct" style="justify-content:center;padding:16px">
+    <div class="popup">
+      <div class="timer"><div class="timer-fill" style="width:70%"></div></div>
+      <div class="rw" style="justify-content:space-between;margin-bottom:14px">
+        <div style="display:flex;gap:6px">
+          <span class="pl" style="background:var(--blue-light);color:var(--blue)">Сантехника</span>
+          <span class="pl" style="background:var(--red-light);color:var(--red)">Срочно</span>
+        </div>
+        <span style="font-size:13px;color:var(--hint);font-weight:700">22с</span>
+      </div>
+      <div style="font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px">Течёт смеситель</div>
+      <div style="color:var(--sub);font-size:13px;line-height:1.5;margin-bottom:16px">Капает снизу, нужна замена прокладки</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+        <div class="st"><small>Бюджет</small><b style="color:var(--primary)">3 000₽</b></div>
+        <div class="st"><small>Район</small><b style="font-size:14px">Центр.</b></div>
+        <div class="st"><small>Откликов</small><b>2</b></div>
+      </div>
+      <div class="cd rw" style="padding:12px;margin-bottom:16px;box-shadow:none;background:var(--soft)">
+        <div class="av" style="width:40px;height:40px;background:var(--primary);color:white;font-size:15px">Е</div>
+        <div style="flex:1"><div style="font-weight:700;font-size:14px">Елена П.</div><div style="font-size:11px;color:var(--sub)">★ 4.8 · 6 заказов</div></div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="bt bt-o">Пропустить</div>
+        <div class="bt bt-p">Откликнуться</div>
+      </div>
+    </div>
+  </div>
+</div></div>
+<div class="caption">Popup заявки</div>
+</div>
+
+<!-- ══════ 3. PROFILE ══════ -->
+<div>
+<div class="phone"><div class="s" style="background:white">
+  <div class="di"></div>
+  <div class="sb"><span style="color:white">9:41</span><span style="color:white">5G</span></div>
+  <div class="ct" style="padding-top:0;gap:12px">
+    <div class="gh">
+      <div class="rw" style="gap:14px">
+        <div class="av" style="width:64px;height:64px;background:rgba(255,255,255,.15);color:white;font-size:24px;border-radius:20px;backdrop-filter:blur(6px)">А</div>
+        <div>
+          <div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Алексей С.</div>
+          <div style="opacity:.7;font-size:13px;font-weight:500">Сантехник · Проверен</div>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <span style="background:rgba(255,255,255,.15);padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700;backdrop-filter:blur(4px)">★ 4.9</span>
+            <span style="background:rgba(255,255,255,.15);padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700;backdrop-filter:blur(4px)">148 заказов</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div class="st"><small>Рейтинг</small><b style="color:var(--primary)">4.9</b></div>
+      <div class="st"><small>Ответ</small><b>7 мин</b></div>
+      <div class="st"><small>Гарантия</small><b style="color:var(--green)">30 дн</b></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--hint);letter-spacing:.04em">ПОРТФОЛИО</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="height:64px;border-radius:16px;background:linear-gradient(145deg,var(--blue-light),var(--primary-light));padding:10px;display:flex;align-items:flex-end">
+        <div><div style="font-size:11px;font-weight:700;color:var(--primary)">Замена крана</div><div style="font-size:9px;color:var(--hint)">Подтверждено</div></div>
+      </div>
+      <div style="height:64px;border-radius:16px;background:linear-gradient(145deg,var(--orange-light),var(--pink-light));padding:10px;display:flex;align-items:flex-end">
+        <div><div style="font-size:11px;font-weight:700;color:var(--orange)">Устранение течи</div><div style="font-size:9px;color:var(--hint)">2 800 ₽</div></div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--hint);letter-spacing:.04em">ОТЗЫВЫ</div>
+    <div class="cd" style="padding:14px">
+      <div class="rw" style="justify-content:space-between;margin-bottom:6px">
+        <div class="rw" style="gap:8px"><div class="av" style="width:28px;height:28px;font-size:11px;background:var(--green-light);color:var(--green);border-radius:8px">Е</div><span style="font-weight:700;font-size:13px">Елена</span></div>
+        <span style="font-size:12px;color:var(--orange)">★★★★★</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.55">"Приехал быстро, цену не менял, всё сделал аккуратно"</div>
+    </div>
+    <div style="margin-top:auto" class="bt bt-p">Выбрать мастера</div>
+  </div>
+</div></div>
+<div class="caption">Профиль мастера</div>
+</div>
+
+<!-- ══════ 4. OFFERS ══════ -->
+<div>
+<div class="phone"><div class="s">
+  <div class="di"></div>
+  <div class="sb"><span style="color:white">9:41</span><span style="color:white">5G</span></div>
+  <div class="ct">
+    <div class="rw" style="justify-content:space-between">
+      <div style="font-size:22px;font-weight:800;letter-spacing:-.04em">Отклики</div>
+      <span class="pl" style="background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:800;border-radius:10px;padding:4px 12px">3</span>
+    </div>
+    <div style="font-size:12px;color:var(--sub)">Течёт смеситель · до 3 000₽</div>
+
+    <div class="cd" style="border:1.5px solid var(--primary-light)">
+      <div class="rw" style="margin-bottom:10px">
+        <div class="av" style="width:46px;height:46px;background:var(--primary);color:white;font-size:17px">А</div>
+        <div style="flex:1"><div style="font-weight:700;font-size:15px;letter-spacing:-.02em">Алексей С.</div><div style="font-size:12px;color:var(--sub);margin-top:1px">★ 4.9 · 148 заказов</div></div>
+        <div style="text-align:right"><div style="font-weight:800;font-size:20px;color:var(--primary);letter-spacing:-.02em">2 800₽</div><div style="font-size:10px;color:var(--green);font-weight:700">30 дн гарантия</div></div>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:12px">"Похоже на прокладку, приеду в 18:30"</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div class="bt bt-o" style="padding:10px;font-size:12px">Профиль</div>
+        <div class="bt bt-o" style="padding:10px;font-size:12px">Написать</div>
+        <div class="bt bt-p" style="padding:10px;font-size:12px">Выбрать</div>
+      </div>
+    </div>
+
+    <div class="cd">
+      <div class="rw">
+        <div class="av" style="width:46px;height:46px;background:var(--green);color:white;font-size:17px">М</div>
+        <div style="flex:1"><div style="font-weight:700;font-size:15px">Михаил В.</div><div style="font-size:12px;color:var(--sub)">★ 4.8 · 73 заказа</div></div>
+        <div style="text-align:right"><div style="font-weight:800;font-size:20px;color:var(--primary)">3 200₽</div><div style="font-size:10px;color:var(--sub)">через 40 мин</div></div>
+      </div>
+    </div>
+
+    <div class="cd">
+      <div class="rw">
+        <div class="av" style="width:46px;height:46px;background:var(--orange);color:white;font-size:17px">И</div>
+        <div style="flex:1"><div style="font-weight:700;font-size:15px">Игорь Н.</div><div style="font-size:12px;color:var(--sub)">★ 4.7 · 42 заказа</div></div>
+        <div style="font-size:13px;color:var(--hint);font-weight:600">После<br>осмотра</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="ni on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>Главная</div>
+    <div class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Чат</div>
+    <div class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>Заявки</div>
+    <div class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</div>
+  </div>
+</div></div>
+<div class="caption">Отклики мастеров</div>
+</div>
+
+<!-- ══════ 5. CHAT ══════ -->
+<div>
+<div class="phone"><div class="s" style="background:white">
+  <div class="di"></div>
+  <div class="sb"><span style="color:white">9:41</span><span style="color:white">5G</span></div>
+  <div class="ct" style="gap:10px">
+    <div class="rw" style="padding-bottom:12px;border-bottom:.5px solid var(--line)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      <div class="av" style="width:40px;height:40px;background:var(--primary);color:white;font-size:15px">А</div>
+      <div><div style="font-weight:700;font-size:15px">Алексей С.</div><div style="font-size:11px;color:var(--green);font-weight:500">В сети</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;flex:1;justify-content:flex-end">
+      <div class="mi">По фото похоже на прокладку. Приеду в 18:30, подходит?</div>
+      <div class="mo">Да, жду! Спасибо</div>
+      <div class="mi">Отлично, инструмент с собой. До встречи!</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div style="flex:1;background:var(--soft);border-radius:16px;padding:14px 16px;font-size:14px;color:var(--hint)">Сообщение...</div>
+      <div style="width:48px;height:48px;border-radius:16px;background:var(--primary);display:grid;place-items:center;box-shadow:0 4px 12px var(--primary-glow)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </div>
+    </div>
+  </div>
+</div></div>
+<div class="caption">Чат</div>
+</div>
+
+</div>
+</div>
+</body>
+</html>

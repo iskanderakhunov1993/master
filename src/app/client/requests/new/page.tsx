@@ -99,7 +99,7 @@ export default function NewRequestPage() {
     return (
       <AppShell role="CLIENT">
         <div className="page-head"><h1>Новая заявка</h1></div>
-        <div className="skeleton" style={{ height: 200, borderRadius: "var(--radius-md)" }} />
+        <div className="skeleton" style={{ height: 200, borderRadius: 16 }} />
       </AppShell>
     );
   }
@@ -108,22 +108,22 @@ export default function NewRequestPage() {
     <AppShell role="CLIENT">
       <div className="page-head"><h1>Новая заявка</h1></div>
 
-      {/* Step indicator */}
+      {/* Step indicator with circles */}
       <div className="flex items-center justify-center" style={{ marginBottom: 32, gap: 0 }}>
         {STEP_LABELS.map((label, i) => (
           <div key={i} className="flex items-center">
             <div className="flex flex-col items-center" style={{ minWidth: 72 }}>
               <div
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 40,
+                  height: 40,
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontWeight: 700,
-                  fontSize: "0.85rem",
-                  background: i <= step ? "var(--accent)" : "var(--bg-section)",
+                  fontWeight: 800,
+                  fontSize: 14,
+                  background: i <= step ? "#000" : "var(--soft, #f2f2f2)",
                   color: i <= step ? "#fff" : "var(--muted)",
                   transition: "all .3s",
                 }}
@@ -131,12 +131,11 @@ export default function NewRequestPage() {
                 {i < step ? <CheckCircle2 size={18} /> : i + 1}
               </div>
               <span
-                className="muted"
                 style={{
-                  fontSize: "0.75rem",
+                  fontSize: 12,
                   marginTop: 6,
-                  color: i === step ? "var(--accent)" : undefined,
-                  fontWeight: i === step ? 600 : 400,
+                  color: i === step ? "#000" : "var(--muted)",
+                  fontWeight: i === step ? 700 : 400,
                 }}
               >
                 {label}
@@ -147,7 +146,7 @@ export default function NewRequestPage() {
                 style={{
                   width: 48,
                   height: 2,
-                  background: i < step ? "var(--accent)" : "var(--bg-section)",
+                  background: i < step ? "#000" : "var(--soft, #f2f2f2)",
                   marginBottom: 20,
                   transition: "background .3s",
                 }}
@@ -160,41 +159,47 @@ export default function NewRequestPage() {
       {error && (
         <div style={{
           color: "var(--red)",
-          background: "var(--accent-light)",
+          background: "#fef2f2",
           padding: 12,
-          borderRadius: "var(--radius-sm)",
+          borderRadius: 12,
           marginBottom: 16,
+          fontSize: 14,
         }}>
           {error}
         </div>
       )}
 
-      {/* Step 0: Category */}
+      {/* Step 0: Category — uber-option cards with colored icon circles */}
       {step === 0 && (
         <div className="animate-fadeIn">
-          <h2 style={{ marginBottom: 16 }}>Выберите категорию</h2>
+          <h2 style={{ marginBottom: 16, fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em" }}>Выберите категорию</h2>
           <div className="grid-3">
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
-                className="card"
                 onClick={() => setCategoryId(cat.id)}
+                className="uber-option"
                 style={{
                   cursor: "pointer",
                   textAlign: "center",
                   padding: 24,
-                  border: categoryId === cat.id
-                    ? "2px solid var(--accent)"
-                    : "2px solid transparent",
-                  background: categoryId === cat.id
-                    ? "var(--accent-light)"
-                    : undefined,
+                  border: categoryId === cat.id ? "2px solid #000" : "2px solid transparent",
+                  background: categoryId === cat.id ? "#000" : "var(--soft, #f2f2f2)",
+                  color: categoryId === cat.id ? "#fff" : "var(--text)",
+                  borderRadius: 16,
                   transition: "all .2s",
                 }}
               >
-                <div style={{ fontSize: "2rem", marginBottom: 8 }}>{cat.icon}</div>
-                <div style={{ fontWeight: 600 }}>{cat.name}</div>
+                <div style={{
+                  width: 48, height: 48, borderRadius: "50%",
+                  background: categoryId === cat.id ? "rgba(255,255,255,0.15)" : "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 24, margin: "0 auto 10px",
+                }}>
+                  {cat.icon}
+                </div>
+                <div style={{ fontWeight: 700 }}>{cat.name}</div>
               </button>
             ))}
           </div>
@@ -205,28 +210,28 @@ export default function NewRequestPage() {
       {step === 1 && (
         <div className="animate-fadeIn">
           <div
-            className="upload-card"
             onClick={() => setHasPhoto(!hasPhoto)}
             style={{
               cursor: "pointer",
               textAlign: "center",
               padding: 32,
               marginBottom: 24,
-              border: hasPhoto ? "2px solid var(--accent)" : "2px dashed var(--line)",
-              background: hasPhoto ? "var(--accent-light)" : undefined,
+              border: hasPhoto ? "2px solid #000" : "2px dashed var(--line)",
+              borderRadius: 16,
+              background: hasPhoto ? "var(--soft, #f2f2f2)" : "transparent",
               transition: "all .2s",
             }}
           >
-            <Camera size={32} style={{ color: "var(--accent)", marginBottom: 8 }} />
+            <Camera size={32} style={{ color: "var(--muted)", marginBottom: 8 }} />
             <div style={{ fontWeight: 600, marginBottom: 4 }}>
               {hasPhoto ? "Фото добавлено" : "Добавить фото или видео"}
             </div>
-            <span className="muted" style={{ fontSize: "0.8rem" }}>
+            <span className="muted" style={{ fontSize: 13 }}>
               до 10 фото или видео до 30 секунд
             </span>
           </div>
 
-          <div className="form-grid">
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <label className="field">
               Заголовок
               <input
@@ -249,11 +254,11 @@ export default function NewRequestPage() {
             </label>
           </div>
 
-          <h3 style={{ margin: "24px 0 12px" }}>Когда нужно?</h3>
-          <div className="flex gap-2" style={{ flexWrap: "wrap" }}>
+          <h3 style={{ margin: "24px 0 12px", fontSize: 18, fontWeight: 800 }}>Когда нужно?</h3>
+          <div className="quick-tags">
             {URGENCY_OPTIONS.map((opt) => (
               <button
-                key={opt.value}
+                key={opt.label}
                 type="button"
                 className={urgency === opt.value ? "chip chip-active" : "chip"}
                 onClick={() => setUrgency(opt.value)}
@@ -268,8 +273,8 @@ export default function NewRequestPage() {
       {/* Step 2: Budget + Location */}
       {step === 2 && (
         <div className="animate-fadeIn">
-          <h3 style={{ marginBottom: 12 }}>Бюджет</h3>
-          <div className="flex gap-2" style={{ flexWrap: "wrap", marginBottom: 32 }}>
+          <h3 style={{ marginBottom: 12, fontSize: 18, fontWeight: 800 }}>Бюджет</h3>
+          <div className="quick-tags" style={{ marginBottom: 32 }}>
             {BUDGET_OPTIONS.map((opt, i) => (
               <button
                 key={i}
@@ -282,9 +287,9 @@ export default function NewRequestPage() {
             ))}
           </div>
 
-          <h3 style={{ marginBottom: 12 }}>Адрес</h3>
-          <div className="form-grid">
-            <div className="two-col">
+          <h3 style={{ marginBottom: 12, fontSize: 18, fontWeight: 800 }}>Адрес</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <label className="field">
                 Район
                 <input
@@ -311,17 +316,18 @@ export default function NewRequestPage() {
           <div style={{
             marginTop: 16,
             padding: "12px 16px",
-            borderRadius: "var(--radius-sm)",
-            background: "var(--accent-light)",
-            fontSize: "0.85rem",
+            borderRadius: 12,
+            background: "var(--soft, #f2f2f2)",
+            fontSize: 14,
             color: "var(--green)",
+            display: "flex", alignItems: "center", gap: 8,
           }}>
-            🔒 Точный адрес увидит только выбранный мастер
+            <span>🔒</span> Точный адрес увидит только выбранный мастер
           </div>
         </div>
       )}
 
-      {/* Navigation */}
+      {/* Navigation — CTA at bottom */}
       <div className="flex justify-between" style={{ marginTop: 32, gap: 12 }}>
         {step > 0 ? (
           <button type="button" className="btn-secondary" onClick={() => setStep(step - 1)}>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Мастер рядом — 5 концепций редизайна</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:#f5f5f7;color:#1d1d1f;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .page{max-width:1100px;margin:0 auto;padding:40px 24px 100px}
+  h1{font-size:clamp(28px,4vw,44px);font-weight:900;letter-spacing:-.04em;line-height:1.1;margin-bottom:8px}
+  .sub{color:#86868b;font-size:17px;margin-bottom:48px;max-width:560px;line-height:1.6}
+  .concept{margin-bottom:64px;border-radius:24px;overflow:hidden;background:white;box-shadow:0 2px 20px rgba(0,0,0,.06)}
+  .concept-head{padding:36px 36px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
+  .concept-body{padding:28px 36px 36px}
+  .tag{display:inline-flex;padding:5px 14px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px}
+  @media(max-width:700px){.row{grid-template-columns:1fr}.concept-head{padding:24px 20px 0}.concept-body{padding:20px}}
+  .info h3{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#86868b;margin-bottom:10px}
+  .info p{font-size:15px;line-height:1.55}
+  .palette{display:flex;gap:8px;flex-wrap:wrap}
+  .sw{width:48px;height:48px;border-radius:12px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:3px;font-size:8px;font-weight:700;border:1px solid rgba(0,0,0,.06)}
+  .phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:20px}
+  .ph{border-radius:28px;overflow:hidden;aspect-ratio:9/19;display:flex;flex-direction:column;border:1px solid rgba(0,0,0,.08)}
+  .ph-status{height:28px;padding:8px 18px 0;display:flex;justify-content:space-between;font-size:11px;font-weight:500}
+  .ph-content{flex:1;display:flex;flex-direction:column;padding:16px;gap:10px;overflow:hidden}
+  .ph-nav{height:52px;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;text-align:center;font-size:9px;font-weight:600}
+  .pros{display:grid;gap:6px;margin-top:10px}
+  .pro{font-size:14px;color:#515154;display:flex;align-items:flex-start;gap:6px}
+  .pro b{color:#1d1d1f}
+  .verdict{background:white;border-radius:20px;padding:32px;margin-top:20px;box-shadow:0 2px 16px rgba(0,0,0,.05)}
+  .compare{width:100%;border-collapse:collapse;font-size:14px;margin-top:16px}
+  .compare th{text-align:left;padding:10px;color:#86868b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #e5e5ea}
+  .compare td{padding:10px;border-bottom:1px solid #f5f5f7}
+  .star{color:#FFB800}
+  .section-title{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>Редизайн: 5 концепций</h1>
+<p class="sub">Каждая концепция — это свой характер, палитра и ощущение. Выберите направление, которое ближе к вашему видению продукта.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- CONCEPT 1: CLEAN MINIMAL -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="concept">
+  <div class="concept-head">
+    <div>
+      <span class="tag" style="background:#f5f5f7;color:#1d1d1f">Концепция 1</span>
+      <h2 style="font-size:28px;font-weight:900;letter-spacing:-.03em;margin-top:12px">Clean Minimal</h2>
+      <p style="color:#86868b;font-size:15px;margin-top:4px">Как Apple и Airbnb — чистота, воздух, фокус на контенте</p>
+    </div>
+  </div>
+  <div class="concept-body">
+    <div class="row">
+      <div>
+        <div class="info"><h3>Философия</h3>
+        <p>Минимум элементов, максимум пространства. Каждый пиксель обоснован. Нет декоративных элементов — только функция. Белый фон, чёрный текст, один акцент.</p></div>
+        <div class="info" style="margin-top:16px"><h3>Палитра</h3>
+        <div class="palette">
+          <div class="sw" style="background:#fff;color:#86868b">FFF</div>
+          <div class="sw" style="background:#f5f5f7;color:#86868b">F5F5F7</div>
+          <div class="sw" style="background:#1d1d1f;color:#fff">1D1D1F</div>
+          <div class="sw" style="background:#0071e3;color:#fff">0071E3</div>
+          <div class="sw" style="background:#34c759;color:#fff">34C759</div>
+        </div></div>
+        <div class="info" style="margin-top:16px"><h3>Типографика</h3>
+        <p style="font-size:32px;font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:6px">SF Pro / Inter</p>
+        <p>Крупные заголовки (32-48px), тонкий body (15-17px). Много line-height. Никаких теней на тексте.</p></div>
+      </div>
+      <div>
+        <div class="info"><h3>Для кого</h3>
+        <p>Аудитория 25-45, привыкшая к Apple, Notion, Linear. Ценят элегантность и простоту. Хорошо подходит для премиум-позиционирования.</p></div>
+        <div class="info" style="margin-top:16px"><h3>Карточки</h3>
+        <p>Без теней и бордеров. Разделение пространством. Еле заметные линии. Hover — только изменение цвета текста.</p></div>
+        <div class="pros">
+          <div class="pro"><b>+</b> Вечный стиль, не устареет</div>
+          <div class="pro"><b>+</b> Быстрая загрузка, ничего лишнего</div>
+          <div class="pro"><b>+</b> Фокус на контенте и действиях</div>
+          <div class="pro"><b>−</b> Может казаться "холодным"</div>
+          <div class="pro"><b>−</b> Мало визуальных якорей для скролла</div>
+        </div>
+      </div>
+    </div>
+    <div class="phones">
+      <div class="ph" style="background:#fff">
+        <div class="ph-status" style="color:#1d1d1f"><span>9:41</span><span>●●● 5G</span></div>
+        <div class="ph-content">
+          <div style="font-size:28px;font-weight:800;letter-spacing:-.04em;color:#1d1d1f;line-height:1.1;margin-top:20px">Что нужно<br>починить?</div>
+          <p style="color:#86868b;font-size:14px;margin:8px 0 16px">Сфоткайте проблему — мастера откликнутся</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:#f5f5f7;border-radius:14px;padding:14px;text-align:center"><div style="font-size:24px">🔧</div><div style="font-size:12px;font-weight:600;margin-top:6px;color:#1d1d1f">Сантехника</div></div>
+            <div style="background:#f5f5f7;border-radius:14px;padding:14px;text-align:center"><div style="font-size:24px">⚡</div><div style="font-size:12px;font-weight:600;margin-top:6px;color:#1d1d1f">Электрика</div></div>
+            <div style="background:#f5f5f7;border-radius:14px;padding:14px;text-align:center"><div style="font-size:24px">🔨</div><div style="font-size:12px;font-weight:600;margin-top:6px;color:#1d1d1f">Ремонт</div></div>
+            <div style="background:#f5f5f7;border-radius:14px;padding:14px;text-align:center"><div style="font-size:24px">🧹</div><div style="font-size:12px;font-weight:600;margin-top:6px;color:#1d1d1f">Клининг</div></div>
+          </div>
+        </div>
+        <div class="ph-nav" style="background:#f5f5f7;color:#86868b;border-top:1px solid #e5e5ea">
+          <span style="color:#0071e3">🏠<br>Заявки</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span>
+        </div>
+      </div>
+      <div class="ph" style="background:#fff">
+        <div class="ph-status" style="color:#1d1d1f"><span>9:41</span><span>●●● 5G</span></div>
+        <div class="ph-content">
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.03em;color:#1d1d1f">Отклики мастеров</div>
+          <div style="background:#f5f5f7;border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center">
+            <div style="width:44px;height:44px;border-radius:50%;background:#0071e3;display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0">А</div>
+            <div style="flex:1"><div style="font-weight:700;font-size:14px">Алексей · ⭐ 4.9</div><div style="color:#86868b;font-size:12px;margin-top:2px">2 800 ₽ · гарантия 30 дн</div></div>
+          </div>
+          <div style="background:#f5f5f7;border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center">
+            <div style="width:44px;height:44px;border-radius:50%;background:#34c759;display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0">М</div>
+            <div style="flex:1"><div style="font-weight:700;font-size:14px">Михаил · ⭐ 4.8</div><div style="color:#86868b;font-size:12px;margin-top:2px">3 200 ₽ · приедет через 40 мин</div></div>
+          </div>
+          <div style="margin-top:auto;background:#0071e3;color:#fff;border-radius:14px;padding:14px;text-align:center;font-weight:700;font-size:15px">Выбрать мастера</div>
+        </div>
+      </div>
+      <div class="ph" style="background:#fff">
+        <div class="ph-status" style="color:#1d1d1f"><span>9:41</span><span>●●● 5G</span></div>
+        <div class="ph-content">
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.03em;color:#1d1d1f">Новая заявка</div>
+          <div style="color:#86868b;font-size:13px">2.4 км · Сантехника</div>
+          <div style="background:#f5f5f7;border-radius:16px;padding:16px;margin-top:8px">
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px">Течёт смеситель</div>
+            <div style="color:#86868b;font-size:13px;line-height:1.4">Капает снизу, нужна замена прокладки или смесителя</div>
+            <div style="display:flex;gap:8px;margin-top:12px;font-size:12px;color:#86868b"><span>💰 3 000 ₽</span><span>📍 Аэропорт</span><span>⏰ Сегодня</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto">
+            <div style="border:1.5px solid #e5e5ea;border-radius:14px;padding:14px;text-align:center;font-weight:700;font-size:14px;color:#86868b">Пропустить</div>
+            <div style="background:#1d1d1f;color:#fff;border-radius:14px;padding:14px;text-align:center;font-weight:700;font-size:14px">Откликнуться</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- CONCEPT 2: WARM GRADIENT -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="concept">
+  <div class="concept-head">
+    <div>
+      <span class="tag" style="background:#fff5f0;color:#e8590c">Концепция 2</span>
+      <h2 style="font-size:28px;font-weight:900;letter-spacing:-.03em;margin-top:12px">Warm Sunset</h2>
+      <p style="color:#86868b;font-size:15px;margin-top:4px">Тёплые градиенты, дружелюбный, как Headspace или Calm</p>
+    </div>
+  </div>
+  <div class="concept-body">
+    <div class="row">
+      <div>
+        <div class="info"><h3>Философия</h3>
+        <p>Тёплые цвета снижают тревогу (а ремонт = стресс). Мягкие градиенты, округлые формы, ощущение заботы. Клиент чувствует: "здесь помогут".</p></div>
+        <div class="info" style="margin-top:16px"><h3>Палитра</h3>
+        <div class="palette">
+          <div class="sw" style="background:#fffbf5;color:#86868b">FFFBF5</div>
+          <div class="sw" style="background:#fff0e6;color:#c2410c">FFF0E6</div>
+          <div class="sw" style="background:#f97316;color:#fff">F97316</div>
+          <div class="sw" style="background:#ea580c;color:#fff">EA580C</div>
+          <div class="sw" style="background:#1c1917;color:#fff">1C1917</div>
+        </div></div>
+        <div class="pros">
+          <div class="pro"><b>+</b> Уникальный, нет конкурентов с таким стилем</div>
+          <div class="pro"><b>+</b> Снижает стресс при вызове мастера</div>
+          <div class="pro"><b>+</b> Хорошо для аудитории 30-55</div>
+          <div class="pro"><b>−</b> Оранжевый может ассоциироваться с "дёшево"</div>
+        </div>
+      </div>
+      <div>
+        <div class="info"><h3>Типографика</h3>
+        <p style="font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.1;color:#1c1917;margin-bottom:6px">Rounded, мягкая</p>
+        <p>Скруглённые углы 20-28px. Кнопки как подушки. Иконки с fill вместо stroke.</p></div>
+        <div class="info" style="margin-top:16px"><h3>Карточки</h3>
+        <p>Кремовый фон с мягкой тенью. Градиентные акценты на важных элементах. Hover — лёгкий подъём + усиление тени.</p></div>
+      </div>
+    </div>
+    <div class="phones">
+      <div class="ph" style="background:linear-gradient(180deg,#fffbf5,#fff0e6)">
+        <div class="ph-status" style="color:#1c1917"><span>9:41</span><span>●●●</span></div>
+        <div class="ph-content">
+          <div style="font-size:26px;font-weight:800;letter-spacing:-.03em;color:#1c1917;line-height:1.15;margin-top:12px">Привет! 👋<br>Что случилось?</div>
+          <p style="color:#a8a29e;font-size:14px;margin:6px 0 14px">Покажите проблему — мы найдём мастера</p>
+          <div style="background:linear-gradient(135deg,#f97316,#ea580c);border-radius:20px;padding:20px;color:white;text-align:center">
+            <div style="font-size:28px;margin-bottom:6px">📷</div>
+            <div style="font-weight:700;font-size:15px">Сфотографировать проблему</div>
+            <div style="font-size:12px;opacity:.8;margin-top:4px">Мастер оценит по фото</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+            <div style="background:white;border-radius:16px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04)"><div style="font-size:22px">🔧</div><div style="font-size:11px;font-weight:600;margin-top:4px">Сантехника</div></div>
+            <div style="background:white;border-radius:16px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04)"><div style="font-size:22px">⚡</div><div style="font-size:11px;font-weight:600;margin-top:4px">Электрика</div></div>
+            <div style="background:white;border-radius:16px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04)"><div style="font-size:22px">🔨</div><div style="font-size:11px;font-weight:600;margin-top:4px">Ремонт</div></div>
+          </div>
+        </div>
+        <div class="ph-nav" style="background:white;color:#a8a29e;border-top:1px solid #f5f0eb">
+          <span style="color:#f97316">🏠<br>Главная</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span>
+        </div>
+      </div>
+      <div class="ph" style="background:#fffbf5">
+        <div class="ph-status" style="color:#1c1917"><span>9:41</span><span>●●●</span></div>
+        <div class="ph-content">
+          <div style="font-size:20px;font-weight:800;color:#1c1917">Новая заявка 🔔</div>
+          <div style="background:white;border-radius:20px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.06)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <span style="background:#fff0e6;color:#ea580c;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700">🔧 Сантехника</span>
+              <span style="background:#fef2f2;color:#ef4444;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700">🔥 Срочно</span>
+            </div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px">Течёт смеситель</div>
+            <div style="color:#a8a29e;font-size:13px">3 000 ₽ · Центральный · Сегодня</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #f5f0eb">
+              <div style="width:32px;height:32px;border-radius:50%;background:#f97316;display:grid;place-items:center;color:white;font-size:12px;font-weight:800">Е</div>
+              <div><div style="font-size:13px;font-weight:600">Елена · ⭐4.8</div><div style="font-size:11px;color:#a8a29e">6 заказов · Надёжный</div></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto">
+            <div style="border:1.5px solid #e7e5e4;border-radius:16px;padding:14px;text-align:center;font-weight:700;font-size:14px;color:#a8a29e">Пропустить</div>
+            <div style="background:linear-gradient(135deg,#f97316,#ea580c);color:white;border-radius:16px;padding:14px;text-align:center;font-weight:700;font-size:14px">Откликнуться</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- CONCEPT 3: DARK PREMIUM -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="concept" style="background:#111">
+  <div class="concept-head">
+    <div>
+      <span class="tag" style="background:rgba(167,139,250,.15);color:#a78bfa">Концепция 3</span>
+      <h2 style="font-size:28px;font-weight:900;letter-spacing:-.03em;margin-top:12px;color:#fff">Dark Premium</h2>
+      <p style="color:#71717a;font-size:15px;margin-top:4px">Тёмная тема с неоновыми акцентами, как Vercel или Linear</p>
+    </div>
+  </div>
+  <div class="concept-body" style="color:#e4e4e7">
+    <div class="row">
+      <div>
+        <div class="info"><h3 style="color:#71717a">Философия</h3>
+        <p>Тёмный фон = фокус. Неоновые акценты = современность. Glass-morphism, градиенты, свечения. Чувство технологичности и надёжности.</p></div>
+        <div class="info" style="margin-top:16px"><h3 style="color:#71717a">Палитра</h3>
+        <div class="palette">
+          <div class="sw" style="background:#09090b;color:#71717a;border-color:rgba(255,255,255,.1)">09090B</div>
+          <div class="sw" style="background:#18181b;color:#71717a;border-color:rgba(255,255,255,.1)">18181B</div>
+          <div class="sw" style="background:#a78bfa;color:#09090b">A78BFA</div>
+          <div class="sw" style="background:#22d3ee;color:#09090b">22D3EE</div>
+          <div class="sw" style="background:#f4f4f5;color:#09090b">F4F4F5</div>
+        </div></div>
+        <div class="pros" style="color:#a1a1aa">
+          <div class="pro"><b style="color:#e4e4e7">+</b> Премиальное ощущение</div>
+          <div class="pro"><b style="color:#e4e4e7">+</b> Модный, tech-forward</div>
+          <div class="pro"><b style="color:#e4e4e7">+</b> Хорошо для вечернего использования</div>
+          <div class="pro"><b style="color:#e4e4e7">−</b> Может отпугнуть аудиторию 45+</div>
+          <div class="pro"><b style="color:#e4e4e7">−</b> Сложнее читать текст при ярком свете</div>
+        </div>
+      </div>
+      <div>
+        <div class="info"><h3 style="color:#71717a">Карточки</h3>
+        <p>Стеклянные карточки с backdrop-blur. Бордеры rgba(255,255,255,.08). Свечение на hover. Градиентные кнопки purple→cyan.</p></div>
+      </div>
+    </div>
+    <div class="phones">
+      <div class="ph" style="background:#09090b;border-color:rgba(255,255,255,.1)">
+        <div class="ph-status" style="color:#71717a"><span>9:41</span><span>5G</span></div>
+        <div class="ph-content">
+          <div style="font-size:26px;font-weight:800;letter-spacing:-.03em;color:#f4f4f5;line-height:1.1;margin-top:12px">Мастер<br><span style="background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent">рядом</span></div>
+          <p style="color:#71717a;font-size:13px;margin-bottom:12px">Сфоткай — починим</p>
+          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="text-align:center;padding:10px"><div style="font-size:22px">🔧</div><div style="font-size:11px;color:#a1a1aa;margin-top:4px">Сантехника</div></div>
+            <div style="text-align:center;padding:10px"><div style="font-size:22px">⚡</div><div style="font-size:11px;color:#a1a1aa;margin-top:4px">Электрика</div></div>
+            <div style="text-align:center;padding:10px"><div style="font-size:22px">🔨</div><div style="font-size:11px;color:#a1a1aa;margin-top:4px">Ремонт</div></div>
+            <div style="text-align:center;padding:10px"><div style="font-size:22px">🧹</div><div style="font-size:11px;color:#a1a1aa;margin-top:4px">Клининг</div></div>
+          </div>
+          <div style="margin-top:auto;background:linear-gradient(135deg,#a78bfa,#22d3ee);color:#09090b;border-radius:16px;padding:14px;text-align:center;font-weight:800;font-size:15px">Создать заявку</div>
+        </div>
+        <div class="ph-nav" style="background:rgba(255,255,255,.03);color:#71717a;border-top:1px solid rgba(255,255,255,.08)">
+          <span style="color:#a78bfa">🏠<br>Заявки</span><span>💬<br>Чат</span><span>⭐<br>Отзывы</span><span>👤<br>Профиль</span>
+        </div>
+      </div>
+      <div class="ph" style="background:#09090b;border-color:rgba(255,255,255,.1)">
+        <div class="ph-status" style="color:#71717a"><span>9:41</span><span>5G</span></div>
+        <div class="ph-content">
+          <div style="font-size:18px;font-weight:800;color:#f4f4f5">Профиль мастера</div>
+          <div style="display:flex;gap:12px;align-items:center;margin:8px 0">
+            <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#a78bfa,#22d3ee);display:grid;place-items:center;color:#09090b;font-weight:900;font-size:20px">А</div>
+            <div><div style="font-weight:700;color:#f4f4f5">Алексей</div><div style="color:#71717a;font-size:12px">⭐ 4.9 · 148 заказов · ✅ Проверен</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px;text-align:center"><div style="font-size:11px;color:#71717a">Рейтинг</div><div style="font-weight:800;color:#a78bfa">4.9</div></div>
+            <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px;text-align:center"><div style="font-size:11px;color:#71717a">Гарантия</div><div style="font-weight:800;color:#22d3ee">30 дн</div></div>
+          </div>
+          <div style="margin-top:8px;font-size:13px;font-weight:700;color:#a1a1aa">Портфолио</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div style="height:60px;border-radius:12px;background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(34,211,238,.08));border:1px solid rgba(255,255,255,.06);padding:8px;display:flex;align-items:flex-end"><span style="font-size:10px;font-weight:700;color:#a1a1aa">Замена крана</span></div>
+            <div style="height:60px;border-radius:12px;background:linear-gradient(135deg,rgba(34,211,238,.15),rgba(167,139,250,.08));border:1px solid rgba(255,255,255,.06);padding:8px;display:flex;align-items:flex-end"><span style="font-size:10px;font-weight:700;color:#a1a1aa">Устранение течи</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- CONCEPT 4: FRESH GREEN -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="concept">
+  <div class="concept-head">
+    <div>
+      <span class="tag" style="background:#ecfdf5;color:#059669">Концепция 4</span>
+      <h2 style="font-size:28px;font-weight:900;letter-spacing:-.03em;margin-top:12px">Fresh Green</h2>
+      <p style="color:#86868b;font-size:15px;margin-top:4px">Свежий зелёный, как Grab, inDrive — доверие и экология</p>
+    </div>
+  </div>
+  <div class="concept-body">
+    <div class="row">
+      <div>
+        <div class="info"><h3>Философия</h3>
+        <p>Текущий стиль, доработанный. Зелёный = доверие, рост, свежесть. Белый фон + зелёные акценты. Карточки с мягкими тенями. Простой и понятный.</p></div>
+        <div class="info" style="margin-top:16px"><h3>Палитра</h3>
+        <div class="palette">
+          <div class="sw" style="background:#fff;color:#86868b">FFF</div>
+          <div class="sw" style="background:#f0fdf4;color:#059669">F0FDF4</div>
+          <div class="sw" style="background:#10b981;color:#fff">10B981</div>
+          <div class="sw" style="background:#059669;color:#fff">059669</div>
+          <div class="sw" style="background:#111827;color:#fff">111827</div>
+        </div></div>
+        <div class="pros">
+          <div class="pro"><b>+</b> Уже работает, минимум изменений</div>
+          <div class="pro"><b>+</b> Доверие и свежесть</div>
+          <div class="pro"><b>+</b> Хорошо для всех возрастов</div>
+          <div class="pro"><b>−</b> Похож на inDrive, Grab</div>
+        </div>
+      </div>
+      <div>
+        <div class="info"><h3>Что улучшить</h3>
+        <p>Добавить больше визуальной глубины: subtle градиенты на hero, улучшить карточки мастеров, добавить микро-анимации, сделать nav более compact.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- CONCEPT 5: BOLD BLUE -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="concept">
+  <div class="concept-head">
+    <div>
+      <span class="tag" style="background:#eff6ff;color:#2563eb">Концепция 5</span>
+      <h2 style="font-size:28px;font-weight:900;letter-spacing:-.03em;margin-top:12px">Bold Blue</h2>
+      <p style="color:#86868b;font-size:15px;margin-top:4px">Энергичный синий, как Revolut, Stripe — надёжность и масштаб</p>
+    </div>
+  </div>
+  <div class="concept-body">
+    <div class="row">
+      <div>
+        <div class="info"><h3>Философия</h3>
+        <p>Синий = надёжность, профессионализм, масштаб. Fintech-стиль: чёткие линии, контрастные кнопки, data-driven дизайн. Для серьёзного бизнеса.</p></div>
+        <div class="info" style="margin-top:16px"><h3>Палитра</h3>
+        <div class="palette">
+          <div class="sw" style="background:#fff;color:#86868b">FFF</div>
+          <div class="sw" style="background:#f8fafc;color:#64748b">F8FAFC</div>
+          <div class="sw" style="background:#2563eb;color:#fff">2563EB</div>
+          <div class="sw" style="background:#1d4ed8;color:#fff">1D4ED8</div>
+          <div class="sw" style="background:#0f172a;color:#fff">0F172A</div>
+        </div></div>
+        <div class="pros">
+          <div class="pro"><b>+</b> Внушает доверие (как банк)</div>
+          <div class="pro"><b>+</b> Хорошо масштабируется</div>
+          <div class="pro"><b>+</b> Профессиональный вид</div>
+          <div class="pro"><b>−</b> Может казаться "корпоративным"</div>
+          <div class="pro"><b>−</b> Менее "тёплый" чем зелёный/оранжевый</div>
+        </div>
+      </div>
+      <div>
+        <div class="info"><h3>Карточки</h3>
+        <p>Чистые белые с 1px бордером #e2e8f0. Синие акценты на кнопках и индикаторах. Строгая сетка. Монохромные иконки.</p></div>
+      </div>
+    </div>
+    <div class="phones">
+      <div class="ph" style="background:#fff">
+        <div class="ph-status" style="color:#0f172a"><span>9:41</span><span>●●● 5G</span></div>
+        <div class="ph-content">
+          <div style="font-size:26px;font-weight:800;letter-spacing:-.03em;color:#0f172a;line-height:1.1;margin-top:12px">Заявки<br><span style="color:#2563eb">рядом</span></div>
+          <div style="display:flex;gap:8px;margin:8px 0">
+            <span style="background:#eff6ff;color:#2563eb;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700">Все</span>
+            <span style="color:#94a3b8;padding:4px 12px;font-size:12px;font-weight:600">Срочные</span>
+            <span style="color:#94a3b8;padding:4px 12px;font-size:12px;font-weight:600">Сегодня</span>
+          </div>
+          <div style="border:1px solid #e2e8f0;border-radius:16px;padding:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-size:11px;font-weight:700;color:#2563eb;background:#eff6ff;padding:3px 8px;border-radius:6px">🔧 Сантехника</span>
+              <span style="font-size:11px;color:#94a3b8">2.4 км</span>
+            </div>
+            <div style="font-weight:700;font-size:15px;color:#0f172a">Течёт смеситель на кухне</div>
+            <div style="color:#94a3b8;font-size:12px;margin-top:4px">до 3 000 ₽ · Сегодня после 18:00</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+              <div style="border:1.5px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center;font-weight:700;font-size:13px;color:#94a3b8">Пропустить</div>
+              <div style="background:#2563eb;color:white;border-radius:10px;padding:10px;text-align:center;font-weight:700;font-size:13px">Откликнуться</div>
+            </div>
+          </div>
+        </div>
+        <div class="ph-nav" style="background:#f8fafc;color:#94a3b8;border-top:1px solid #e2e8f0">
+          <span style="color:#2563eb">📋<br>Заявки</span><span>🧰<br>Заказы</span><span>💎<br>План</span><span>👤<br>Профиль</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- COMPARISON -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="verdict">
+  <h2 style="font-size:24px;font-weight:900;letter-spacing:-.03em;margin-bottom:4px">Сравнение</h2>
+  <p style="color:#86868b;margin-bottom:16px">Выберите стиль, который ближе к вашему видению</p>
+  <table class="compare">
+    <tr><th>Критерий</th><th>Clean Minimal</th><th>Warm Sunset</th><th>Dark Premium</th><th>Fresh Green</th><th>Bold Blue</th></tr>
+    <tr><td>Аудитория</td><td>25-40, tech</td><td>30-55, массовая</td><td>20-35, tech</td><td>Все возрасты</td><td>30-50, бизнес</td></tr>
+    <tr><td>Доверие</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐⭐⭐</td></tr>
+    <tr><td>Уникальность</td><td>⭐⭐⭐</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐⭐</td><td>⭐⭐</td><td>⭐⭐⭐</td></tr>
+    <tr><td>Простота</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐⭐</td></tr>
+    <tr><td>Мобильный UX</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐⭐</td></tr>
+    <tr><td>Время реализации</td><td>Средне</td><td>Много</td><td>Много</td><td>Мало (уже есть)</td><td>Средне</td></tr>
+    <tr><td>Похож на</td><td>Apple, Airbnb</td><td>Headspace, Calm</td><td>Vercel, Linear</td><td>inDrive, Grab</td><td>Revolut, Stripe</td></tr>
+  </table>
+
+  <div style="margin-top:24px;padding:20px;background:#f0fdf4;border-radius:14px;border:1px solid #bbf7d0">
+    <div style="font-weight:800;font-size:15px;margin-bottom:6px">💡 Рекомендация</div>
+    <div style="color:#515154;font-size:14px;line-height:1.6">
+      <b>Warm Sunset</b> — самый уникальный и запоминающийся. Ни один конкурент не использует тёплую палитру для ремонтных услуг. Снижает стресс, вызывает доверие, подходит для широкой аудитории. Это ваш шанс выделиться.<br><br>
+      <b>Clean Minimal</b> — если хотите премиум-позиционирование. Вечный стиль, быстрый, элегантный.<br><br>
+      <b>Fresh Green</b> — если не хотите рисковать. Уже работает, нужен только polish.
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
