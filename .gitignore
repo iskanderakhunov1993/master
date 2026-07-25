@@ -8,3 +8,6 @@ coverage/
 .DS_Store
 *.log
 tsconfig.tsbuildinfo
+
+/src/generated/prisma
+prisma/migrations/

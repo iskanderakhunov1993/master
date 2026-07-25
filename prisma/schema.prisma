@@ -1,0 +1,340 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id
+  email     String   @unique
+  password  String
+  role      String   @default("CLIENT")
+  verified  Boolean  @default(false)
+  blocked   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userProfile     UserProfile?
+  addresses       UserAddress[]
+  clientOrders    Order[]         @relation("client")
+  masterProfile   MasterProfile?
+  masterOffers    MasterOffer[]
+  reviews         Review[]
+  sessionTokens   SessionToken[]
+  masterPhotos    MasterPhoto[]
+  calendarEvents  CalendarEvent[]
+  kanbanTasks     KanbanTask[]
+  taskPhotos      TaskPhoto[]
+  masterQualifications MasterQualification[]
+  masterSubscriptions  MasterSubscription[]
+  adminNotes      AdminNote[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id          String   @id
+  userId      String   @unique @map("user_id")
+  fullName    String?  @map("full_name")
+  phoneNumber String?  @map("phone_number")
+  photoId     String?  @map("photo_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UserAddress {
+  id          String  @id
+  userId      String  @map("user_id")
+  label       String?
+  city        String
+  street      String
+  house       String
+  apartment   String?
+  comment     String?
+  isDefault   Boolean @default(false) @map("is_default")
+
+  user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@map("user_addresses")
+}
+
+model Order {
+  id                      String   @id
+  clientId                String   @map("client_id")
+  status                  String   @default("DRAFT")
+  description             String?
+  categoryId              String?  @map("category_id")
+  subcategoryId           String?  @map("subcategory_id")
+  addressId               String?  @map("address_id")
+  addressCity             String?  @map("address_city")
+  addressStreet           String?  @map("address_street")
+  addressHouse            String?  @map("address_house")
+  addressApartment        String?  @map("address_apartment")
+  addressComment          String?  @map("address_comment")
+  scheduleKind            String?  @map("schedule_kind")
+  scheduledAt             DateTime? @map("scheduled_at")
+  orderType               String   @default("NORMAL") @map("order_type")
+  basePriceMinor          Int?     @map("base_price_minor")
+  urgencyMultiplierBps    Int      @default(10000) @map("urgency_multiplier_bps")
+  totalPriceMinor         Int?     @map("total_price_minor")
+  currentStep             Int      @default(1) @map("current_step")
+  version                 Int      @default(1)
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+  submittedAt             DateTime? @map("submitted_at")
+  selectedMasterId        String?  @map("selected_master_id")
+  selectedOfferId         String?  @map("selected_offer_id")
+  agreedPriceMinor        Int?     @map("agreed_price_minor")
+  masterSelectedAt        DateTime? @map("master_selected_at")
+  masterConfirmedAt       DateTime? @map("master_confirmed_at")
+
+  client      User             @relation("client", fields: [clientId], references: [id], onDelete: Cascade)
+  address     UserAddress?     @relation(fields: [addressId], references: [id])
+  photos      OrderPhoto[]
+  offers      MasterOffer[]
+  reviews     Review[]
+  statusHistory OrderStatusHistory[]
+  calendarEvents CalendarEvent[]
+  serviceAreas    OrderServiceArea[]
+
+  @@map("orders")
+}
+
+model OrderPhoto {
+  id        String   @id
+  orderId   String   @map("order_id")
+  fileName  String   @map("file_name")
+  byteSize  Int      @map("byte_size")
+  mediaData Bytes
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_photos")
+}
+
+model OrderStatusHistory {
+  id        String   @id
+  orderId   String   @map("order_id")
+  status    String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_status_history")
+}
+
+model OrderServiceArea {
+  id        String  @id
+  orderId   String  @map("order_id")
+  areaName  String  @map("area_name")
+  distance  Float?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_service_areas")
+}
+
+model MasterProfile {
+  id              String   @id
+  userId          String   @unique @map("user_id")
+  description     String?
+  rating          Float    @default(0)
+  reviewCount     Int      @default(0) @map("review_count")
+  responseRate    Float    @default(0) @map("response_rate")
+  completionRate  Float    @default(0) @map("completion_rate")
+  averageResponse Int?     @map("average_response")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  verified        Boolean  @default(false)
+  verifiedAt      DateTime? @map("verified_at")
+
+  user            User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos          MasterPhoto[]
+  qualifications  MasterQualification[]
+  subscriptions   MasterSubscription[]
+  offers          MasterOffer[]
+  reviews         Review[]                 @relation("reviewer")
+
+  @@map("master_profiles")
+}
+
+model MasterPhoto {
+  id        String   @id
+  masterId  String   @map("master_id")
+  userId    String   @map("user_id")
+  fileName  String   @map("file_name")
+  byteSize  Int      @map("byte_size")
+  mediaData Bytes
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
+  master MasterProfile @relation(fields: [masterId], references: [userId], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("master_photos")
+}
+
+model MasterQualification {
+  id           String   @id
+  masterId     String   @map("master_id")
+  userId       String   @map("user_id")
+  categoryId   String   @map("category_id")
+  subcategoryId String?  @map("subcategory_id")
+  certified    Boolean  @default(false)
+  yearsExperience Int?   @map("years_experience")
+
+  master MasterProfile @relation(fields: [masterId], references: [userId], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("master_qualifications")
+}
+
+model MasterSubscription {
+  id          String   @id
+  masterId    String   @map("master_id")
+  userId      String   @map("user_id")
+  plan        String   @default("FREE")
+  subscriptionActive Boolean @default(true) @map("subscription_active")
+  expiresAt   DateTime? @map("expires_at")
+  serviceAreas String?  @map("service_areas")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  master MasterProfile @relation(fields: [masterId], references: [userId], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([masterId])
+  @@map("master_subscriptions")
+}
+
+model MasterOffer {
+  id              String   @id
+  orderId         String   @map("order_id")
+  masterId        String   @map("master_id")
+  userId          String   @map("user_id")
+  priceMinor      Int      @map("price_minor")
+  description     String?
+  status          String   @default("PENDING")
+  createdAt       DateTime @default(now()) @map("created_at")
+  expiresAt       DateTime @map("expires_at")
+  respondedAt     DateTime? @map("responded_at")
+
+  order  Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  master MasterProfile @relation(fields: [masterId], references: [userId], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("master_offers")
+}
+
+model Review {
+  id          String   @id
+  orderId     String   @map("order_id")
+  authorId    String   @map("author_id")
+  masterId    String   @map("master_id")
+  rating      Int
+  title       String?
+  text        String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  order  Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  author User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  master MasterProfile @relation("reviewer", fields: [masterId], references: [userId], onDelete: Cascade)
+  photos ReviewPhoto[]
+
+  @@map("reviews")
+}
+
+model ReviewPhoto {
+  id        String   @id
+  reviewId  String   @map("review_id")
+  fileName  String   @map("file_name")
+  byteSize  Int      @map("byte_size")
+  mediaData Bytes
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@map("review_photos")
+}
+
+model SessionToken {
+  id        String   @id
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session_tokens")
+}
+
+model CalendarEvent {
+  id        String   @id
+  userId    String   @map("user_id")
+  orderId   String?  @map("order_id")
+  title     String
+  startTime DateTime @map("start_time")
+  endTime   DateTime @map("end_time")
+  eventType String   @map("event_type")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@map("calendar_events")
+}
+
+model KanbanTask {
+  id          String   @id
+  userId      String   @map("user_id")
+  orderId     String?  @map("order_id")
+  title       String
+  description String?
+  status      String   @default("TODO")
+  priority    String   @default("NORMAL")
+  dueDate     DateTime? @map("due_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos TaskPhoto[]
+
+  @@map("kanban_tasks")
+}
+
+model TaskPhoto {
+  id        String   @id
+  taskId    String   @map("task_id")
+  userId    String   @map("user_id")
+  fileName  String   @map("file_name")
+  byteSize  Int      @map("byte_size")
+  mediaData Bytes
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
+  task KanbanTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("task_photos")
+}
+
+model AdminNote {
+  id        String   @id
+  adminId   String   @map("admin_id")
+  userId    String?  @map("user_id")
+  orderId   String?  @map("order_id")
+  note      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  admin User @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@map("admin_notes")
+}

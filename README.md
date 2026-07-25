@@ -9,7 +9,7 @@
 - Next.js 16, App Router и Server Actions;
 - React 19;
 - TypeScript 5 в strict mode;
-- SQLite через `better-sqlite3`;
+- **PostgreSQL** через **Prisma ORM** (была SQLite);
 - Zod для входной валидации;
 - bcryptjs для хеширования паролей;
 - Lucide React для иконок;
@@ -20,47 +20,86 @@ AI, платное ранжирование и покупка лидов не и
 ## Требования
 
 - Node.js 22 LTS или новее;
-- npm 10 или новее.
+- npm 10 или новее;
+- **PostgreSQL 14+** (локально, Docker или облако)
 
 ## Быстрый старт
 
+### 1. С Docker (рекомендуется)
 ```bash
+# Запустите PostgreSQL контейнер
+docker run --name master-ryadom-db \
+  -e POSTGRES_DB=master_ryadom \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  -d postgres:16
+
+# Установите зависимости и инициализируйте БД
 npm install
-cp .env.example .env.local
-npm run seed
+npx tsx scripts/init-postgres.ts
 npm run dev
 ```
 
-После запуска приложение доступно по адресу [http://localhost:3000](http://localhost:3000). Если порт занят, Next.js выберет следующий свободный порт.
+### 2. С локальным PostgreSQL
+```bash
+npm install
+npm run prisma:push
+npm run dev
+```
+
+После запуска приложение доступно по адресу [http://localhost:3000](http://localhost:3000).
+
+📖 **Подробно:** см. [POSTGRESQL_SETUP.md](./POSTGRESQL_SETUP.md)
 
 ## Переменные окружения
 
-Все переменные необязательны и имеют безопасные значения для локальной разработки.
+**Основная:** (обновлена для PostgreSQL)
+
+| Переменная | Пример | Назначение |
+| --- | --- | --- |
+| `DATABASE_URL` | `postgresql://user:pass@localhost:5432/master_ryadom` | PostgreSQL connection string |
+
+**Дополнительные** (опционально):
 
 | Переменная | По умолчанию | Назначение |
-| --- | ---: | --- |
-| `DATABASE_FILENAME` | `master-ryadom.db` | Имя SQLite-файла внутри `.data/`. Разрешены буквы, цифры, `.`, `_` и `-`. |
-| `SESSION_TTL_DAYS` | `7` | Срок жизни серверной сессии в днях. |
-| `URGENCY_MULTIPLIER` | `2` | Коэффициент срочного заказа, допустимый диапазон `1–5`. |
-| `NORMAL_MATCH_TTL_MINUTES` | `120` | Время жизни обычного matching-события, `15–1440` минут. |
-| `URGENT_MATCH_TTL_MINUTES` | `45` | Время жизни срочного matching-события, `10–240` минут. |
-| `MASTER_OFFER_TTL_MINUTES` | `20` | Время жизни предложения мастера, `5–120` минут. |
+| --- | --- | --- |
+| `SESSION_TTL_DAYS` | `7` | Срок жизни серверной сессии в днях |
+| `URGENCY_MULTIPLIER` | `2` | Коэффициент срочного заказа, `1–5` |
+| `NORMAL_MATCH_TTL_MINUTES` | `120` | Время жизни обычного matching, `15–1440` |
+| `URGENT_MATCH_TTL_MINUTES` | `45` | Время жизни срочного matching, `10–240` |
+| `MASTER_OFFER_TTL_MINUTES` | `20` | Время жизни предложения, `5–120` |
 
 В production cookie сессии автоматически получает флаг `Secure`. Приложение должно работать только через HTTPS.
 
 ## База данных и миграции
 
-При первом обращении к базе приложение создаёт каталог `.data/`, включает WAL и foreign keys, затем выполняет идемпотентные schema migrations из `src/lib/db.ts`.
+Приложение использует **Prisma ORM** для работы с PostgreSQL.
 
-Локальная подготовка базы:
+### Инициализация (первый запуск)
 
 ```bash
-npm run seed
+# Создайте базу (см. POSTGRESQL_SETUP.md) и обновите .env
+npm run prisma:push
 ```
 
-Seed можно запускать повторно: он обновляет только детерминированные demo-данные и не удаляет обычных пользователей. Перед изменением схемы production-базы необходимо сделать резервную копию SQLite-файла и отдельно проверить миграцию на копии данных.
+### Разработка БД
 
-Для полностью чистого локального окружения остановите приложение, удалите `.data/master-ryadom.db`, `.data/master-ryadom.db-shm` и `.data/master-ryadom.db-wal`, затем снова выполните `npm run seed`.
+```bash
+# Генерировать Prisma клиент (после изменений schema.prisma)
+npm run prisma:generate
+
+# Открыть Prisma Studio (GUI для БД)
+npm run prisma:studio
+```
+
+### Production
+
+Используйте управляемые БД сервисы:
+- **Supabase** (бесплатно)
+- **Neon** (serverless PostgreSQL)
+- **AWS RDS**, **DigitalOcean**, **Azure**
+
+📖 **Подробно:** см. [POSTGRESQL_SETUP.md](./POSTGRESQL_SETUP.md)
 
 ## Demo-среда
 
@@ -118,7 +157,7 @@ npm run lint && npm run typecheck && npm test && npm run build
 
 ## Границы текущего MVP
 
-- SQLite и хранение изображений BLOB подходят для локального MVP и одного экземпляра приложения, но не для горизонтального масштабирования;
+- ~~SQLite и хранение изображений BLOB подходят для локального MVP и одного экземпляра приложения, но не для горизонтального масштабирования;~~ → **PostgreSQL готова к масштабированию**
 - обновления заказов используют polling fallback, отдельный realtime transport не подключён;
 - верификация мастеров выполняется администратором вручную;
 - приблизительное расстояние рассчитывается детерминированно без геокодинга и маршрутизации;
