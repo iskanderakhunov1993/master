@@ -9,6 +9,17 @@ export type AdminDashboardData = {
   pendingVerifications: number;
   activeOrders: number;
   openComplaints: number;
+  pilot: {
+    publishedOrders: number;
+    ordersWithOffers: number;
+    selectedOrders: number;
+    completedOrders: number;
+    repeatClients: number;
+    disputes: number;
+    changeOrders: number;
+    evidenceReadyOrders: number;
+    averageFirstOfferMinutes: number | null;
+  };
 };
 
 export type AdminUser = {
@@ -60,12 +71,14 @@ export type AdminComplaint = {
   id: string;
   orderId: string;
   status: "OPEN" | "IN_REVIEW" | "RESOLVED" | "REJECTED";
-  kind: "DISPUTE" | "COMPLAINT";
+  kind: "DISPUTE" | "COMPLAINT" | "WARRANTY";
   subject: string;
   description: string;
   reporterName: string;
   againstName: string;
   createdAt: number;
+  evidenceCount: number;
+  evidenceIds: string[];
 };
 
 export type AdminActionResult = { ok: boolean; message?: string };

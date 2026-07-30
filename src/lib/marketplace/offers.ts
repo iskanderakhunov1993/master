@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { getDb } from "@/lib/db";
+import { appendAnalyticsEvent } from "@/lib/analytics/events";
 import { appendOrderStatusHistory } from "@/lib/orders/lifecycle";
 
 import { getMarketplaceConfig } from "./config";
@@ -197,6 +198,7 @@ export function createMasterOffer(input: {
         createdAt: now,
       });
     }
+    appendAnalyticsEvent(database, { name: "offer_created", actorId: input.masterId, actorRole: "MASTER", orderId: input.orderId, occurredAt: now });
 
     return {
       id,

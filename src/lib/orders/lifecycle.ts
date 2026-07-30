@@ -3,9 +3,11 @@ import { randomUUID } from "node:crypto";
 import type Database from "better-sqlite3";
 
 import { getDb } from "@/lib/db";
+import { appendAnalyticsEvent } from "@/lib/analytics/events";
 import { matchOrder } from "@/lib/marketplace/matching";
 import { advanceSubscriptionAfterCompletedOrder } from "@/lib/subscriptions/sync";
 import { syncTaskStatusForOrder } from "@/lib/tasks/sync";
+import { createWarrantyForCompletedOrder } from "@/lib/warranties/repository";
 
 import type { OrderStatus } from "./types";
 import { assertOrderTransparencyGates } from "./transparency";
@@ -200,6 +202,23 @@ export function transitionOrderInTransaction(
     reason: input.reason,
     createdAt: now,
   });
+  const eventByStatus: Partial<Record<OrderStatus, string>> = {
+    MASTER_CONFIRMED: "master_confirmed",
+    MASTER_ON_THE_WAY: "master_on_the_way",
+    MASTER_ARRIVED: "master_arrived",
+    COMPLETED_BY_MASTER: "completion_claimed",
+    COMPLETED: "completion_confirmed",
+    DISPUTED: "dispute_opened",
+    REVIEWED: "review_submitted",
+  };
+  const analyticsEvent = eventByStatus[input.toStatus];
+  if (analyticsEvent) appendAnalyticsEvent(database, {
+    name: analyticsEvent,
+    actorId: input.actorId,
+    actorRole: input.actorRole,
+    orderId: order.id,
+    occurredAt: now,
+  });
 
   syncTaskStatusForOrder(database, order.id, input.toStatus, now);
 
@@ -235,6 +254,7 @@ export function transitionOrderInTransaction(
   let nextSubscriptionOrderId: string | null = null;
   if (input.toStatus === "COMPLETED") {
     applyCompletionSideEffects(database, order, now);
+    createWarrantyForCompletedOrder(database, order.id, now);
     nextSubscriptionOrderId = advanceSubscriptionAfterCompletedOrder(database, order.id, now);
   }
   if (input.toStatus === "CANCELLED_BY_MASTER" && order.selectedMasterId) {

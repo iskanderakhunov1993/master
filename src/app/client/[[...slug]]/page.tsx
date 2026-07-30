@@ -28,6 +28,7 @@ import {
 } from "@/lib/orders/repository";
 import { getClientTask, listClientTasks } from "@/lib/tasks/repository";
 import { getSubscriptionPageData } from "@/lib/subscriptions/repository";
+import { listClientWarranties } from "@/lib/warranties/repository";
 
 const sections: Record<string, { title: string; description: string }> = {
   tasks: { title: "Задачи", description: "Планируйте бытовые дела и превращайте их в заказы, когда нужна помощь." },
@@ -57,7 +58,7 @@ export default async function ClientPage({
 
   if (slug.length === 1 && slug[0] === "home") {
     const dashboard = getClientDashboardData(user.id);
-    return <HomePassport addresses={listClientAddresses(user.id)} activeOrder={dashboard.activeOrder} recentOrders={dashboard.recentOrders} />;
+    return <HomePassport addresses={listClientAddresses(user.id)} activeOrder={dashboard.activeOrder} recentOrders={listClientOrders(user.id, 50)} warranties={listClientWarranties(user.id)} />;
   }
 
   if (slug.length === 1 && slug[0] === "tasks") {

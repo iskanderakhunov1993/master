@@ -520,6 +520,61 @@ function migrate(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS analytics_events_name_created_idx
       ON analytics_events(event_name, created_at DESC);
 
+    CREATE TABLE IF NOT EXISTS warranties (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL UNIQUE,
+      master_id TEXT NOT NULL,
+      client_id TEXT NOT NULL,
+      duration_days INTEGER NOT NULL CHECK (duration_days IN (30, 60)),
+      terms TEXT NOT NULL,
+      starts_at INTEGER NOT NULL,
+      ends_at INTEGER NOT NULL,
+      status TEXT NOT NULL CHECK (status IN ('PENDING', 'ACTIVE', 'CLAIMED', 'EXPIRED', 'VOID')),
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE RESTRICT,
+      FOREIGN KEY (master_id) REFERENCES users(id) ON DELETE RESTRICT,
+      FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE RESTRICT
+    );
+
+    CREATE INDEX IF NOT EXISTS warranties_client_status_idx
+      ON warranties(client_id, status, ends_at DESC);
+    CREATE INDEX IF NOT EXISTS warranties_master_status_idx
+      ON warranties(master_id, status, ends_at DESC);
+
+    CREATE TABLE IF NOT EXISTS warranty_claims (
+      id TEXT PRIMARY KEY,
+      warranty_id TEXT NOT NULL,
+      client_id TEXT NOT NULL,
+      description TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'OPEN' CHECK (status IN ('OPEN', 'IN_REVIEW', 'RESOLVED', 'REJECTED')),
+      created_at INTEGER NOT NULL,
+      resolved_at INTEGER,
+      resolved_by TEXT,
+      resolution TEXT,
+      FOREIGN KEY (warranty_id) REFERENCES warranties(id) ON DELETE RESTRICT,
+      FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE RESTRICT,
+      FOREIGN KEY (resolved_by) REFERENCES users(id) ON DELETE SET NULL
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS warranty_claims_one_open
+      ON warranty_claims(warranty_id) WHERE status IN ('OPEN', 'IN_REVIEW');
+
+    CREATE TABLE IF NOT EXISTS warranty_claim_evidence (
+      id TEXT PRIMARY KEY,
+      claim_id TEXT NOT NULL,
+      uploader_id TEXT NOT NULL,
+      file_name TEXT NOT NULL,
+      mime_type TEXT NOT NULL,
+      byte_size INTEGER NOT NULL,
+      content BLOB NOT NULL,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (claim_id) REFERENCES warranty_claims(id) ON DELETE RESTRICT,
+      FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE RESTRICT
+    );
+
+    CREATE INDEX IF NOT EXISTS warranty_claim_evidence_claim_idx
+      ON warranty_claim_evidence(claim_id, created_at);
+
     CREATE TABLE IF NOT EXISTS client_tasks (
       id TEXT PRIMARY KEY,
       client_id TEXT NOT NULL,

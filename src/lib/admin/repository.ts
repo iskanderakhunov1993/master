@@ -30,7 +30,8 @@ function audit(adminId: string, action: string, entityType: string, entityId: st
 }
 
 export function getAdminDashboardData(): AdminDashboardData {
-  const row = getDb()
+  const database = getDb();
+  const row = database
     .prepare(
       `SELECT
         (SELECT COUNT(*) FROM users) AS totalUsers,
@@ -41,10 +42,36 @@ export function getAdminDashboardData(): AdminDashboardData {
           'SEARCHING_MASTERS', 'OFFERS_RECEIVED', 'MASTER_SELECTED', 'MASTER_CONFIRMED',
           'MASTER_ON_THE_WAY', 'MASTER_ARRIVED', 'IN_PROGRESS', 'COMPLETED_BY_MASTER'
         )) AS activeOrders,
-        (SELECT COUNT(*) FROM complaints WHERE status IN ('OPEN', 'IN_REVIEW')) AS openComplaints`,
+        ((SELECT COUNT(*) FROM complaints WHERE status IN ('OPEN', 'IN_REVIEW')) +
+         (SELECT COUNT(*) FROM warranty_claims WHERE status IN ('OPEN', 'IN_REVIEW'))) AS openComplaints`,
     )
-    .get() as AdminDashboardData;
-  return row;
+    .get() as Omit<AdminDashboardData, "pilot">;
+  const pilot = database.prepare(
+    `SELECT
+      (SELECT COUNT(*) FROM orders WHERE status != 'DRAFT') AS publishedOrders,
+      (SELECT COUNT(DISTINCT order_id) FROM master_offers) AS ordersWithOffers,
+      (SELECT COUNT(*) FROM orders WHERE selected_master_id IS NOT NULL) AS selectedOrders,
+      (SELECT COUNT(*) FROM orders WHERE status IN ('COMPLETED', 'REVIEWED')) AS completedOrders,
+      (SELECT COUNT(*) FROM (
+        SELECT client_id FROM orders WHERE status IN ('COMPLETED', 'REVIEWED')
+        GROUP BY client_id HAVING COUNT(*) >= 2
+      )) AS repeatClients,
+      (SELECT COUNT(*) FROM orders WHERE status = 'DISPUTED') AS disputes,
+      (SELECT COUNT(DISTINCT order_id) FROM order_change_requests) AS changeOrders,
+      (SELECT COUNT(*) FROM orders
+        WHERE status IN ('COMPLETED_BY_MASTER', 'COMPLETED', 'REVIEWED')
+          AND EXISTS (SELECT 1 FROM order_evidence WHERE order_evidence.order_id = orders.id AND stage = 'BEFORE')
+          AND EXISTS (SELECT 1 FROM order_evidence WHERE order_evidence.order_id = orders.id AND stage = 'AFTER')
+      ) AS evidenceReadyOrders,
+      (SELECT AVG((firstOfferAt - submitted_at) / 60000.0) FROM (
+        SELECT orders.id, orders.submitted_at, MIN(master_offers.created_at) AS firstOfferAt
+        FROM orders INNER JOIN master_offers ON master_offers.order_id = orders.id
+        WHERE orders.submitted_at IS NOT NULL
+        GROUP BY orders.id
+        HAVING MIN(master_offers.created_at) >= orders.submitted_at
+      )) AS averageFirstOfferMinutes`,
+  ).get() as AdminDashboardData["pilot"];
+  return { ...row, pilot };
 }
 
 export function listAdminUsers() {
@@ -214,17 +241,29 @@ export function setAdminCategoryActive(adminId: string, categoryId: string, isAc
 }
 
 export function listAdminComplaints() {
-  return getDb()
+  const rows = getDb()
     .prepare(
-      `SELECT complaints.id, complaints.order_id AS orderId, complaints.status, complaints.kind,
+      `SELECT * FROM (
+      SELECT complaints.id, complaints.order_id AS orderId, complaints.status, complaints.kind,
         complaints.subject, COALESCE(complaints.description, '') AS description,
         reporter.name AS reporterName, COALESCE(against_user.name, '') AS againstName,
-        complaints.created_at AS createdAt
+        complaints.created_at AS createdAt, 0 AS evidenceCount, '' AS evidenceIds
       FROM complaints
       INNER JOIN users AS reporter ON reporter.id = complaints.reporter_id
       LEFT JOIN users AS against_user ON against_user.id = complaints.against_user_id
-      ORDER BY CASE complaints.status WHEN 'OPEN' THEN 1 WHEN 'IN_REVIEW' THEN 2 ELSE 3 END,
-        complaints.created_at DESC`,
+      UNION ALL
+      SELECT warranty_claims.id, warranties.order_id AS orderId, warranty_claims.status, 'WARRANTY' AS kind,
+        'Гарантийное обращение' AS subject, warranty_claims.description,
+        client.name AS reporterName, master.name AS againstName,
+        warranty_claims.created_at AS createdAt,
+        (SELECT COUNT(*) FROM warranty_claim_evidence WHERE claim_id = warranty_claims.id) AS evidenceCount,
+        COALESCE((SELECT GROUP_CONCAT(id) FROM warranty_claim_evidence WHERE claim_id = warranty_claims.id), '') AS evidenceIds
+      FROM warranty_claims
+      INNER JOIN warranties ON warranties.id = warranty_claims.warranty_id
+      INNER JOIN users AS client ON client.id = warranties.client_id
+      INNER JOIN users AS master ON master.id = warranties.master_id
+      ) ORDER BY CASE status WHEN 'OPEN' THEN 1 WHEN 'IN_REVIEW' THEN 2 ELSE 3 END, createdAt DESC`,
     )
-    .all() as AdminComplaint[];
+    .all() as Array<Omit<AdminComplaint, "evidenceIds"> & { evidenceIds: string }>;
+  return rows.map((row) => ({ ...row, evidenceIds: row.evidenceIds ? row.evidenceIds.split(",") : [] }));
 }

@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db";
+import { appendAnalyticsEvent } from "@/lib/analytics/events";
 import {
   appendOrderStatusHistory,
   transitionOrderInTransaction,
@@ -162,6 +163,7 @@ export function selectMasterOffer(input: {
       createdAt: now,
     });
     syncTaskStatusForOrder(database, input.orderId, "MASTER_SELECTED", now);
+    appendAnalyticsEvent(database, { name: "master_selected", actorId: input.clientId, actorRole: "CLIENT", orderId: input.orderId, occurredAt: now });
 
     try {
       database

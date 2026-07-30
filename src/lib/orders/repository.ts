@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { listClientAddresses } from "@/lib/addresses/repository";
 import type { ClientAddress } from "@/lib/addresses/types";
 import { getDb } from "@/lib/db";
+import { appendAnalyticsEvent } from "@/lib/analytics/events";
 import { matchOrder } from "@/lib/marketplace/matching";
 import { expireOffers } from "@/lib/marketplace/offers";
 
@@ -597,6 +598,7 @@ export function submitOrder(clientId: string, orderId: string) {
       actorRole: "CLIENT",
       createdAt: now,
     });
+    appendAnalyticsEvent(database, { name: "order_published", actorId: clientId, actorRole: "CLIENT", orderId, occurredAt: now });
     matchOrder(orderId, now);
     return orderId;
   })();

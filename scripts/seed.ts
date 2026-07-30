@@ -305,7 +305,12 @@ database.transaction(() => {
     }
   }
 
-  for (const order of orders) database.prepare("DELETE FROM orders WHERE id = ?").run(order.id);
+  for (const order of orders) {
+    database.prepare("DELETE FROM warranty_claim_evidence WHERE claim_id IN (SELECT id FROM warranty_claims WHERE warranty_id IN (SELECT id FROM warranties WHERE order_id = ?))").run(order.id);
+    database.prepare("DELETE FROM warranty_claims WHERE warranty_id IN (SELECT id FROM warranties WHERE order_id = ?)").run(order.id);
+    database.prepare("DELETE FROM warranties WHERE order_id = ?").run(order.id);
+    database.prepare("DELETE FROM orders WHERE id = ?").run(order.id);
+  }
   const insertOrder = database.prepare(
     `INSERT INTO orders (
       id, client_id, status, description, category_id, subcategory_id,
@@ -503,6 +508,16 @@ database.transaction(() => {
   insertOrderReview.run("demo-order-review-client-plumbing", "demo-completed-plumbing", clientId, alexanderId, "CLIENT", 5, 5, 5, 5, 5, "Всё аккуратно и по согласованной цене.", now - 10 * day);
   insertOrderReview.run("demo-order-review-master-plumbing", "demo-completed-plumbing", alexanderId, clientId, "MASTER", 5, null, null, null, null, "Быстро согласовали детали заказа.", now - 10 * day + 60_000);
   insertOrderReview.run("demo-order-review-client-electrical", "demo-completed-electrical", clientId, mikhailId, "CLIENT", 5, 5, 5, 5, 5, "Светильники установлены аккуратно.", now - 25 * day);
+
+  const insertWarranty = database.prepare(
+    `INSERT INTO warranties (
+      id, order_id, master_id, client_id, duration_days, terms,
+      starts_at, ends_at, status, created_at
+    ) VALUES (?, ?, ?, ?, 30, ?, ?, ?, 'ACTIVE', ?)`,
+  );
+  const warrantyTerms = "Мастер бесплатно устраняет недостатки своей работы в пределах согласованной услуги. Материалы и новые работы согласуются отдельно.";
+  insertWarranty.run("demo-warranty-plumbing", "demo-completed-plumbing", alexanderId, clientId, warrantyTerms, now - 10 * day, now + 20 * day, now - 10 * day);
+  insertWarranty.run("demo-warranty-electrical", "demo-completed-electrical", mikhailId, clientId, warrantyTerms, now - 25 * day, now + 5 * day, now - 25 * day);
 
   const tasks = [
     ["demo-task-shelf", "Повесить полку", "Закрепить полку в гостиной на бетонной стене.", "installation", "MEDIUM", now + 2 * day, "PLANNED", null],

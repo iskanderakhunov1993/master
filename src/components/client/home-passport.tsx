@@ -5,20 +5,25 @@ import Link from "next/link";
 import type { ClientAddress } from "@/lib/addresses/types";
 import { formatOrderCategory, formatRubles, ORDER_STATUS_LABEL } from "@/lib/orders/presentation";
 import type { OrderSummary } from "@/lib/orders/types";
+import type { ClientWarranty } from "@/lib/warranties/repository";
+import { WarrantyCenter } from "./warranty-center";
 
 export function HomePassport({
   addresses,
   activeOrder,
   recentOrders,
+  warranties,
 }: {
   addresses: ClientAddress[];
   activeOrder: OrderSummary | null;
   recentOrders: OrderSummary[];
+  warranties: ClientWarranty[];
 }) {
   const home = addresses.find((address) => address.isPrimary) ?? addresses[0];
   const completed = recentOrders.filter((order) => ["COMPLETED", "REVIEWED"].includes(order.status));
   const total = completed.reduce((sum, order) => sum + order.totalPriceRubles, 0);
   const showTracking = activeOrder?.status === "MASTER_ON_THE_WAY";
+  const activeWarranties = warranties.filter((warranty) => warranty.status === "ACTIVE" || warranty.status === "CLAIMED").length;
 
   return (
     <div className="home-passport-page">
@@ -30,16 +35,18 @@ export function HomePassport({
       {activeOrder && (
         <section className="home-live-visit">
           <header><div><small>{showTracking ? "Мастер в пути" : ORDER_STATUS_LABEL[activeOrder.status]}</small><h2>{formatOrderCategory(activeOrder)}</h2></div>{showTracking && <strong>24 мин</strong>}</header>
-          {showTracking && <div className="home-live-visit__map"><Image src="/maps/master-en-route.png" alt="Маршрут мастера к дому" fill sizes="(max-width: 850px) 100vw, 900px" /></div>}
+          {showTracking && <><div className="home-live-visit__map"><Image src="/maps/master-en-route.png" alt="Демонстрационный маршрут мастера к дому" fill sizes="(max-width: 850px) 100vw, 900px" /></div><p className="tracking-demo-note">Демо маршрута — live-геолокация в пилоте ещё не передаётся.</p></>}
           <footer><span>{formatRubles(activeOrder.totalPriceRubles)}</span><Link href={`/client/orders/${activeOrder.id}`}>Открыть заказ <ArrowRight size={16} /></Link></footer>
         </section>
       )}
 
       <section className="home-passport-summary" aria-label="Сводка по дому">
         <div><WalletCards size={20} /><span><small>Расходы в истории</small><strong>{formatRubles(total)}</strong></span></div>
-        <div><ShieldCheck size={20} /><span><small>Гарантии мастеров</small><strong>Не подключены</strong></span></div>
+        <div><ShieldCheck size={20} /><span><small>Активные гарантии</small><strong>{activeWarranties || "Нет"}</strong></span></div>
         <div><CalendarDays size={20} /><span><small>Следующий визит</small><strong>{activeOrder ? "По заказу" : "Не запланирован"}</strong></span></div>
       </section>
+
+      <WarrantyCenter warranties={warranties} />
 
       <section className="home-work-log">
         <header><div><span>Паспорт дома</span><h2>Журнал работ</h2></div><Link href="/client/orders?tab=COMPLETED">Все работы <ArrowRight size={15} /></Link></header>
