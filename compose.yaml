@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: master-ryadom-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: master_ryadom
+      POSTGRES_USER: master_ryadom
+      POSTGRES_PASSWORD: master_ryadom
+    ports:
+      - "5432:5432"
+    volumes:
+      - master-ryadom-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U master_ryadom -d master_ryadom"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  master-ryadom-postgres-data:
