@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { requireRole } from "@/lib/auth/guards";
+import { getSession } from "@/lib/auth/session";
 import { matchOrder } from "@/lib/marketplace/matching";
 import { createClientAddress, findClientAddress } from "@/lib/addresses/repository";
 import type { ClientAddress } from "@/lib/addresses/types";
@@ -22,6 +23,11 @@ import {
   getClientOrder,
 } from "./repository";
 import { submitClientReview, submitMasterReview } from "./reviews";
+import {
+  addOrderMessage,
+  createOrderChangeRequest,
+  respondToOrderChangeRequest,
+} from "./transparency";
 import type { OrderActionResult, OrderType, ScheduleKind } from "./types";
 
 export type LifecycleActionResult = { ok: boolean; message?: string };
@@ -86,8 +92,71 @@ function failure(error: unknown): LifecycleActionResult {
     REVIEW_ORDER_NOT_COMPLETED: "Отзыв можно оставить только после завершения заказа",
     REVIEW_RATING_INVALID: "Поставьте оценку от 1 до 5",
     REVIEW_COMMENT_TOO_LONG: "Комментарий не должен превышать 1000 символов",
+    EVIDENCE_BEFORE_REQUIRED: "Перед началом добавьте хотя бы одно фото «до»",
+    EVIDENCE_AFTER_REQUIRED: "Перед завершением добавьте хотя бы одно фото «после»",
+    CHANGE_ORDER_PENDING_COMPLETION: "Сначала дождитесь решения клиента по изменению цены",
+    CHANGE_ORDER_STATUS_INVALID: "Изменить цену можно после прибытия и до завершения работы",
+    CHANGE_ORDER_PENDING: "Клиент ещё не ответил на предыдущее изменение цены",
+    CHANGE_ORDER_PRICE_UNCHANGED: "Новая цена должна отличаться от текущей",
+    CHANGE_ORDER_NOT_FOUND: "Изменение цены не найдено",
+    CHANGE_ORDER_ALREADY_RESPONDED: "Решение по этой цене уже принято",
+    ORDER_CHAT_UNAVAILABLE: "Чат откроется после выбора мастера",
   };
   return { ok: false, message: messages[code] ?? "Не удалось выполнить действие. Попробуйте ещё раз" };
+}
+
+export async function createOrderChangeRequestAction(input: {
+  orderId: string;
+  proposedPriceRubles: number;
+  reason: string;
+}): Promise<LifecycleActionResult> {
+  const master = await requireRole("MASTER");
+  const parsed = z.object({
+    orderId: z.string().min(1),
+    proposedPriceRubles: z.number().int().min(500).max(1_000_000),
+    reason: z.string().trim().min(10).max(500),
+  }).safeParse(input);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Проверьте новую цену и причину" };
+  try {
+    createOrderChangeRequest({ ...parsed.data, masterId: master.id });
+    revalidateOrder(parsed.data.orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function respondToOrderChangeRequestAction(
+  requestId: string,
+  orderId: string,
+  accept: boolean,
+): Promise<LifecycleActionResult> {
+  const client = await requireRole("CLIENT");
+  try {
+    respondToOrderChangeRequest({ requestId, clientId: client.id, accept });
+    revalidateOrder(orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function sendOrderMessageAction(
+  orderId: string,
+  body: string,
+): Promise<LifecycleActionResult> {
+  const user = await getSession();
+  if (!user || !["CLIENT", "MASTER"].includes(user.role)) return { ok: false, message: "Требуется вход" };
+  const actorRole = user.role === "MASTER" ? "MASTER" : "CLIENT";
+  const parsed = z.string().trim().min(1, "Напишите сообщение").max(2000, "Не больше 2000 символов").safeParse(body);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message };
+  try {
+    addOrderMessage({ orderId, actorId: user.id, actorRole, body: parsed.data });
+    revalidateOrder(orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
 }
 
 function orderFailure(error: unknown): OrderActionResult {

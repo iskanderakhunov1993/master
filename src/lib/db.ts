@@ -452,6 +452,74 @@ function migrate(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS order_media_order_idx
       ON order_media(order_id, created_at);
 
+    CREATE TABLE IF NOT EXISTS order_change_requests (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      master_id TEXT NOT NULL,
+      previous_price_minor INTEGER NOT NULL CHECK (previous_price_minor > 0),
+      proposed_price_minor INTEGER NOT NULL CHECK (proposed_price_minor BETWEEN 50000 AND 100000000),
+      reason TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED', 'EXPIRED')),
+      created_at INTEGER NOT NULL,
+      responded_at INTEGER,
+      responded_by TEXT,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (master_id) REFERENCES users(id) ON DELETE RESTRICT,
+      FOREIGN KEY (responded_by) REFERENCES users(id) ON DELETE SET NULL
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS order_change_requests_one_pending
+      ON order_change_requests(order_id) WHERE status = 'PENDING';
+    CREATE INDEX IF NOT EXISTS order_change_requests_order_idx
+      ON order_change_requests(order_id, created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS order_evidence (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      uploader_id TEXT NOT NULL,
+      stage TEXT NOT NULL CHECK (stage IN ('BEFORE', 'PROCESS', 'AFTER')),
+      file_name TEXT NOT NULL,
+      mime_type TEXT NOT NULL,
+      byte_size INTEGER NOT NULL,
+      content BLOB NOT NULL,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE RESTRICT
+    );
+
+    CREATE INDEX IF NOT EXISTS order_evidence_order_stage_idx
+      ON order_evidence(order_id, stage, created_at);
+
+    CREATE TABLE IF NOT EXISTS order_messages (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      sender_id TEXT,
+      sender_role TEXT NOT NULL CHECK (sender_role IN ('CLIENT', 'MASTER', 'SYSTEM')),
+      kind TEXT NOT NULL DEFAULT 'TEXT' CHECK (kind IN ('TEXT', 'SYSTEM')),
+      body TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE SET NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS order_messages_order_idx
+      ON order_messages(order_id, created_at, id);
+
+    CREATE TABLE IF NOT EXISTS analytics_events (
+      id TEXT PRIMARY KEY,
+      event_name TEXT NOT NULL,
+      actor_id TEXT,
+      actor_role TEXT,
+      order_id TEXT,
+      properties_json TEXT,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (actor_id) REFERENCES users(id) ON DELETE SET NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS analytics_events_name_created_idx
+      ON analytics_events(event_name, created_at DESC);
+
     CREATE TABLE IF NOT EXISTS client_tasks (
       id TEXT PRIMARY KEY,
       client_id TEXT NOT NULL,

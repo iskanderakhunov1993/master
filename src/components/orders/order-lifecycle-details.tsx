@@ -4,6 +4,7 @@ import {
   AlertCircle,
   ArrowLeft,
   BadgeCheck,
+  Camera,
   CheckCircle2,
   Clock3,
   LoaderCircle,
@@ -14,6 +15,7 @@ import {
   Navigation,
   Phone,
   Star,
+  Send,
   UserRound,
   WalletCards,
   X,
@@ -22,12 +24,15 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState, useTransition } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState, useTransition } from "react";
 
 import {
   advanceMasterOrderAction,
   cancelClientOrderAction,
+  createOrderChangeRequestAction,
   respondToCompletionAction,
+  respondToOrderChangeRequestAction,
+  sendOrderMessageAction,
   submitClientReviewAction,
   submitMasterReviewAction,
 } from "@/lib/orders/actions";
@@ -177,6 +182,9 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
       <div className="order-lifecycle-grid">
         <main>
           <section className="order-detail-card"><header><div><small>Задача</small><h2>{details.categoryName}{details.subcategoryName ? ` · ${details.subcategoryName}` : ""}</h2></div><strong>{formatRubles(details.agreedPriceRubles)}</strong></header><p>{details.description}</p>{details.photos.length > 0 && <div className="order-detail-photos">{details.photos.map((photo) => <Image key={photo.id} src={photo.url} alt={photo.fileName} width={150} height={110} unoptimized />)}</div>}</section>
+          <ChangeOrderPanel details={details} audience={audience} />
+          <EvidencePanel details={details} audience={audience} />
+          <OrderChat details={details} audience={audience} />
           <section className="order-detail-card"><header><div><small>История статусов</small><h2>Как менялся заказ</h2></div></header><ol className="order-timeline">{details.history.map((entry) => <li key={entry.id}><span /><div><strong>{ORDER_STATUS_LABEL[entry.toStatus]}</strong><p>{new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(entry.createdAt)}{entry.actorName ? ` · ${entry.actorName}` : ""}</p>{entry.reason && <small>{entry.reason}</small>}</div></li>)}</ol></section>
           {audience === "CLIENT" && details.status === "COMPLETED" && !details.reviews.some((review) => review.reviewerRole === "CLIENT") && <ClientReviewForm orderId={details.id} />}
           {audience === "MASTER" && ["COMPLETED", "REVIEWED"].includes(details.status) && !details.reviews.some((review) => review.reviewerRole === "MASTER") && <MasterReviewForm orderId={details.id} clientName={details.client.name} />}
@@ -202,13 +210,13 @@ function LiveTrackingCard({ details }: { details: OrderDetails }) {
       </header>
       <a className="live-tracking-map" href="#live-tracking-map" aria-label="Открыть полноэкранную карту движения мастера">
         <Image src="/maps/master-en-route.png" alt="Маршрут выбранного мастера Александра до дома на Тверской, 18" fill sizes="(max-width: 850px) 100vw, 900px" priority />
-        <span><Navigation size={16} /> Следить на карте</span>
+        <span><Navigation size={16} /> Демо маршрута</span>
       </a>
       <div className="live-tracking-master">
         <div className="order-person-avatar">{details.master?.avatarUrl ? <Image src={details.master.avatarUrl} alt={details.master.name} fill sizes="62px" unoptimized /> : <UserRound size={25} />}</div>
         <div><small>Ваш мастер</small><h2>{details.master?.name}</h2><p>{details.master?.specialization} · <Star size={13} fill="currentColor" /> {details.master?.rating?.toFixed(1) ?? "Новый"}</p></div>
         <div className="live-tracking-contact">
-          <button type="button" aria-label="Написать мастеру"><MessageCircle size={20} /></button>
+          <a href="#order-chat" aria-label="Написать мастеру"><MessageCircle size={20} /></a>
           {details.master?.phone && <a href={`tel:${details.master.phone}`} aria-label="Позвонить мастеру"><Phone size={20} /></a>}
         </div>
       </div>
@@ -216,6 +224,7 @@ function LiveTrackingCard({ details }: { details: OrderDetails }) {
         <div><dt>Согласованная цена</dt><dd>{formatRubles(details.agreedPriceRubles)}</dd></div>
         <div><dt>Ожидаем прибытие</dt><dd>через {eta} мин</dd></div>
       </dl>
+      <p className="tracking-demo-note">Маршрут показан как пример. Live-геолокация мастера в пилоте ещё не передаётся.</p>
       <div className="live-tracking-next"><span><Navigation size={18} /></span><div><small>Следующий этап</small><strong>По прибытии мастер добавит фото «до»</strong></div></div>
     </section>
   );
@@ -234,13 +243,117 @@ function LiveTrackingOverlay({ details }: { details: OrderDetails }) {
         <div className="live-tracking-master">
           <div className="order-person-avatar">{details.master?.avatarUrl ? <Image src={details.master.avatarUrl} alt={details.master.name} fill sizes="64px" unoptimized /> : <UserRound size={25} />}</div>
           <div><small>Выбранный мастер</small><h2>{details.master?.name}</h2><p>{details.master?.specialization} · <Star size={13} fill="currentColor" /> {details.master?.rating?.toFixed(1) ?? "Новый"}</p></div>
-          <div className="live-tracking-contact"><button type="button" aria-label="Написать мастеру"><MessageCircle size={20} /></button>{details.master?.phone && <a href={`tel:${details.master.phone}`} aria-label="Позвонить мастеру"><Phone size={20} /></a>}</div>
+          <div className="live-tracking-contact"><a href="#order-chat" aria-label="Написать мастеру"><MessageCircle size={20} /></a>{details.master?.phone && <a href={`tel:${details.master.phone}`} aria-label="Позвонить мастеру"><Phone size={20} /></a>}</div>
         </div>
         <dl className="live-tracking-facts"><div><dt>Адрес</dt><dd>{details.street}, {details.house}</dd></div><div><dt>Цена</dt><dd>{formatRubles(details.agreedPriceRubles)}</dd></div></dl>
         <a className="button button--primary tracking-overlay__close" href="#"><Map size={18} /> Вернуться к заказу</a>
       </section>
     </div>
   );
+}
+
+const changeStatusLabel = {
+  PENDING: "Ожидает решения",
+  ACCEPTED: "Согласовано",
+  REJECTED: "Отклонено",
+  CANCELLED: "Отменено",
+  EXPIRED: "Истекло",
+} as const;
+
+function ChangeOrderPanel({ details, audience }: { details: OrderDetails; audience: "CLIENT" | "MASTER" }) {
+  const router = useRouter();
+  const [price, setPrice] = useState(Math.round(details.agreedPriceRubles));
+  const [reason, setReason] = useState("");
+  const [error, setError] = useState("");
+  const [pending, startTransition] = useTransition();
+  const canPropose = audience === "MASTER" && ["MASTER_ARRIVED", "IN_PROGRESS"].includes(details.status)
+    && !details.changeRequests.some((request) => request.status === "PENDING");
+
+  function propose(event: FormEvent) {
+    event.preventDefault();
+    setError("");
+    startTransition(async () => {
+      const result = await createOrderChangeRequestAction({ orderId: details.id, proposedPriceRubles: price, reason });
+      if (!result.ok) setError(result.message ?? "Не удалось предложить цену");
+      else { setReason(""); router.refresh(); }
+    });
+  }
+
+  function respond(requestId: string, accept: boolean) {
+    setError("");
+    startTransition(async () => {
+      const result = await respondToOrderChangeRequestAction(requestId, details.id, accept);
+      if (!result.ok) setError(result.message ?? "Не удалось сохранить решение");
+      else router.refresh();
+    });
+  }
+
+  if (details.changeRequests.length === 0 && !canPropose) return null;
+  return <section className="order-detail-card order-change-card">
+    <header><div><small>Стоимость работ</small><h2>Изменения цены</h2></div><strong>{formatRubles(details.agreedPriceRubles)}</strong></header>
+    {details.changeRequests.length > 0 && <div className="order-change-list">{details.changeRequests.map((request) => <article key={request.id}>
+      <div><span className={`change-status change-status--${request.status.toLowerCase()}`}>{changeStatusLabel[request.status]}</span><time>{new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(request.createdAt)}</time></div>
+      <strong>{formatRubles(request.previousPriceRubles)} → {formatRubles(request.proposedPriceRubles)}</strong>
+      <p>{request.reason}</p>
+      {audience === "CLIENT" && request.status === "PENDING" && <footer><button className="button button--primary" type="button" onClick={() => respond(request.id, true)} disabled={pending}>Согласовать</button><button className="button button--secondary" type="button" onClick={() => respond(request.id, false)} disabled={pending}>Отклонить</button></footer>}
+    </article>)}</div>}
+    {canPropose && <form className="change-order-form" onSubmit={propose}><label>Новая итоговая цена, ₽<input type="number" min="500" max="1000000" value={price} onChange={(event) => setPrice(Number(event.target.value))} /></label><label>Почему изменилась цена<textarea rows={3} minLength={10} maxLength={500} placeholder="Например: после осмотра нужен демонтаж старого смесителя" value={reason} onChange={(event) => setReason(event.target.value)} /></label><button className="button button--secondary" type="submit" disabled={pending}>Предложить новую цену</button></form>}
+    {error && <p className="task-form-error" role="alert"><AlertCircle size={16} /> {error}</p>}
+  </section>;
+}
+
+const evidenceLabel = { BEFORE: "До", PROCESS: "Процесс", AFTER: "После" } as const;
+
+function EvidencePanel({ details, audience }: { details: OrderDetails; audience: "CLIENT" | "MASTER" }) {
+  const router = useRouter();
+  const defaultStage = details.status === "MASTER_ARRIVED" ? "BEFORE" : details.status === "IN_PROGRESS" ? "AFTER" : "PROCESS";
+  const [stage, setStage] = useState<"BEFORE" | "PROCESS" | "AFTER">(defaultStage);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const canUpload = audience === "MASTER" && ["MASTER_ARRIVED", "IN_PROGRESS"].includes(details.status);
+  const effectiveStage = details.status === "MASTER_ARRIVED" ? "BEFORE" : stage === "BEFORE" ? "AFTER" : stage;
+
+  async function upload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploading(true); setError("");
+    const formData = new FormData(); formData.set("file", file); formData.set("stage", effectiveStage);
+    const response = await fetch(`/api/master/orders/${details.id}/evidence`, { method: "POST", body: formData });
+    const body = await response.json().catch(() => ({})) as { message?: string };
+    if (!response.ok) setError(body.message ?? "Не удалось загрузить фото");
+    else router.refresh();
+    event.target.value = ""; setUploading(false);
+  }
+
+  return <section className="order-detail-card order-evidence-card">
+    <header><div><small>Доказательства работы</small><h2>Фото до, в процессе и после</h2></div><Camera size={21} /></header>
+    {details.evidence.length > 0 ? <div className="evidence-grid">{details.evidence.map((item) => <figure key={item.id}><Image src={item.url} alt={`${evidenceLabel[item.stage]}: ${item.fileName}`} width={180} height={130} unoptimized /><figcaption>{evidenceLabel[item.stage]}</figcaption></figure>)}</div> : <p className="empty-evidence">Фотографии выполнения ещё не добавлены.</p>}
+    {canUpload && <div className="evidence-upload"><div>{(["BEFORE", "PROCESS", "AFTER"] as const).map((item) => <button className={effectiveStage === item ? "is-active" : ""} type="button" key={item} onClick={() => setStage(item)} disabled={details.status === "MASTER_ARRIVED" ? item !== "BEFORE" : item === "BEFORE"}>{evidenceLabel[item]}</button>)}</div><label className="button button--secondary"><Camera size={16} /> {uploading ? "Загружаем…" : `Добавить фото «${evidenceLabel[effectiveStage].toLowerCase()}»`}<input type="file" accept="image/jpeg,image/png,image/webp" onChange={upload} disabled={uploading} hidden /></label></div>}
+    {audience === "MASTER" && details.status === "MASTER_ARRIVED" && !details.evidence.some((item) => item.stage === "BEFORE") && <p className="evidence-requirement">Для начала работы обязательно добавьте фото «до».</p>}
+    {audience === "MASTER" && details.status === "IN_PROGRESS" && !details.evidence.some((item) => item.stage === "AFTER") && <p className="evidence-requirement">Для завершения обязательно добавьте фото «после».</p>}
+    {error && <p className="task-form-error"><AlertCircle size={16} /> {error}</p>}
+  </section>;
+}
+
+function OrderChat({ details, audience }: { details: OrderDetails; audience: "CLIENT" | "MASTER" }) {
+  const router = useRouter();
+  const [body, setBody] = useState("");
+  const [error, setError] = useState("");
+  const [pending, startTransition] = useTransition();
+  function submit(event: FormEvent) {
+    event.preventDefault(); setError("");
+    startTransition(async () => {
+      const result = await sendOrderMessageAction(details.id, body);
+      if (!result.ok) setError(result.message ?? "Не удалось отправить сообщение");
+      else { setBody(""); router.refresh(); }
+    });
+  }
+  return <section className="order-detail-card order-chat" id="order-chat">
+    <header><div><small>Связь по заказу</small><h2>Чат клиента и мастера</h2></div><MessageCircle size={21} /></header>
+    <div className="order-chat__messages" aria-live="polite">{details.messages.length === 0 ? <p>Сообщений пока нет. Все договорённости по заказу останутся здесь.</p> : details.messages.map((message) => <article className={message.kind === "SYSTEM" ? "is-system" : message.senderRole === audience ? "is-own" : ""} key={message.id}><small>{message.senderName} · {new Intl.DateTimeFormat("ru-RU", { hour: "2-digit", minute: "2-digit" }).format(message.createdAt)}</small><p>{message.body}</p></article>)}</div>
+    <form onSubmit={submit}><input aria-label="Сообщение" required maxLength={2000} placeholder="Напишите сообщение по заказу" value={body} onChange={(event) => setBody(event.target.value)} /><button className="button button--primary" type="submit" disabled={pending}><Send size={16} /><span>Отправить</span></button></form>
+    {error && <p className="task-form-error"><AlertCircle size={16} /> {error}</p>}
+  </section>;
 }
 
 function RatingButtons({ value, onChange, label }: { value: number; onChange: (value: number) => void; label: string }) {

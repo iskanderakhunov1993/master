@@ -8,6 +8,7 @@ import { advanceSubscriptionAfterCompletedOrder } from "@/lib/subscriptions/sync
 import { syncTaskStatusForOrder } from "@/lib/tasks/sync";
 
 import type { OrderStatus } from "./types";
+import { assertOrderTransparencyGates } from "./transparency";
 
 export type OrderActorRole = "CLIENT" | "MASTER" | "ADMIN" | "SYSTEM";
 
@@ -175,6 +176,7 @@ export function transitionOrderInTransaction(
   if (!canTransitionOrder(order.status, input.toStatus, input.actorRole)) {
     throw new Error("ORDER_TRANSITION_NOT_ALLOWED");
   }
+  assertOrderTransparencyGates(database, order.id, input.toStatus);
 
   const updated = database
     .prepare(

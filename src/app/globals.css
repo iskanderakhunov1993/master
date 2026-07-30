@@ -19,6 +19,131 @@
   --shadow-md: 0 16px 0 rgba(23, 23, 23, 0.06);
 }
 
+.tracking-demo-note,
+.empty-evidence,
+.evidence-requirement {
+  margin: 10px 0 0;
+  color: #716f67;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.evidence-requirement {
+  padding: 10px 12px;
+  color: #704e15;
+  border-radius: 12px;
+  background: #fff4d6;
+}
+
+.order-change-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.order-change-list article {
+  padding: 14px;
+  border: 1px solid #e4e2da;
+  border-radius: 14px;
+  background: #faf9f5;
+}
+
+.order-change-list article > div,
+.order-change-list footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.order-change-list article > strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.order-change-list article p { margin: 6px 0 12px; }
+.order-change-list time { color: #77746d; font-size: 12px; }
+
+.change-status {
+  padding: 5px 8px;
+  color: #625116;
+  border-radius: 999px;
+  background: #ffef9d;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.change-status--accepted { color: #275c45; background: #dff4e9; }
+.change-status--rejected,
+.change-status--cancelled,
+.change-status--expired { color: #6e5555; background: #f1e7e7; }
+
+.change-order-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e7e4dc;
+}
+
+.change-order-form label { display: grid; gap: 6px; font-size: 13px; font-weight: 650; }
+.change-order-form input,
+.change-order-form textarea,
+.order-chat form input {
+  width: 100%;
+  padding: 11px 12px;
+  color: #24231f;
+  border: 1px solid #d9d6cc;
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+}
+
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.evidence-grid figure { position: relative; margin: 0; overflow: hidden; border-radius: 13px; background: #efeee8; }
+.evidence-grid img { display: block; width: 100%; height: 120px; object-fit: cover; }
+.evidence-grid figcaption { position: absolute; right: 7px; bottom: 7px; padding: 4px 7px; color: white; border-radius: 999px; background: rgba(25, 25, 22, .78); font-size: 11px; font-weight: 700; }
+
+.evidence-upload { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.evidence-upload > div { display: flex; gap: 5px; padding: 4px; border-radius: 11px; background: #f0efe9; }
+.evidence-upload > div button { padding: 7px 9px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; }
+.evidence-upload > div button.is-active { background: white; box-shadow: 0 1px 4px rgba(0, 0, 0, .08); }
+.evidence-upload > div button:disabled { opacity: .35; cursor: not-allowed; }
+
+.order-chat__messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 340px;
+  margin: 14px 0;
+  padding: 12px;
+  overflow-y: auto;
+  border-radius: 14px;
+  background: #f5f4ef;
+}
+
+.order-chat__messages > p { margin: 6px; color: #77746d; text-align: center; font-size: 13px; }
+.order-chat__messages article { align-self: flex-start; max-width: 82%; padding: 9px 11px; border-radius: 12px 12px 12px 3px; background: white; }
+.order-chat__messages article.is-own { align-self: flex-end; border-radius: 12px 12px 3px 12px; background: #dff4e9; }
+.order-chat__messages article.is-system { align-self: center; max-width: 95%; color: #6f6b61; background: transparent; text-align: center; }
+.order-chat__messages article small { color: #77746d; font-size: 10px; }
+.order-chat__messages article p { margin: 3px 0 0; white-space: pre-wrap; }
+.order-chat form { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+
+@media (max-width: 640px) {
+  .evidence-upload { align-items: stretch; flex-direction: column; }
+  .evidence-upload > div { justify-content: center; }
+  .order-chat form { grid-template-columns: 1fr 44px; }
+  .order-chat form button span { display: none; }
+}
+
 /* Master product surfaces */
 .master-dashboard,
 .master-profile-page,

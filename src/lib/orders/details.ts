@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 
 import { specialistLabel } from "../marketplace/ranking";
 import type { OrderStatus, OrderSummary, OrderType, ScheduleKind } from "./types";
+import { getOrderTransparency, type OrderChangeRequest, type OrderEvidence, type OrderMessage } from "./transparency";
 
 export type OrderHistoryEntry = {
   id: string;
@@ -59,6 +60,9 @@ export type OrderDetails = {
   };
   history: OrderHistoryEntry[];
   reviews: OrderReviewDetails[];
+  changeRequests: OrderChangeRequest[];
+  evidence: OrderEvidence[];
+  messages: OrderMessage[];
 };
 
 type DetailsRow = {
@@ -139,6 +143,7 @@ const detailsSelect = `
 
 function loadDetails(row: DetailsRow): OrderDetails {
   const database = getDb();
+  const transparency = getOrderTransparency(row.id);
   const photos = database
     .prepare(
       `SELECT id, file_name AS fileName
@@ -226,6 +231,7 @@ function loadDetails(row: DetailsRow): OrderDetails {
           createdAt: row.updatedAt,
         }],
     reviews,
+    ...transparency,
   };
 }
 

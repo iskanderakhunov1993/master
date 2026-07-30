@@ -23,6 +23,7 @@ test("complete client → master → review loop keeps privacy, history, metrics
   const { classifyOrderForHistory, getClientOrderDetails, getMasterOrderDetails, listMasterOrders } = await import("../src/lib/orders/details");
   const { transitionOrder } = await import("../src/lib/orders/lifecycle");
   const { submitClientReview } = await import("../src/lib/orders/reviews");
+  const { addOrderEvidence } = await import("../src/lib/orders/transparency");
   const {
     getClientDashboardData,
     getClientOrder,
@@ -139,6 +140,12 @@ test("complete client → master → review loop keeps privacy, history, metrics
     "IN_PROGRESS",
     "COMPLETED_BY_MASTER",
   ].entries()) {
+    if (status === "IN_PROGRESS") {
+      addOrderEvidence({ orderId: wizard.draft.id, masterId: master.id, stage: "BEFORE", fileName: "before.png", mimeType: "image/png", byteSize: 8, content: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]) });
+    }
+    if (status === "COMPLETED_BY_MASTER") {
+      addOrderEvidence({ orderId: wizard.draft.id, masterId: master.id, stage: "AFTER", fileName: "after.png", mimeType: "image/png", byteSize: 8, content: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]) });
+    }
     transitionOrder({
       orderId: wizard.draft.id,
       actorId: master.id,

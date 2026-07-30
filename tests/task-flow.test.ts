@@ -91,7 +91,14 @@ test("task prefills an order and follows the selected/completed lifecycle", asyn
     "IN_PROGRESS",
     "COMPLETED_BY_MASTER",
   ] as const;
+  const { addOrderEvidence } = await import("../src/lib/orders/transparency");
   for (const [index, status] of masterTransitions.entries()) {
+    if (status === "IN_PROGRESS") {
+      addOrderEvidence({ orderId: wizard.draft.id, masterId, stage: "BEFORE", fileName: "before.png", mimeType: "image/png", byteSize: 8, content: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]) });
+    }
+    if (status === "COMPLETED_BY_MASTER") {
+      addOrderEvidence({ orderId: wizard.draft.id, masterId, stage: "AFTER", fileName: "after.png", mimeType: "image/png", byteSize: 8, content: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]) });
+    }
     transitionOrder({
       orderId: wizard.draft.id,
       actorId: masterId,

@@ -37,7 +37,7 @@ export function HomePassport({
 
       <section className="home-passport-summary" aria-label="Сводка по дому">
         <div><WalletCards size={20} /><span><small>Расходы в истории</small><strong>{formatRubles(total)}</strong></span></div>
-        <div><ShieldCheck size={20} /><span><small>Активные гарантии</small><strong>{completed.length > 0 ? "1" : "Нет"}</strong></span></div>
+        <div><ShieldCheck size={20} /><span><small>Гарантии мастеров</small><strong>Не подключены</strong></span></div>
         <div><CalendarDays size={20} /><span><small>Следующий визит</small><strong>{activeOrder ? "По заказу" : "Не запланирован"}</strong></span></div>
       </section>
 
