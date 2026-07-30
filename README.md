@@ -9,7 +9,8 @@
 - Next.js 16, App Router и Server Actions;
 - React 19;
 - TypeScript 5 в strict mode;
-- **PostgreSQL** через **Prisma ORM** (была SQLite);
+- `better-sqlite3` как текущий runtime MVP;
+- Prisma ORM и PostgreSQL как подготовленный, но ещё не завершённый production cutover;
 - Zod для входной валидации;
 - bcryptjs для хеширования паролей;
 - Lucide React для иконок;
@@ -21,39 +22,29 @@ AI, платное ранжирование и покупка лидов не и
 
 - Node.js 22 LTS или новее;
 - npm 10 или новее;
-- **PostgreSQL 14+** (локально, Docker или облако)
+- PostgreSQL 14+ нужен только для проверки подготовленной Prisma-схемы и будущей миграции;
 
-## Быстрый старт
+## Быстрый старт текущего MVP
 
-### 1. С Docker (рекомендуется)
-```bash
-# Запустите PostgreSQL контейнер
-docker run --name master-ryadom-db \
-  -e POSTGRES_DB=master_ryadom \
-  -e POSTGRES_PASSWORD=postgres \
-  -p 5432:5432 \
-  -d postgres:16
-
-# Установите зависимости и инициализируйте БД
-npm install
-npx tsx scripts/init-postgres.ts
-npm run dev
-```
-
-### 2. С локальным PostgreSQL
 ```bash
 npm install
-npm run prisma:push
+npm run seed
 npm run dev
 ```
 
 После запуска приложение доступно по адресу [http://localhost:3000](http://localhost:3000).
 
-📖 **Подробно:** см. [POSTGRESQL_SETUP.md](./POSTGRESQL_SETUP.md)
+SQLite-файл создаётся в `.data/` и не коммитится. Для проверки подготовленного PostgreSQL-контура используйте [POSTGRESQL_SETUP.md](./POSTGRESQL_SETUP.md), но он пока не заменяет активный runtime.
 
 ## Переменные окружения
 
-**Основная:** (обновлена для PostgreSQL)
+**Текущий runtime:**
+
+| Переменная | Пример | Назначение |
+| --- | --- | --- |
+| `DATABASE_FILENAME` | `master-ryadom.db` | SQLite-файл текущего MVP в `.data/` |
+
+**Будущая миграция PostgreSQL:**
 
 | Переменная | Пример | Назначение |
 | --- | --- | --- |
@@ -73,9 +64,9 @@ npm run dev
 
 ## База данных и миграции
 
-Приложение использует **Prisma ORM** для работы с PostgreSQL.
+Активные repositories используют SQLite через `better-sqlite3`. Prisma-схема и PostgreSQL-инструменты находятся в переходном состоянии и не покрывают весь runtime-контракт. Постоянный dual-write запрещён.
 
-### Инициализация (первый запуск)
+### Проверка подготовленной PostgreSQL-схемы
 
 ```bash
 # Создайте базу (см. POSTGRESQL_SETUP.md) и обновите .env
@@ -92,7 +83,7 @@ npm run prisma:generate
 npm run prisma:studio
 ```
 
-### Production
+### После завершения cutover
 
 Используйте управляемые БД сервисы:
 - **Supabase** (бесплатно)
@@ -157,11 +148,14 @@ npm run lint && npm run typecheck && npm test && npm run build
 
 ## Границы текущего MVP
 
-- ~~SQLite и хранение изображений BLOB подходят для локального MVP и одного экземпляра приложения, но не для горизонтального масштабирования;~~ → **PostgreSQL готова к масштабированию**
+- SQLite и хранение изображений в текущем MVP подходят только для локальной разработки и одного экземпляра приложения;
+- Prisma/PostgreSQL подготовлены частично, но ещё не являются canonical runtime;
 - обновления заказов используют polling fallback, отдельный realtime transport не подключён;
 - верификация мастеров выполняется администратором вручную;
 - приблизительное расстояние рассчитывается детерминированно без геокодинга и маршрутизации;
+- экран движения мастера использует демонстрационный route asset, а не live GPS;
 - платежи, чат, SMS/push-уведомления и автоматическое урегулирование споров не входят в MVP;
+- счётчик гарантии в паспорте дома не является полноценной гарантийной моделью;
 - административная панель покрывает основные операции, но не является полноценной службой поддержки и аналитики.
 
-Для production понадобятся управляемая SQL-база с транзакциями, объектное хранилище изображений, HTTPS и secrets management, резервные копии, observability, а при включении соответствующих сценариев — карты/геокодинг, realtime и сервис уведомлений.
+Для production понадобятся завершённый PostgreSQL cutover, объектное хранилище изображений, HTTPS и secrets management, резервные копии, observability, а при включении соответствующих сценариев — PSP, карты/геокодинг, realtime и сервис уведомлений. Контракты описаны в [P0-спецификации](./docs/product/07-p0-specifications.md).
