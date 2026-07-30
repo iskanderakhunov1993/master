@@ -37,12 +37,13 @@ export type DashboardNavigationItem = {
 export const dashboardNavigation: Record<Role, DashboardNavigationItem[]> = {
   CLIENT: [
     { href: "/client", label: "Главная", icon: House, mobile: true },
-    { href: "/client/tasks", label: "Задачи", icon: ListTodo, mobile: true },
+    { href: "/client/orders", label: "Мои заказы", mobileLabel: "Заказы", icon: ClipboardList, mobile: true },
+    { href: "/client/home", label: "Мой дом", icon: MapPinned, mobile: true },
+    { href: "/client/profile", label: "Профиль", icon: UserRound, mobile: true },
+    { href: "/client/tasks", label: "Задачи", icon: ListTodo },
     { href: "/client/calendar", label: "Календарь", icon: CalendarDays },
     { href: "/client/subscriptions", label: "Подписки", icon: Repeat2 },
-    { href: "/client/orders", label: "Мои заказы", mobileLabel: "Заказы", icon: ClipboardList, mobile: true },
     { href: "/client/history", label: "История", icon: FolderClock },
-    { href: "/client/profile", label: "Профиль", icon: UserRound, mobile: true },
     { href: "/client/addresses", label: "Адреса", icon: MapPinned },
     { href: "/client/settings", label: "Настройки", icon: Settings },
   ],

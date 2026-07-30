@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { AddressManager } from "@/components/client/address-manager";
 import { ClientDashboard } from "@/components/client/client-dashboard";
+import { HomePassport } from "@/components/client/home-passport";
 import { OrderHistoryList } from "@/components/orders/order-history-list";
 import { OrderSearching } from "@/components/client/order-searching";
 import { OrderCandidates } from "@/components/client/order-candidates";
@@ -52,6 +53,11 @@ export default async function ClientPage({
 
   if (slug.length === 1 && slug[0] === "addresses") {
     return <AddressManager addresses={listClientAddresses(user.id)} />;
+  }
+
+  if (slug.length === 1 && slug[0] === "home") {
+    const dashboard = getClientDashboardData(user.id);
+    return <HomePassport addresses={listClientAddresses(user.id)} activeOrder={dashboard.activeOrder} recentOrders={dashboard.recentOrders} />;
   }
 
   if (slug.length === 1 && slug[0] === "tasks") {

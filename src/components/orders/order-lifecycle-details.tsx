@@ -8,11 +8,15 @@ import {
   Clock3,
   LoaderCircle,
   Mail,
+  Map,
   MapPin,
+  MessageCircle,
+  Navigation,
   Phone,
   Star,
   UserRound,
   WalletCards,
+  X,
   XCircle,
 } from "lucide-react";
 import Image from "next/image";
@@ -138,18 +142,23 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
 
   const canClientCancel = audience === "CLIENT" && ["MASTER_SELECTED", "MASTER_CONFIRMED"].includes(details.status);
   const canMasterCancel = audience === "MASTER" && ["MASTER_SELECTED", "MASTER_CONFIRMED", "MASTER_ON_THE_WAY", "MASTER_ARRIVED"].includes(details.status);
+  const showLiveTracking = audience === "CLIENT" && details.status === "MASTER_ON_THE_WAY" && Boolean(details.master);
 
   return (
     <div className="order-lifecycle-page">
       <Link className="selected-master-back" href={audience === "CLIENT" ? "/client/orders" : "/master/orders"}><ArrowLeft size={17} /> Все заказы</Link>
-      <section className="order-lifecycle-hero">
+      {showLiveTracking ? (
+        <LiveTrackingCard details={details} />
+      ) : <section className="order-lifecycle-hero">
         <span><CheckCircle2 size={25} /></span><small>{audience === "CLIENT" ? "Активный заказ" : "Заказ клиента"}</small><h1>{statusCopy?.title ?? ORDER_STATUS_LABEL[details.status]}</h1><p>{statusCopy?.text}</p>
         <div className="order-next-step"><small>Что дальше</small><strong>{nextStepText}</strong></div>
         {audience === "MASTER" && masterAction && <button className="button button--primary button--large" type="button" onClick={advance} disabled={isPending}>{isPending ? <><LoaderCircle className="spin" size={18} /> Обновляем…</> : masterAction.label}</button>}
         {audience === "CLIENT" && details.status === "COMPLETED_BY_MASTER" && <div className="order-completion-actions"><button className="button button--primary" type="button" onClick={() => respond(true)} disabled={isPending}>Да, всё выполнено</button><button className="button button--secondary" type="button" onClick={() => respond(false)} disabled={isPending}>Есть проблема</button></div>}
         {(canClientCancel || canMasterCancel) && <button className="button button--ghost is-danger" type="button" onClick={cancelOrder} disabled={isPending}><XCircle size={17} /> Отменить заказ</button>}
         {error && <p className="task-form-error" role="alert"><AlertCircle size={16} /> {error}</p>}
-      </section>
+      </section>}
+
+      {showLiveTracking && <LiveTrackingOverlay details={details} />}
 
       {isJourneyStatus && (
         <section className="order-progress-card" aria-label="Ход заказа">
@@ -179,6 +188,57 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
           <section className="order-facts-card"><div><MapPin size={18} /><span><small>Адрес</small><strong>{details.city}, {details.street}, {details.house}{details.apartment ? `, кв. ${details.apartment}` : ""}</strong>{details.addressComment && <p>{details.addressComment}</p>}</span></div><div><Clock3 size={18} /><span><small>Когда</small><strong>{formatSchedule(details.scheduleKind, details.scheduledAt)}</strong>{details.etaMinutes && <p>Ориентир прибытия: {details.etaMinutes} минут</p>}</span></div><div><WalletCards size={18} /><span><small>Согласованная цена</small><strong>{formatRubles(details.agreedPriceRubles)}</strong></span></div></section>
         </aside>
       </div>
+    </div>
+  );
+}
+
+function LiveTrackingCard({ details }: { details: OrderDetails }) {
+  const eta = details.etaMinutes ?? 24;
+  return (
+    <section className="live-tracking-card" aria-labelledby="live-tracking-title">
+      <header>
+        <div><small>Активный заказ</small><h1 id="live-tracking-title">Мастер в пути</h1><p>{details.categoryName}{details.subcategoryName ? ` · ${details.subcategoryName}` : ""}</p></div>
+        <strong><span>{eta}</span> мин</strong>
+      </header>
+      <a className="live-tracking-map" href="#live-tracking-map" aria-label="Открыть полноэкранную карту движения мастера">
+        <Image src="/maps/master-en-route.png" alt="Маршрут выбранного мастера Александра до дома на Тверской, 18" fill sizes="(max-width: 850px) 100vw, 900px" priority />
+        <span><Navigation size={16} /> Следить на карте</span>
+      </a>
+      <div className="live-tracking-master">
+        <div className="order-person-avatar">{details.master?.avatarUrl ? <Image src={details.master.avatarUrl} alt={details.master.name} fill sizes="62px" unoptimized /> : <UserRound size={25} />}</div>
+        <div><small>Ваш мастер</small><h2>{details.master?.name}</h2><p>{details.master?.specialization} · <Star size={13} fill="currentColor" /> {details.master?.rating?.toFixed(1) ?? "Новый"}</p></div>
+        <div className="live-tracking-contact">
+          <button type="button" aria-label="Написать мастеру"><MessageCircle size={20} /></button>
+          {details.master?.phone && <a href={`tel:${details.master.phone}`} aria-label="Позвонить мастеру"><Phone size={20} /></a>}
+        </div>
+      </div>
+      <dl className="live-tracking-facts">
+        <div><dt>Согласованная цена</dt><dd>{formatRubles(details.agreedPriceRubles)}</dd></div>
+        <div><dt>Ожидаем прибытие</dt><dd>через {eta} мин</dd></div>
+      </dl>
+      <div className="live-tracking-next"><span><Navigation size={18} /></span><div><small>Следующий этап</small><strong>По прибытии мастер добавит фото «до»</strong></div></div>
+    </section>
+  );
+}
+
+function LiveTrackingOverlay({ details }: { details: OrderDetails }) {
+  const eta = details.etaMinutes ?? 24;
+  return (
+    <div className="tracking-overlay" id="live-tracking-map" role="dialog" aria-modal="true" aria-labelledby="tracking-overlay-title">
+      <div className="tracking-overlay__map">
+        <Image src="/maps/master-en-route.png" alt="Маршрут мастера до адреса клиента" fill sizes="100vw" priority />
+      </div>
+      <header><a href="#" aria-label="Закрыть карту"><X size={22} /></a><div><small>Заказ № {details.id === "demo-active-order" ? "MR-1048" : details.id.slice(-6).toUpperCase()}</small><h2 id="tracking-overlay-title">Мастер в пути</h2></div><strong>{eta} мин</strong></header>
+      <section className="tracking-overlay__sheet">
+        <span className="tracking-overlay__handle" />
+        <div className="live-tracking-master">
+          <div className="order-person-avatar">{details.master?.avatarUrl ? <Image src={details.master.avatarUrl} alt={details.master.name} fill sizes="64px" unoptimized /> : <UserRound size={25} />}</div>
+          <div><small>Выбранный мастер</small><h2>{details.master?.name}</h2><p>{details.master?.specialization} · <Star size={13} fill="currentColor" /> {details.master?.rating?.toFixed(1) ?? "Новый"}</p></div>
+          <div className="live-tracking-contact"><button type="button" aria-label="Написать мастеру"><MessageCircle size={20} /></button>{details.master?.phone && <a href={`tel:${details.master.phone}`} aria-label="Позвонить мастеру"><Phone size={20} /></a>}</div>
+        </div>
+        <dl className="live-tracking-facts"><div><dt>Адрес</dt><dd>{details.street}, {details.house}</dd></div><div><dt>Цена</dt><dd>{formatRubles(details.agreedPriceRubles)}</dd></div></dl>
+        <a className="button button--primary tracking-overlay__close" href="#"><Map size={18} /> Вернуться к заказу</a>
+      </section>
     </div>
   );
 }
