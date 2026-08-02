@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   BadgeRussianRuble,
   CalendarClock,
   MapPin,
@@ -140,8 +141,9 @@ export function SubscriptionManager({ data }: { data: SubscriptionPageData }) {
     <div className="subscriptions-page">
       <header className="client-page-heading">
         <div>
-          <span>Регулярная помощь</span>
-          <h1>Работы по подписке</h1>
+          <Link className="home-subsection-back" href="/client/home"><ArrowLeft size={15} /> Мой дом</Link>
+          <span>План ухода</span>
+          <h1>Регулярные работы</h1>
           <p>Настройте периодичность один раз — следующие выезды будут создаваться автоматически.</p>
         </div>
         <button className="button button--primary" type="button" onClick={openDialog} disabled={data.addresses.length === 0}>

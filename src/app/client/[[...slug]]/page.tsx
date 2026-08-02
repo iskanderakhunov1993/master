@@ -27,6 +27,7 @@ import {
   listServiceCategories,
 } from "@/lib/orders/repository";
 import { getClientTask, listClientTasks } from "@/lib/tasks/repository";
+import { getCurrentTimestamp } from "@/lib/time";
 import { getSubscriptionPageData } from "@/lib/subscriptions/repository";
 import { listClientWarranties } from "@/lib/warranties/repository";
 
@@ -58,7 +59,7 @@ export default async function ClientPage({
 
   if (slug.length === 1 && slug[0] === "home") {
     const dashboard = getClientDashboardData(user.id);
-    return <HomePassport addresses={listClientAddresses(user.id)} activeOrder={dashboard.activeOrder} recentOrders={listClientOrders(user.id, 50)} warranties={listClientWarranties(user.id)} />;
+    return <HomePassport addresses={listClientAddresses(user.id)} activeOrder={dashboard.activeOrder} recentOrders={listClientOrders(user.id, 50)} warranties={listClientWarranties(user.id)} tasks={listClientTasks(user.id)} referenceTime={getCurrentTimestamp()} />;
   }
 
   if (slug.length === 1 && slug[0] === "tasks") {

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s — Мастер рядом",
   },
   description:
-    "Создайте заказ за минуту и получите предложения от проверенных бытовых мастеров рядом с вами.",
+    "Опишите бытовую задачу, сравните предложения и выберите мастера по цене, профилю и истории работ.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

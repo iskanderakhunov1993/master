@@ -105,7 +105,7 @@ export function TaskBoard({
   return (
     <div className="task-board-page">
       <header className="client-page-heading task-board-heading">
-        <div><span>Домашние планы</span><h1>Мои задачи</h1><p>Собирайте бытовые дела в одном месте и вызывайте мастера, когда будете готовы.</p></div>
+        <div><Link className="home-subsection-back" href="/client/home"><ArrowLeft size={15} /> Мой дом</Link><span>План ухода</span><h1>Задачи по дому</h1><p>Планируйте обслуживание, делайте сами или поручайте задачу мастеру.</p></div>
         <button className="button button--primary" type="button" onClick={() => setIsCreateOpen(true)}><Plus size={18} /> Создать задачу</button>
       </header>
 

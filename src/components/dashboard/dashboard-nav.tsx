@@ -7,12 +7,10 @@ import {
   ClipboardList,
   FolderClock,
   House,
-  ListTodo,
   MapPinned,
   MessageSquareWarning,
   PackageSearch,
   PanelsTopLeft,
-  Repeat2,
   Settings,
   Star,
   Tags,
@@ -40,12 +38,6 @@ export const dashboardNavigation: Record<Role, DashboardNavigationItem[]> = {
     { href: "/client/orders", label: "Мои заказы", mobileLabel: "Заказы", icon: ClipboardList, mobile: true },
     { href: "/client/home", label: "Мой дом", icon: MapPinned, mobile: true },
     { href: "/client/profile", label: "Профиль", icon: UserRound, mobile: true },
-    { href: "/client/tasks", label: "Задачи", icon: ListTodo },
-    { href: "/client/calendar", label: "Календарь", icon: CalendarDays },
-    { href: "/client/subscriptions", label: "Подписки", icon: Repeat2 },
-    { href: "/client/history", label: "История", icon: FolderClock },
-    { href: "/client/addresses", label: "Адреса", icon: MapPinned },
-    { href: "/client/settings", label: "Настройки", icon: Settings },
   ],
   MASTER: [
     { href: "/master", label: "Главная", icon: House, mobile: true },
@@ -69,6 +61,14 @@ export const dashboardNavigation: Record<Role, DashboardNavigationItem[]> = {
 };
 
 function isActive(pathname: string, href: string) {
+  if (href === "/client/home" && [
+    "/client/tasks",
+    "/client/calendar",
+    "/client/subscriptions",
+    "/client/addresses",
+  ].some((route) => pathname === route || pathname.startsWith(`${route}/`))) {
+    return true;
+  }
   return pathname === href || (href.split("/").length > 2 && pathname.startsWith(`${href}/`));
 }
 

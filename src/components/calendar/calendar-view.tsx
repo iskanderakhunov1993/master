@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ChevronLeft, ChevronRight, Clock3, MapPin, UserRound } from "lucide-react";
+import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, Clock3, MapPin, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -87,7 +87,7 @@ export function CalendarView({
   return (
     <div className="calendar-page">
       <header className="client-page-heading calendar-heading">
-        <div><span>{audience === "CLIENT" ? "Планы и заказы" : "Рабочее расписание"}</span><h1>Календарь</h1><p>{audience === "CLIENT" ? "Задачи и выезды мастеров без лишних деталей." : "Активные и запланированные заказы в одном расписании."}</p></div>
+        <div>{audience === "CLIENT" && <Link className="home-subsection-back" href="/client/home"><ArrowLeft size={15} /> Мой дом</Link>}<span>{audience === "CLIENT" ? "План ухода" : "Рабочее расписание"}</span><h1>Календарь</h1><p>{audience === "CLIENT" ? "Задачи, обслуживание и выезды мастеров в одном расписании." : "Активные и запланированные заказы в одном расписании."}</p></div>
         <button className="button button--secondary" type="button" onClick={() => setAnchor(startOfDay(new Date()))}>Сегодня</button>
       </header>
 

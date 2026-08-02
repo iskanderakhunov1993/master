@@ -22,8 +22,8 @@ import { PublicHeader } from "./public-header";
 const benefits = [
   {
     icon: BadgeCheck,
-    title: "Проверенные мастера",
-    text: "Вы видите профиль, историю, рейтинг и подтверждение личности.",
+    title: "Прозрачные профили",
+    text: "Вы видите историю, рейтинг и фактический статус подтверждения личности.",
     accent: "mint",
   },
   {
@@ -34,8 +34,8 @@ const benefits = [
   },
   {
     icon: Clock3,
-    title: "Быстро",
-    text: "Подходящие мастера получают ваш заказ и могут сразу откликнуться.",
+    title: "Отклики по задаче",
+    text: "Подходящие мастера получают заказ и сами решают, готовы ли предложить условия.",
     accent: "blue",
   },
   {
@@ -125,10 +125,10 @@ export function LandingPage() {
               </div>
               <h1>
                 Нужен мастер?
-                <span>Решим задачу быстро и безопасно</span>
+                <span>Сравните условия и выберите сами</span>
               </h1>
               <p className="hero__lead">
-                Создайте заказ за минуту и получите предложения от подходящих мастеров рядом с вами.
+                Опишите задачу, дождитесь откликов и выберите мастера по цене, профилю и истории работ.
               </p>
               <div className="hero__actions">
                 <Link className="button button--primary button--large" href="/register?role=CLIENT">
@@ -158,7 +158,7 @@ export function LandingPage() {
               </div>
               <div className="floating-card floating-card--top">
                 <span className="floating-card__icon"><BadgeCheck size={18} /></span>
-                <span><strong>Личность подтверждена</strong><small>Проверенный профиль</small></span>
+                <span><strong>Личность подтверждена</strong><small>Статус указан в профиле</small></span>
               </div>
               <div className="floating-card floating-card--bottom">
                 <div className="avatar-stack" aria-hidden="true">
@@ -280,13 +280,14 @@ export function LandingPage() {
         <section className="section section--white" id="reviews">
           <div className="container">
             <div className="section-heading section-heading--center">
-              <span className="section-kicker">Отзывы</span>
-              <h2>Доверие строится на реальном опыте</h2>
-              <p>После завершения заказа клиент может оценить результат и поделиться впечатлением.</p>
+              <span className="section-kicker">Как будут выглядеть отзывы</span>
+              <h2>Отзыв можно оставить только после заказа</h2>
+              <p>Ниже — демонстрационные примеры интерфейса, а не отзывы реальных пользователей сервиса.</p>
             </div>
             <div className="reviews-grid">
               {reviews.map((review) => (
                 <article className="review-card" key={review.name}>
+                  <span className="review-card__demo-label">Демонстрационный пример</span>
                   <Quote size={25} aria-hidden="true" />
                   <p>«{review.text}»</p>
                   <div>
@@ -320,9 +321,9 @@ export function LandingPage() {
         <section className="final-cta">
           <div className="container final-cta__inner">
             <div>
-              <span className="section-kicker section-kicker--light">Можно начинать</span>
+              <span className="section-kicker section-kicker--light">Опишите задачу</span>
               <h2>Расскажите, что нужно сделать</h2>
-              <p>Создание заказа займёт около минуты.</p>
+              <p>Добавьте фото, адрес, удобное время и желаемую цену.</p>
             </div>
             <div className="final-cta__actions">
               <Link className="button button--light button--large" href="/register?role=CLIENT">Найти мастера</Link>

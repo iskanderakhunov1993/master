@@ -22,6 +22,7 @@
 Дополнительные материалы:
 
 - [аудит интерфейса](./audit-2026-07-30/README.md);
+- [продуктовый и UX-аудит перед пилотом](./audit-2026-08-01/README.md);
 - [QA live tracking и паспорта дома](./implementation-2026-07-30/README.md);
 - [нейминг «МастераТут»](./naming/masteratut-naming-package-2026-07-30.md).
 

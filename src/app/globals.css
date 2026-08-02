@@ -1973,6 +1973,20 @@ svg {
   background: #fff;
 }
 
+.review-card__demo-label {
+  width: fit-content;
+  margin-bottom: 18px;
+  padding: 6px 9px;
+  color: #5c4b22;
+  border: 1px solid #ead99f;
+  border-radius: 999px;
+  background: #fff7d6;
+  font-size: 10px;
+  font-weight: 760;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
 .review-card > svg {
   color: #b9c9eb;
 }
@@ -3322,6 +3336,20 @@ svg {
 .home-passport-summary span { display: grid; gap: 3px; }
 .home-passport-summary small { color: var(--muted); font-size: 9px; }
 .home-passport-summary strong { font-size: 15px; }
+.home-care-hub { padding: 22px; border: 1px solid #cecec8; border-radius: 20px; background: #fff; }
+.home-care-hub > header { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 17px; }
+.home-care-hub > header span { color: var(--primary); font-size: 9px; font-weight: 840; letter-spacing: .08em; text-transform: uppercase; }
+.home-care-hub > header h2 { margin: 3px 0 0; font-size: 21px; }
+.home-care-hub > header p { max-width: 480px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; text-align: right; }
+.home-care-hub__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.home-care-hub__grid > a { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; min-height: 82px; padding: 15px; color: #171717; border: 1px solid #deded8; border-radius: 17px; background: #f7f7f3; transition: border-color 160ms ease, background 160ms ease, transform 160ms ease; }
+.home-care-hub__grid > a:hover { border-color: #171717; background: #edf1ff; transform: translateY(-1px); }
+.home-care-hub__grid > a > span { display: grid; width: 43px; height: 43px; place-items: center; color: var(--primary); border-radius: 13px; background: #fff; }
+.home-care-hub__grid > a > div { display: grid; gap: 4px; }
+.home-care-hub__grid strong { font-size: 13px; }
+.home-care-hub__grid small { color: var(--muted); font-size: 10px; line-height: 1.4; }
+.home-care-hub__grid > a > svg { color: var(--primary); }
+.home-subsection-back { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 12px; color: var(--primary); font-size: 12px; font-weight: 740; }
 .home-work-log { padding: 22px; border: 1px solid #cecec8; border-radius: 20px; background: #fff; }
 .home-work-log > header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .home-work-log > header h2 { margin: 3px 0 0; font-size: 21px; }
@@ -3360,6 +3388,10 @@ svg {
   .home-passport-heading .button { width: 100%; }
   .home-passport-summary { grid-template-columns: 1fr; }
   .home-passport-summary > div + div { border-top: 1px solid #e0e0da; border-left: 0; }
+  .home-care-hub { padding: 18px; }
+  .home-care-hub > header { align-items: start; flex-direction: column; gap: 8px; }
+  .home-care-hub > header p { text-align: left; }
+  .home-care-hub__grid { grid-template-columns: 1fr; }
   .home-work-log { padding: 18px; }
 }
 

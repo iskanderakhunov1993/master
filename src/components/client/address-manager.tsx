@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, Edit3, MapPin, Plus, Star, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, Edit3, MapPin, Plus, Star, Trash2, X } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState, useTransition } from "react";
 
@@ -102,7 +103,7 @@ export function AddressManager({ addresses }: { addresses: ClientAddress[] }) {
   return (
     <div className="addresses-page">
       <header className="client-page-heading">
-        <div><span>Кабинет клиента</span><h1>Адреса</h1><p>Сохраните адреса, чтобы быстрее создавать новые заказы.</p></div>
+        <div><Link className="home-subsection-back" href="/client/home"><ArrowLeft size={15} /> Мой дом</Link><span>Объекты</span><h1>Адреса</h1><p>Сохраните объекты и адреса, чтобы привязывать к ним задачи, работы и историю.</p></div>
         <button className="button button--primary" type="button" onClick={openCreate}><Plus size={18} /> Добавить адрес</button>
       </header>
 

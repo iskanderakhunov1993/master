@@ -17,7 +17,7 @@ export function ClientDashboard({ user, data }: { user: SessionUser; data: Clien
       <section className="client-order-start" aria-label="Создание заказа">
         <Link className="client-primary-cta" href="/client/orders/new">
           <span className="client-primary-cta__icon"><Plus size={25} /></span>
-          <span><small>Новая задача</small><strong>Создать новый заказ</strong><b>Фото и описание займут около минуты</b></span>
+          <span><small>Новая задача</small><strong>Создать новый заказ</strong><b>Добавьте фото, описание и удобное время</b></span>
           <ArrowRight size={22} />
         </Link>
         <Link className="client-urgent-link" href="/client/orders/new?type=URGENT">
