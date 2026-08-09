@@ -9,6 +9,7 @@ import { CalendarView } from "@/components/calendar/calendar-view";
 import { OrderLifecycleDetails } from "@/components/orders/order-lifecycle-details";
 import { OrderHistoryList } from "@/components/orders/order-history-list";
 import { requireRole } from "@/lib/auth/guards";
+import { usesPostgresRuntime } from "@/lib/db/runtime";
 import { listMasterCalendarEvents } from "@/lib/calendar/repository";
 import { listMatchedOrdersForMaster } from "@/lib/marketplace/matching";
 import { expireOffers } from "@/lib/marketplace/offers";
@@ -33,6 +34,16 @@ export default async function MasterPage({
 }) {
   const user = await requireRole("MASTER");
   const { slug = [] } = await params;
+
+  if (usesPostgresRuntime()) {
+    return <SectionPage
+      eyebrow="Аккаунт мастера создан"
+      title={`Добро пожаловать, ${user.name}`}
+      description="Вход и сессия уже сохраняются в защищённой базе. Профиль, отклики и заказы переносятся из локального хранилища, поэтому мы не показываем временный кабинет."
+      homeHref="/"
+    />;
+  }
+
   const profileData = getMasterProfileData(user.id);
 
   if (slug.length === 1 && slug[0] === "onboarding") {

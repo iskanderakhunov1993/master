@@ -15,6 +15,7 @@ import { CalendarView } from "@/components/calendar/calendar-view";
 import { SectionPage } from "@/components/dashboard/section-page";
 import { listClientAddresses } from "@/lib/addresses/repository";
 import { requireRole } from "@/lib/auth/guards";
+import { usesPostgresRuntime } from "@/lib/db/runtime";
 import { listClientCalendarEvents } from "@/lib/calendar/repository";
 import { listRankedCandidates } from "@/lib/marketplace/ranking";
 import { getClientOrderDetails } from "@/lib/orders/details";
@@ -47,6 +48,18 @@ export default async function ClientPage({
 }) {
   const user = await requireRole("CLIENT");
   const { slug = [] } = await params;
+
+  // The authenticated production path is already on Neon. The remaining
+  // marketplace repositories are still being moved from SQLite, which cannot
+  // be opened in Vercel's read-only deployment filesystem.
+  if (usesPostgresRuntime()) {
+    return <SectionPage
+      eyebrow="Аккаунт создан"
+      title={`Рады познакомиться, ${user.name}`}
+      description="Регистрация и вход уже работают через защищённую базу. Кабинет заказов переносится в эту же базу — мы не показываем непостоянные данные из временного хранилища."
+      homeHref="/"
+    />;
+  }
 
   if (slug.length === 0) {
     return <ClientDashboard user={user} data={getClientDashboardData(user.id)} />;
