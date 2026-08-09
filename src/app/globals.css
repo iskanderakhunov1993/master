@@ -2998,6 +2998,97 @@ svg {
   line-height: 1.7;
 }
 
+.postgres-order-form {
+  margin-bottom: 18px;
+}
+
+.postgres-order-form form {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 18px;
+  padding-top: 22px;
+}
+
+.postgres-order-form label {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  color: #2f3948;
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.postgres-order-form textarea,
+.postgres-order-form input,
+.postgres-order-form select {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 13px;
+  color: var(--ink);
+  border: 1px solid #d8dfe9;
+  border-radius: 12px;
+  background: #fbfcfe;
+  font: inherit;
+  font-weight: 560;
+}
+
+.postgres-order-form textarea {
+  min-height: 104px;
+  resize: vertical;
+}
+
+.postgres-order-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.postgres-order-form .button {
+  width: fit-content;
+  align-self: end;
+  justify-self: end;
+}
+
+.postgres-order-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 10px 0 0;
+  list-style: none;
+}
+
+.postgres-order-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e8ecf1;
+}
+
+.postgres-order-list li:last-child { border-bottom: 0; }
+.postgres-order-list li > div { display: grid; gap: 3px; }
+.postgres-order-list strong { font-size: 13px; }
+.postgres-order-list p { margin: 0; color: #566274; font-size: 12px; line-height: 1.5; }
+.postgres-order-list small { color: var(--muted); font-size: 10px; }
+
+.postgres-profile-card {
+  display: grid;
+  grid-template-columns: auto repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 24px;
+}
+
+.postgres-profile-card > div { display: grid; gap: 4px; }
+.postgres-profile-card small { color: var(--muted); font-size: 10px; }
+.postgres-profile-card strong { overflow-wrap: anywhere; font-size: 13px; }
+
+@media (max-width: 700px) {
+  .postgres-order-form form { grid-template-columns: 1fr; }
+  .postgres-order-form .button { width: 100%; justify-self: stretch; }
+  .postgres-profile-card { grid-template-columns: auto 1fr; }
+  .postgres-profile-card > div { grid-column: 1 / -1; }
+}
+
 @media (max-width: 1160px) {
   .public-nav { display: none; }
   .public-header__actions { margin-left: auto; }

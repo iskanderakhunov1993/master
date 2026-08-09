@@ -19,7 +19,7 @@ export function PostgresClientDashboard({ user, orders }: { user: SessionUser; o
       </header>
 
       <section className="dashboard-panel postgres-order-form">
-        <div><span className="client-section-title"><span>Новая задача</span><h2>Найти мастера</h2></span></div>
+        <div className="dashboard-panel__heading"><div><span>Новая задача</span><h2>Найти мастера</h2></div></div>
         <form action={createPostgresClientOrderAction}>
           <label>Категория<select name="categoryId" required defaultValue=""><option value="" disabled>Выберите категорию</option>{POSTGRES_ORDER_CATEGORIES.map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label>
           <label>Что случилось?<textarea name="description" required minLength={10} placeholder="Например: течёт смеситель на кухне, нужна диагностика и замена" /></label>
@@ -30,7 +30,7 @@ export function PostgresClientDashboard({ user, orders }: { user: SessionUser; o
 
       <section className="client-list-panel">
         <div className="client-section-title"><div><span>История</span><h2>Ваши заявки</h2></div></div>
-        {orders.length === 0 ? <div className="client-compact-empty"><span><Search size={23} /></span><div><strong>Заявок пока нет</strong><small>Первая заявка появится здесь сразу после публикации.</small></div></div> : <ul className="client-order-list">{orders.map((order) => <li key={order.id}><span className="client-order-list__icon"><Search size={18} /></span><div><strong>{categoryNames[order.categoryId ?? ""] ?? "Заявка"}</strong><small>{order.description} · Ищем мастера</small></div></li>)}</ul>}
+        {orders.length === 0 ? <div className="client-compact-empty"><span><Search size={23} /></span><div><strong>Заявок пока нет</strong><small>Первая заявка появится здесь сразу после публикации.</small></div></div> : <ul className="postgres-order-list">{orders.map((order) => <li key={order.id}><span className="client-order-list__icon"><Search size={18} /></span><div><strong>{categoryNames[order.categoryId ?? ""] ?? "Заявка"}</strong><p>{order.description}</p><small>Ищем мастера</small></div></li>)}</ul>}
       </section>
     </div>
   );

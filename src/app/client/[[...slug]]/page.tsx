@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { AddressManager } from "@/components/client/address-manager";
 import { ClientDashboard } from "@/components/client/client-dashboard";
 import { PostgresClientDashboard } from "@/components/client/postgres-client-dashboard";
+import { PostgresHomePage, PostgresOrdersPage, PostgresProfilePage } from "@/components/client/postgres-client-sections";
 import { HomePassport } from "@/components/client/home-passport";
 import { OrderHistoryList } from "@/components/orders/order-history-list";
 import { OrderSearching } from "@/components/client/order-searching";
@@ -52,7 +53,12 @@ export default async function ClientPage({
   const { slug = [] } = await params;
 
   if (usesPostgresRuntime()) {
-    return <PostgresClientDashboard user={user} orders={await listPostgresClientOrders(user.id)} />;
+    if (slug.length === 1 && slug[0] === "profile") return <PostgresProfilePage user={user} />;
+    const orders = await listPostgresClientOrders(user.id);
+    if (slug.length === 0 || (slug.length === 2 && slug[0] === "orders" && slug[1] === "new")) return <PostgresClientDashboard user={user} orders={orders} />;
+    if (slug.length === 1 && slug[0] === "orders") return <PostgresOrdersPage orders={orders} />;
+    if (slug.length === 1 && slug[0] === "home") return <PostgresHomePage orders={orders} />;
+    notFound();
   }
 
   if (slug.length === 0) {
