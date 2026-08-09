@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { AddressManager } from "@/components/client/address-manager";
 import { ClientDashboard } from "@/components/client/client-dashboard";
+import { PostgresClientDashboard } from "@/components/client/postgres-client-dashboard";
 import { HomePassport } from "@/components/client/home-passport";
 import { OrderHistoryList } from "@/components/orders/order-history-list";
 import { OrderSearching } from "@/components/client/order-searching";
@@ -16,6 +17,7 @@ import { SectionPage } from "@/components/dashboard/section-page";
 import { listClientAddresses } from "@/lib/addresses/repository";
 import { requireRole } from "@/lib/auth/guards";
 import { usesPostgresRuntime } from "@/lib/db/runtime";
+import { listPostgresClientOrders } from "@/lib/orders/postgres-repository";
 import { listClientCalendarEvents } from "@/lib/calendar/repository";
 import { listRankedCandidates } from "@/lib/marketplace/ranking";
 import { getClientOrderDetails } from "@/lib/orders/details";
@@ -49,16 +51,8 @@ export default async function ClientPage({
   const user = await requireRole("CLIENT");
   const { slug = [] } = await params;
 
-  // The authenticated production path is already on Neon. The remaining
-  // marketplace repositories are still being moved from SQLite, which cannot
-  // be opened in Vercel's read-only deployment filesystem.
   if (usesPostgresRuntime()) {
-    return <SectionPage
-      eyebrow="Аккаунт создан"
-      title={`Рады познакомиться, ${user.name}`}
-      description="Регистрация и вход уже работают через защищённую базу. Кабинет заказов переносится в эту же базу — мы не показываем непостоянные данные из временного хранилища."
-      homeHref="/"
-    />;
+    return <PostgresClientDashboard user={user} orders={await listPostgresClientOrders(user.id)} />;
   }
 
   if (slug.length === 0) {
