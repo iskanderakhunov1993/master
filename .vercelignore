@@ -1,0 +1,6 @@
+.env
+.env.local
+.data
+.next
+node_modules
+coverage
