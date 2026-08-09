@@ -17,7 +17,6 @@ import { listClientAddresses } from "@/lib/addresses/repository";
 import { requireRole } from "@/lib/auth/guards";
 import { listClientCalendarEvents } from "@/lib/calendar/repository";
 import { listRankedCandidates } from "@/lib/marketplace/ranking";
-import { getOrderSearchMeta } from "@/lib/marketplace/matching";
 import { getClientOrderDetails } from "@/lib/orders/details";
 import {
   getClientDashboardData,
@@ -101,7 +100,7 @@ export default async function ClientPage({
       if (candidates.length > 0) return <OrderCandidates order={order} candidates={candidates} />;
       const refreshedOrder = getClientOrder(user.id, order.id);
       if (!refreshedOrder) notFound();
-      return <OrderSearching order={refreshedOrder} matchedMasters={getOrderSearchMeta(order.id).matchedMasters} />;
+      return <OrderSearching order={refreshedOrder} />;
     }
     if ([
       "MASTER_SELECTED", "MASTER_CONFIRMED", "MASTER_ON_THE_WAY",
@@ -113,7 +112,7 @@ export default async function ClientPage({
       if (!details) notFound();
       return <OrderLifecycleDetails details={details} audience="CLIENT" />;
     }
-    return <OrderSearching order={order} matchedMasters={getOrderSearchMeta(order.id).matchedMasters} />;
+    return <OrderSearching order={order} />;
   }
 
   if (slug.length !== 1 || !sections[slug[0]]) notFound();

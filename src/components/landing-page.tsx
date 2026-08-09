@@ -47,12 +47,9 @@ const benefits = [
 ];
 
 const steps = [
-  "Создайте заказ",
-  "Получите предложения",
-  "Изучите профили",
-  "Выберите мастера",
-  "Мастер выполнит работу",
-  "Оцените результат",
+  { title: "Опишите задачу", text: "Добавьте категорию, фото, описание, адрес, время и цену." },
+  { title: "Выберите мастера", text: "Сравните предложения, опыт, рейтинг и условия до назначения." },
+  { title: "Примите работу", text: "Проверьте результат, подтвердите выполнение и оставьте отзыв." },
 ];
 
 const masterBenefits = [
@@ -193,22 +190,15 @@ export function LandingPage() {
           <div className="container">
             <div className="section-heading">
               <span className="section-kicker">Как это работает</span>
-              <h2>От задачи до результата — шесть понятных шагов</h2>
+              <h2>От задачи до результата — три понятных шага</h2>
             </div>
             <ol className="steps-grid">
               {steps.map((step, index) => (
-                <li key={step}>
+                <li key={step.title}>
                   <span className="step-number">{String(index + 1).padStart(2, "0")}</span>
                   <div>
-                    <h3>{step}</h3>
-                    <p>{[
-                      "Добавьте фото, описание, адрес и удобное время.",
-                      "Подходящие мастера откликнутся на ваш заказ.",
-                      "Сравните опыт, рейтинг, отзывы и условия.",
-                      "Назначьте того, кто подходит именно вам.",
-                      "Следите за статусом заказа в личном кабинете.",
-                      "Подтвердите выполнение и оставьте честный отзыв.",
-                    ][index]}</p>
+                    <h3>{step.title}</h3>
+                    <p>{step.text}</p>
                   </div>
                 </li>
               ))}
@@ -280,7 +270,6 @@ export function LandingPage() {
         <section className="section section--white" id="reviews">
           <div className="container">
             <div className="section-heading section-heading--center">
-              <span className="section-kicker">Как будут выглядеть отзывы</span>
               <h2>Отзыв можно оставить только после заказа</h2>
               <p>Ниже — демонстрационные примеры интерфейса, а не отзывы реальных пользователей сервиса.</p>
             </div>

@@ -4190,6 +4190,21 @@ svg {
 .wizard-step-heading h1 { margin: 0 0 5px; font-size: clamp(25px, 3vw, 34px); line-height: 1.12; letter-spacing: -0.045em; }
 .wizard-step-heading p { max-width: 600px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
 
+/* One-page order brief: all input precedes a single review screen. */
+.wizard-one-page { min-height: 0; }
+.wizard-form-section { padding: 25px 0; border-top: 1px solid #e7ebf1; }
+.wizard-form-section:first-of-type { padding-top: 0; border-top: 0; }
+.wizard-form-section > h2 { margin: 0 0 8px; color: var(--ink); font-size: 17px; letter-spacing: -0.025em; }
+.wizard-form-section > h2 small { color: var(--muted); font-size: 10px; font-weight: 550; }
+.wizard-form-section > p { margin: 0 0 14px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.wizard-one-page .category-grid button { min-height: 176px; padding: 0 0 13px; overflow: hidden; justify-content: flex-end; }
+.wizard-one-page .category-grid__visual { display: block; width: 100%; height: 130px; overflow: hidden; border-radius: 14px 14px 0 0; background: #f5f7ff; }
+.wizard-one-page .category-grid__visual img { width: 100%; height: 100%; object-fit: contain; }
+.wizard-one-page .category-grid button > strong { padding: 0 14px; }
+.wizard-one-page .category-grid button > svg { top: 11px; right: 11px; }
+.wizard-one-page .order-type-grid > button { min-height: 145px; }
+.wizard-one-page .price-field { margin-top: 24px; }
+
 .photo-uploader input,
 .photo-preview-grid input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .photo-uploader > label { display: flex; min-height: 210px; flex-direction: column; align-items: center; justify-content: center; padding: 25px; color: #5e6d83; border: 2px dashed #cbd6e7; border-radius: 18px; background: #f8faff; cursor: pointer; transition: border-color 160ms ease, background 160ms ease; }
@@ -4401,6 +4416,10 @@ svg {
   .wizard-step-heading > span { width: 44px; height: 44px; }
   .wizard-step-heading h1 { font-size: 26px; }
   .wizard-step-heading p { font-size: 11px; }
+  .wizard-form-section { padding: 22px 0; }
+  .wizard-form-section > h2 { font-size: 16px; }
+  .wizard-one-page .category-grid button { min-height: 158px; }
+  .wizard-one-page .category-grid__visual { height: 112px; }
   .photo-uploader > label { min-height: 190px; }
   .photo-preview-grid { grid-template-columns: 1fr 1fr; }
   .wizard-textarea textarea { min-height: 260px; }

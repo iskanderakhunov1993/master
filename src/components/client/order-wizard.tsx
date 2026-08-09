@@ -5,7 +5,6 @@ import {
   ArrowLeft,
   ArrowRight,
   CalendarDays,
-  Camera,
   Check,
   Clock3,
   Hammer,
@@ -56,16 +55,12 @@ import type {
   ScheduleKind,
 } from "@/lib/orders/types";
 
-const steps = ["Фото", "Описание", "Категория", "Адрес", "Когда", "Тип заказа", "Цена", "Проверка"];
+const steps = ["Детали заказа", "Проверка"];
 
 const stages = [
-  { title: "Опишите задачу", hint: "Фото · описание · категория", lastStep: 3 },
-  { title: "Выберите время", hint: "Адрес · когда", lastStep: 5 },
-  { title: "Согласуйте условия", hint: "Срочность · цена", lastStep: 7 },
-  { title: "Проверьте заказ", hint: "Перед поиском мастеров", lastStep: 8 },
+  { title: "Опишите задачу", hint: "Все детали на одной странице", lastStep: 1 },
+  { title: "Проверьте заказ", hint: "Перед поиском мастеров", lastStep: 2 },
 ];
-
-const nextLabels = ["Далее: описание", "Далее: категория", "Далее: адрес", "Далее: время", "Далее: условия", "Далее: цена", "Проверить заказ"];
 
 const categoryImages: Record<string, string> = {
   plumbing: "/illustrations/categories/plumbing.png",
@@ -124,7 +119,7 @@ function formatMultiplier(multiplier: number) {
 export function OrderWizard({ data }: { data: OrderWizardData }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [step, setStep] = useState(Math.min(8, Math.max(1, data.draft.currentStep)));
+  const [step, setStep] = useState(Math.min(2, Math.max(1, data.draft.currentStep)));
   const [error, setError] = useState("");
   const [photos, setPhotos] = useState<OrderPhoto[]>(data.draft.photos);
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
@@ -247,43 +242,43 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
     }
   }
 
-  function nextStep() {
+  function saveDetailsAndReview() {
     setError("");
     startTransition(async () => {
-      let result;
-      if (step === 1) result = await saveOrderPhotoStepAction(data.draft.id);
-      else if (step === 2) result = await saveOrderDescriptionAction(data.draft.id, description);
-      else if (step === 3) result = await saveOrderCategoryAction(data.draft.id, { categoryId, subcategoryId });
-      else if (step === 4) {
-        const input: OrderAddressInput = addressMode === "saved"
-          ? { mode: "saved", addressId: savedAddressId, serviceAreaId }
-          : {
-              mode: "new",
-              serviceAreaId,
-              city: newAddress.city,
-              street: newAddress.street,
-              house: newAddress.house,
-              apartment: newAddress.apartment,
-              comment: newAddress.comment,
-              saveAddress: saveNewAddress,
-            };
-        result = await saveOrderAddressAction(data.draft.id, input);
-      } else if (step === 5) result = await saveOrderScheduleAction(data.draft.id, { scheduleKind, scheduledAt });
-      else if (step === 6) result = await saveOrderTypeAction(data.draft.id, orderType);
-      else result = await saveOrderPriceAction(data.draft.id, Number(basePrice));
-
-      if (!result.ok) {
-        setError(result.message ?? "Проверьте введённые данные");
+      const addressInput: OrderAddressInput = addressMode === "saved"
+        ? { mode: "saved", addressId: savedAddressId, serviceAreaId }
+        : {
+            mode: "new",
+            serviceAreaId,
+            city: newAddress.city,
+            street: newAddress.street,
+            house: newAddress.house,
+            apartment: newAddress.apartment,
+            comment: newAddress.comment,
+            saveAddress: saveNewAddress,
+          };
+      const results = [
+        await saveOrderCategoryAction(data.draft.id, { categoryId, subcategoryId }),
+        await saveOrderDescriptionAction(data.draft.id, description),
+        await saveOrderPhotoStepAction(data.draft.id),
+        await saveOrderAddressAction(data.draft.id, addressInput),
+        await saveOrderScheduleAction(data.draft.id, { scheduleKind, scheduledAt }),
+        await saveOrderTypeAction(data.draft.id, orderType),
+        await saveOrderPriceAction(data.draft.id, Number(basePrice)),
+      ];
+      const failed = results.find((result) => !result.ok);
+      if (failed) {
+        setError(failed.message ?? "Проверьте введённые данные");
         return;
       }
-      setStep((current) => Math.min(8, current + 1));
+      setStep(2);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
 
   function previousStep() {
     setError("");
-    const previous = Math.max(1, step - 1);
+    const previous = 1;
     setStep(previous);
     startTransition(async () => {
       await setOrderDraftStepAction(data.draft.id, previous);
@@ -315,12 +310,29 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
   function renderStep() {
     if (step === 1) {
       return (
-        <section className="wizard-step">
-          <StepHeading icon={Camera} title="Покажите задачу" description="Фото помогает мастеру быстрее понять объём работы. Этот шаг можно пропустить." />
-          <div className="photo-uploader">
-            <input id="order-photos" type="file" accept={ALLOWED_ORDER_PHOTO_TYPES.join(",")} multiple onChange={handlePhotoSelection} disabled={isUploading || photos.length >= MAX_ORDER_PHOTOS} />
-            <label htmlFor="order-photos"><span><Upload size={27} /></span><strong>{photos.length ? "Добавить ещё фотографии" : "Добавить фотографии"}</strong><small>JPG, PNG или WebP · до 8 МБ · максимум 5</small></label>
-          </div>
+        <section className="wizard-step wizard-one-page">
+          <StepHeading icon={Hammer} title="Расскажите о задаче" description="Заполните всё один раз — затем только проверьте заказ и начнём поиск мастера." />
+          <section className="wizard-form-section">
+            <h2>1. Выберите категорию</h2>
+            <div className="category-grid">
+              {data.categories.map((category) => {
+                const imageSrc = categoryImages[category.slug] ?? categoryImages.other;
+                return <button className={categoryId === category.id ? "is-selected" : ""} type="button" key={category.id} aria-pressed={categoryId === category.id} onClick={() => { setCategoryId(category.id); setSubcategoryId(""); }}><span className="category-grid__visual"><Image src={imageSrc} alt="" width={768} height={768} sizes="(max-width: 620px) 45vw, 220px" /></span><strong>{category.name}</strong><Check size={16} /></button>;
+              })}
+            </div>
+            {selectedCategory && selectedCategory.subcategories.length > 0 && <div className="subcategory-picker"><span>Уточните задачу <small>необязательно</small></span><div>{selectedCategory.subcategories.map((subcategory) => <button className={subcategoryId === subcategory.id ? "is-selected" : ""} type="button" key={subcategory.id} onClick={() => setSubcategoryId(subcategory.id === subcategoryId ? "" : subcategory.id)}>{subcategory.name}</button>)}</div></div>}
+          </section>
+          <section className="wizard-form-section">
+            <h2>2. Опишите проблему</h2>
+            <label className="wizard-textarea"><textarea value={description} onChange={(event) => setDescription(event.target.value)} maxLength={1000} rows={6} placeholder="Например: течёт под раковиной после включения воды" /><span className={description.length >= 950 ? "is-limit" : ""}>{description.length} / 1000</span></label>
+          </section>
+          <section className="wizard-form-section">
+            <h2>3. Добавьте фото <small>необязательно</small></h2>
+            <p>Фото помогает мастеру быстрее понять объём работы.</p>
+            <div className="photo-uploader">
+              <input id="order-photos" type="file" accept={ALLOWED_ORDER_PHOTO_TYPES.join(",")} multiple onChange={handlePhotoSelection} disabled={isUploading || photos.length >= MAX_ORDER_PHOTOS} />
+              <label htmlFor="order-photos"><span><Upload size={27} /></span><strong>{photos.length ? "Добавить ещё фотографии" : "Добавить фотографии"}</strong><small>JPG, PNG или WebP · до 8 МБ · максимум 5</small></label>
+            </div>
           {(photos.length > 0 || pendingPhotos.length > 0) && (
             <div className="photo-preview-grid">
               {photos.map((photo, index) => (
@@ -335,12 +347,32 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
               {photos.length + pendingPhotos.length < MAX_ORDER_PHOTOS && <label className="photo-preview-add" htmlFor="order-photos"><ImagePlus size={23} /><span>Добавить</span></label>}
             </div>
           )}
-          <div className="wizard-tip"><Info size={18} /><p><strong>Совет:</strong> сделайте общий план и крупное фото проблемного места.</p></div>
+            <div className="wizard-tip"><Info size={18} /><p><strong>Совет:</strong> сделайте общий план и крупное фото проблемного места.</p></div>
+          </section>
+          <section className="wizard-form-section">
+            <h2>4. Укажите адрес</h2><p>Точный адрес будет доступен только выбранному вами мастеру.</p>
+            {data.addresses.length > 0 && <div className="address-mode-tabs"><button className={addressMode === "saved" ? "is-active" : ""} type="button" onClick={() => setAddressMode("saved")}>Сохранённые</button><button className={addressMode === "new" ? "is-active" : ""} type="button" onClick={() => setAddressMode("new")}><Plus size={15} /> Новый адрес</button></div>}
+            {addressMode === "saved" && data.addresses.length > 0 ? <div className="wizard-address-list">{data.addresses.map((address) => <button className={savedAddressId === address.id ? "is-selected" : ""} type="button" key={address.id} onClick={() => setSavedAddressId(address.id)}><span><MapPin size={20} /></span><div><strong>{address.street}, {address.house}{address.apartment ? `, кв. ${address.apartment}` : ""}</strong><small>{address.city}{address.isPrimary ? " · Основной" : ""}</small></div><span className="wizard-radio"><Check size={14} /></span></button>)}</div> : <div className="wizard-address-form"><label>Город<input value={newAddress.city} onChange={(event) => updateAddressField("city", event.target.value)} placeholder="Москва" autoComplete="address-level2" /></label><label className="is-wide">Улица<input value={newAddress.street} onChange={(event) => updateAddressField("street", event.target.value)} placeholder="Название улицы" autoComplete="address-line1" /></label><label>Дом<input value={newAddress.house} onChange={(event) => updateAddressField("house", event.target.value)} placeholder="12" /></label><label>Квартира<input value={newAddress.apartment} onChange={(event) => updateAddressField("apartment", event.target.value)} placeholder="45" /></label><label className="is-wide">Комментарий мастеру<textarea value={newAddress.comment} onChange={(event) => updateAddressField("comment", event.target.value)} maxLength={500} rows={3} placeholder="Подъезд, этаж, домофон" /></label><label className="checkbox-field is-wide"><input type="checkbox" checked={saveNewAddress} onChange={(event) => setSaveNewAddress(event.target.checked)} /><span><Check size={14} /></span> Сохранить адрес для следующих заказов</label></div>}
+            <label className="service-area-picker"><span>Район</span><select value={serviceAreaId} onChange={(event) => setServiceAreaId(event.target.value)}><option value="">Выберите район</option>{data.serviceAreas.map((area) => <option key={area.id} value={area.id}>{area.name} · {area.city}</option>)}</select><small>Мастера увидят этот район вместо точного адреса.</small></label>
+          </section>
+          <section className="wizard-form-section">
+            <h2>5. Когда нужен мастер?</h2>
+            <div className="schedule-options"><button className={scheduleKind === "NOW" ? "is-selected" : ""} type="button" onClick={() => setScheduleKind("NOW")}><span><Sparkles size={22} /></span><div><strong>Сейчас</strong><small>Начать поиск немедленно</small></div><span className="wizard-radio"><Check size={14} /></span></button><button className={scheduleKind === "TODAY" ? "is-selected" : ""} type="button" onClick={() => setScheduleKind("TODAY")}><span><Clock3 size={22} /></span><div><strong>Сегодня</strong><small>В удобное время сегодня</small></div><span className="wizard-radio"><Check size={14} /></span></button><button className={scheduleKind === "CUSTOM" ? "is-selected" : ""} type="button" onClick={() => setScheduleKind("CUSTOM")}><span><CalendarDays size={22} /></span><div><strong>Выбрать дату и время</strong><small>Запланировать заранее</small></div><span className="wizard-radio"><Check size={14} /></span></button></div>
+            {scheduleKind === "TODAY" && <label className="schedule-time-field">Удобное время<input type="time" value={todayTime} onChange={(event) => setTodayTime(event.target.value)} /></label>}
+            {scheduleKind === "CUSTOM" && <div className="schedule-custom-fields"><label>Дата<input type="date" min={todayDate} value={customDate} onChange={(event) => setCustomDate(event.target.value)} /></label><label>Время<input type="time" value={customTime} onChange={(event) => setCustomTime(event.target.value)} /></label></div>}
+          </section>
+          <section className="wizard-form-section wizard-form-section--conditions">
+            <h2>6. Условия заказа</h2>
+            <div className="order-type-grid"><button className={orderType === "NORMAL" ? "is-selected" : ""} type="button" onClick={() => setOrderType("NORMAL")}><span><Clock3 size={24} /></span><div><strong>Обычный</strong><p>Можно спокойно сравнить предложения.</p><small>Без дополнительного коэффициента</small></div><span className="wizard-radio"><Check size={14} /></span></button><button className={`is-urgent ${orderType === "URGENT" ? "is-selected" : ""}`} type="button" onClick={() => setOrderType("URGENT")}><span><Zap size={24} /></span><div><strong>Срочный</strong><p>Нужно решить задачу как можно быстрее.</p><small>Коэффициент ×{formatMultiplier(data.urgencyMultiplier)}</small></div><span className="wizard-radio"><Check size={14} /></span></button></div>
+            <div className="price-field"><label htmlFor="order-price">{orderType === "URGENT" ? "Ваша базовая цена" : "Сколько вы готовы заплатить?"}</label><div><input id="order-price" type="number" inputMode="numeric" min="500" max="1000000" step="100" value={basePrice} onChange={(event) => setBasePrice(event.target.value)} placeholder="3 000" /><span>₽</span></div></div>
+            <div className="price-suggestions"><span>Быстрый выбор</span><div>{[1500, 3000, 5000, 8000].map((price) => <button type="button" key={price} onClick={() => setBasePrice(String(price))}>{formatRubles(price)}</button>)}</div></div>
+            {orderType === "URGENT" && <div className="price-calculation is-urgent"><div><span>Базовая цена</span><strong>{formatRubles(numericBasePrice)}</strong></div><div><span>Срочный коэффициент</span><strong>×{formatMultiplier(data.urgencyMultiplier)}</strong></div><div className="price-calculation__total"><span>Итоговая цена</span><strong>{formatRubles(totalPrice)}</strong></div></div>}
+          </section>
         </section>
       );
     }
 
-    if (step === 2) {
+    if (step === 99) {
       return (
         <section className="wizard-step">
           <StepHeading icon={Pencil} title="Что нужно сделать?" description="Опишите проблему простыми словами — мастер уточнит детали в предложении." />
@@ -453,11 +485,11 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
       <section className="wizard-step wizard-review">
         <StepHeading icon={Check} title="Проверьте заказ" description="Убедитесь, что всё верно. После отправки начнём искать мастеров." />
         <ReviewRow title="Фотографии" onEdit={() => goToStep(1)}>{photos.length ? <div className="review-photos">{photos.map((photo, index) => <Image key={photo.id} src={photo.url} alt={`Фото задачи ${index + 1}`} width={78} height={62} unoptimized />)}</div> : <span className="review-empty">Без фотографий</span>}</ReviewRow>
-        <ReviewRow title="Описание" onEdit={() => goToStep(2)}><p>{description}</p></ReviewRow>
-        <ReviewRow title="Категория" onEdit={() => goToStep(3)}><p>{selectedCategory?.name}{selectedSubcategory ? ` → ${selectedSubcategory.name}` : ""}</p></ReviewRow>
-        <ReviewRow title="Адрес" onEdit={() => goToStep(4)}><p>{reviewAddress.city}, {reviewAddress.street}, {reviewAddress.house}{reviewAddress.apartment ? `, кв. ${reviewAddress.apartment}` : ""}</p><small>Район: {data.serviceAreas.find((area) => area.id === serviceAreaId)?.name ?? "не выбран"}</small>{reviewAddress.comment && <small>{reviewAddress.comment}</small>}</ReviewRow>
-        <div className="review-grid-row"><ReviewRow title="Когда" onEdit={() => goToStep(5)}><p>{scheduleLabel}</p></ReviewRow><ReviewRow title="Тип заказа" onEdit={() => goToStep(6)}><p>{orderType === "URGENT" ? "Срочный" : "Обычный"}</p></ReviewRow></div>
-        <ReviewRow title="Цена" onEdit={() => goToStep(7)}><div className="review-price"><strong>{formatRubles(totalPrice)}</strong>{orderType === "URGENT" && <small>{formatRubles(numericBasePrice)} × {formatMultiplier(data.urgencyMultiplier)}</small>}</div></ReviewRow>
+        <ReviewRow title="Описание" onEdit={() => goToStep(1)}><p>{description}</p></ReviewRow>
+        <ReviewRow title="Категория" onEdit={() => goToStep(1)}><p>{selectedCategory?.name}{selectedSubcategory ? ` → ${selectedSubcategory.name}` : ""}</p></ReviewRow>
+        <ReviewRow title="Адрес" onEdit={() => goToStep(1)}><p>{reviewAddress.city}, {reviewAddress.street}, {reviewAddress.house}{reviewAddress.apartment ? `, кв. ${reviewAddress.apartment}` : ""}</p><small>Район: {data.serviceAreas.find((area) => area.id === serviceAreaId)?.name ?? "не выбран"}</small>{reviewAddress.comment && <small>{reviewAddress.comment}</small>}</ReviewRow>
+        <div className="review-grid-row"><ReviewRow title="Когда" onEdit={() => goToStep(1)}><p>{scheduleLabel}</p></ReviewRow><ReviewRow title="Тип заказа" onEdit={() => goToStep(1)}><p>{orderType === "URGENT" ? "Срочный" : "Обычный"}</p></ReviewRow></div>
+        <ReviewRow title="Цена" onEdit={() => goToStep(1)}><div className="review-price"><strong>{formatRubles(totalPrice)}</strong>{orderType === "URGENT" && <small>{formatRubles(numericBasePrice)} × {formatMultiplier(data.urgencyMultiplier)}</small>}</div></ReviewRow>
         <div className="review-privacy"><ShieldCheck size={19} /><p>Точный адрес увидит только выбранный вами мастер.</p></div>
       </section>
     );
@@ -480,7 +512,7 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
         </div>
         <div>
           {error && <span className="wizard-error" role="alert"><AlertCircle size={16} /> {error}</span>}
-          {step < 8 ? <button className="button button--primary button--large" type="button" onClick={nextStep} disabled={isPending || isUploading}>{isPending ? <><LoaderCircle className="spin" size={18} /> Сохраняем…</> : <>{nextLabels[step - 1]} <ArrowRight size={18} /></>}</button> : <button className="button button--primary button--large" type="button" onClick={submit} disabled={isPending}>{isPending ? <><LoaderCircle className="spin" size={18} /> Публикуем…</> : <><Search size={18} /> Найти мастера</>}</button>}
+          {step === 1 ? <button className="button button--primary button--large" type="button" onClick={saveDetailsAndReview} disabled={isPending || isUploading}>{isPending ? <><LoaderCircle className="spin" size={18} /> Сохраняем…</> : <>Проверить заказ <ArrowRight size={18} /></>}</button> : <button className="button button--primary button--large" type="button" onClick={submit} disabled={isPending}>{isPending ? <><LoaderCircle className="spin" size={18} /> Запускаем поиск…</> : <><Search size={18} /> Найти мастера</>}</button>}
         </div>
       </footer>
     </div>

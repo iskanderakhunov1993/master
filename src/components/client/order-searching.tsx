@@ -9,18 +9,18 @@ import { cancelClientOrderAction, refreshOrderSearchAction } from "@/lib/orders/
 import { formatOrderCategory, formatRubles, formatSchedule, ORDER_STATUS_LABEL } from "@/lib/orders/presentation";
 import type { OrderSummary } from "@/lib/orders/types";
 
-export function OrderSearching({ order, matchedMasters = 0 }: { order: OrderSummary; matchedMasters?: number }) {
+export function OrderSearching({ order }: { order: OrderSummary }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isOffline, setIsOffline] = useState(false);
   const [error, setError] = useState("");
-  const [urgentWithoutResponse, setUrgentWithoutResponse] = useState(false);
+  const [searchTimedOut, setSearchTimedOut] = useState(false);
   const hasOffers = order.status === "OFFERS_RECEIVED";
 
   useEffect(() => {
     const updateConnection = () => setIsOffline(!navigator.onLine);
-    const updateSearchAge = () => setUrgentWithoutResponse(
-      order.orderType === "URGENT" && !hasOffers && Boolean(order.submittedAt && Date.now() - order.submittedAt > 2 * 60_000),
+    const updateSearchAge = () => setSearchTimedOut(
+      !hasOffers && Boolean(order.submittedAt && Date.now() - order.submittedAt >= 2 * 60_000),
     );
     updateConnection();
     updateSearchAge();
@@ -28,7 +28,7 @@ export function OrderSearching({ order, matchedMasters = 0 }: { order: OrderSumm
     window.addEventListener("offline", updateConnection);
     const interval = window.setInterval(() => { updateSearchAge(); if (navigator.onLine) router.refresh(); }, 10_000);
     return () => { window.removeEventListener("online", updateConnection); window.removeEventListener("offline", updateConnection); window.clearInterval(interval); };
-  }, [hasOffers, order.orderType, order.submittedAt, router]);
+  }, [hasOffers, order.submittedAt, router]);
 
   function retry() {
     setError("");
@@ -52,11 +52,9 @@ export function OrderSearching({ order, matchedMasters = 0 }: { order: OrderSumm
 
   const title = hasOffers
     ? ORDER_STATUS_LABEL[order.status]
-    : matchedMasters === 0
-      ? "Сейчас нет доступных мастеров"
-      : urgentWithoutResponse
-        ? "Пока нет откликов на срочный заказ"
-        : "Ищем подходящих мастеров";
+    : searchTimedOut
+      ? "Мастера пока не нашлись"
+      : "Мы ищем мастера";
   return (
     <div className="order-search-page">
       <Link className="order-search-page__back" href="/client"><ArrowLeft size={17} /> На главную</Link>
@@ -64,8 +62,8 @@ export function OrderSearching({ order, matchedMasters = 0 }: { order: OrderSumm
         <div className="search-animation" aria-hidden="true"><span /><span /><span /><Search size={29} /></div>
         <span className="order-status-badge">{ORDER_STATUS_LABEL[order.status]}</span>
         <h1>{title}</h1>
-        <p>{hasOffers ? "Мастера уже начали откликаться. Здесь появятся до трёх актуальных предложений." : matchedMasters === 0 ? "Мы продолжим проверять новых мастеров. Можно закрыть страницу — заказ и поиск сохранятся." : urgentWithoutResponse ? "Заказ остаётся активным. Обновите поиск или измените условия позднее из кабинета." : "Подходящие мастера получили заказ. Можно закрыть страницу — статус сохранится в кабинете."}</p>
-        <div className="order-search-actions"><button className="button button--secondary" type="button" onClick={retry} disabled={isPending || isOffline}>{isPending ? <LoaderCircle className="spin" /> : <RefreshCw />} Обновить поиск</button><button className="button button--ghost is-danger" type="button" onClick={cancel} disabled={isPending}><X /> Отменить заказ</button></div>
+        <p>{hasOffers ? "Мастера уже начали откликаться. Здесь появятся до трёх актуальных предложений." : searchTimedOut ? "Простите, мастеров не обнаружили за две минуты. Обновите поиск или отмените заказ." : "Подождите немного: подходящие мастера получили заказ. Можно закрыть страницу — поиск сохранится в кабинете."}</p>
+        <div className="order-search-actions">{searchTimedOut && <button className="button button--secondary" type="button" onClick={retry} disabled={isPending || isOffline}>{isPending ? <LoaderCircle className="spin" /> : <RefreshCw />} Обновить поиск</button>}<button className="button button--ghost is-danger" type="button" onClick={cancel} disabled={isPending}><X /> Отменить заказ</button></div>
       </section>
       {isOffline && <div className="master-alert master-alert--error" role="status"><WifiOff /><div><strong>Нет соединения</strong><p>Поиск продолжается на сервере. Данные обновятся после восстановления сети.</p></div></div>}
       {error && <div className="master-alert master-alert--error" role="alert"><AlertCircle /> {error}</div>}
