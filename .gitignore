@@ -12,3 +12,4 @@ tsconfig.tsbuildinfo
 
 /src/generated/prisma
 prisma/migrations/
+.vercel
