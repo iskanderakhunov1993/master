@@ -3,7 +3,14 @@
 import { hash, compare } from "bcryptjs";
 import { redirect } from "next/navigation";
 
-import { createUser, findUserByEmail } from "./repository";
+import { usesPostgresRuntime } from "@/lib/db/runtime";
+
+import {
+  createPostgresUser,
+  createUser,
+  findPostgresUserByEmail,
+  findUserByEmail,
+} from "./repository";
 import { createSession, destroySession, getRoleHome } from "./session";
 import type { AuthActionState } from "./types";
 import { loginSchema, registerSchema } from "./validation";
@@ -25,7 +32,9 @@ export async function loginAction(
     return { status: "error", message: firstError(result.error.issues) };
   }
 
-  const user = findUserByEmail(result.data.email);
+  const user = usesPostgresRuntime()
+    ? await findPostgresUserByEmail(result.data.email)
+    : findUserByEmail(result.data.email);
   const passwordMatches = user
     ? await compare(result.data.password, user.passwordHash)
     : false;
@@ -57,7 +66,10 @@ export async function registerAction(
     return { status: "error", message: firstError(result.error.issues) };
   }
 
-  if (findUserByEmail(result.data.email)) {
+  const existingUser = usesPostgresRuntime()
+    ? await findPostgresUserByEmail(result.data.email)
+    : findUserByEmail(result.data.email);
+  if (existingUser) {
     return {
       status: "error",
       message: "Пользователь с таким email уже зарегистрирован",
@@ -67,12 +79,15 @@ export async function registerAction(
   const passwordHash = await hash(result.data.password, 12);
 
   try {
-    const user = createUser({
+    const input = {
       name: result.data.name,
       email: result.data.email,
       passwordHash,
       role: result.data.role,
-    });
+    };
+    const user = usesPostgresRuntime()
+      ? await createPostgresUser(input)
+      : createUser(input);
 
     await createSession(user.id);
     redirect(getRoleHome(user.role));

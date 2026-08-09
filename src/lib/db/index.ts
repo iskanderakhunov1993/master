@@ -6,7 +6,7 @@
  * logging, and performance monitoring.
  */
 
-export { prisma } from "./prisma";
+export { getPrisma } from "./prisma";
 
 // Re-export Prisma types
 export type {

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { getDb } from "@/lib/db";
+import { getPrisma } from "@/lib/db/prisma";
 
 import type { Role, SessionUser } from "./types";
 
@@ -8,6 +9,81 @@ export type UserWithPassword = SessionUser & {
   passwordHash: string;
   isBlocked: boolean;
 };
+
+export async function findPostgresUserByEmail(email: string): Promise<UserWithPassword | undefined> {
+  const user = await getPrisma().user.findUnique({ where: { email } });
+
+  return user
+    ? {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role as Role,
+        passwordHash: user.passwordHash,
+        isBlocked: user.blocked,
+      }
+    : undefined;
+}
+
+export async function findPostgresSessionUser(tokenHash: string, now: number) {
+  const session = await getPrisma().session.findFirst({
+    where: {
+      tokenHash,
+      expiresAt: { gt: new Date(now) },
+      user: { blocked: false },
+    },
+    select: {
+      user: { select: { id: true, name: true, email: true, role: true } },
+    },
+  });
+
+  return session
+    ? { ...session.user, role: session.user.role as Role }
+    : undefined;
+}
+
+export async function createPostgresUser(input: {
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: Exclude<Role, "ADMIN">;
+}) {
+  const user = await getPrisma().user.create({
+    data: {
+      id: randomUUID(),
+      name: input.name,
+      email: input.email,
+      passwordHash: input.passwordHash,
+      role: input.role,
+    },
+  });
+
+  return { id: user.id, name: user.name, email: user.email, role: user.role as Role };
+}
+
+export async function createPostgresSessionRecord(input: {
+  userId: string;
+  tokenHash: string;
+  expiresAt: number;
+}) {
+  const now = new Date();
+  const prisma = getPrisma();
+  await prisma.$transaction([
+    prisma.session.deleteMany({ where: { expiresAt: { lte: now } } }),
+    prisma.session.create({
+      data: {
+        id: randomUUID(),
+        userId: input.userId,
+        tokenHash: input.tokenHash,
+        expiresAt: new Date(input.expiresAt),
+      },
+    }),
+  ]);
+}
+
+export async function deletePostgresSessionRecord(tokenHash: string) {
+  await getPrisma().session.deleteMany({ where: { tokenHash } });
+}
 
 export function findUserByEmail(email: string): UserWithPassword | undefined {
   const row = getDb()

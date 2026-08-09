@@ -4,7 +4,15 @@ import { createHash, randomBytes } from "node:crypto";
 
 import { cookies } from "next/headers";
 
-import { createSessionRecord, deleteSessionRecord, findSessionUser } from "./repository";
+import {
+  createPostgresSessionRecord,
+  createSessionRecord,
+  deletePostgresSessionRecord,
+  deleteSessionRecord,
+  findPostgresSessionUser,
+  findSessionUser,
+} from "./repository";
+import { usesPostgresRuntime } from "@/lib/db/runtime";
 import { ROLE_HOME, type Role } from "./types";
 
 const SESSION_COOKIE = "master_ryadom_session";
@@ -31,11 +39,16 @@ export async function createSession(userId: string) {
   const token = randomBytes(32).toString("base64url");
   const expiresAt = Date.now() + getSessionTtlMilliseconds();
 
-  createSessionRecord({
+  const input = {
     userId,
     tokenHash: hashToken(token),
     expiresAt,
-  });
+  };
+  if (usesPostgresRuntime()) {
+    await createPostgresSessionRecord(input);
+  } else {
+    createSessionRecord(input);
+  }
 
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {
@@ -55,7 +68,10 @@ export async function getSession() {
     return null;
   }
 
-  return findSessionUser(hashToken(token), Date.now()) ?? null;
+  const user = usesPostgresRuntime()
+    ? await findPostgresSessionUser(hashToken(token), Date.now())
+    : findSessionUser(hashToken(token), Date.now());
+  return user ?? null;
 }
 
 export async function destroySession() {
@@ -63,7 +79,11 @@ export async function destroySession() {
   const token = cookieStore.get(SESSION_COOKIE)?.value;
 
   if (token) {
-    deleteSessionRecord(hashToken(token));
+    if (usesPostgresRuntime()) {
+      await deletePostgresSessionRecord(hashToken(token));
+    } else {
+      deleteSessionRecord(hashToken(token));
+    }
   }
 
   cookieStore.delete(SESSION_COOKIE);

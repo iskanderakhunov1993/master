@@ -9,8 +9,8 @@
 - Next.js 16, App Router и Server Actions;
 - React 19;
 - TypeScript 5 в strict mode;
-- `better-sqlite3` как текущий runtime MVP;
-- Prisma ORM и PostgreSQL как подготовленный, но ещё не завершённый production cutover;
+- Neon PostgreSQL и Prisma для production-авторизации и сессий;
+- `better-sqlite3` для оставшихся marketplace-репозиториев и локального детерминированного тестового контура;
 - Zod для входной валидации;
 - bcryptjs для хеширования паролей;
 - Lucide React для иконок;
@@ -22,7 +22,7 @@ AI, платное ранжирование и покупка лидов не и
 
 - Node.js 22 LTS или новее;
 - npm 10 или новее;
-- PostgreSQL 14+ нужен только для проверки подготовленной Prisma-схемы и будущей миграции;
+- PostgreSQL 14+ нужен для production-авторизации; Neon подключён к Vercel production/preview;
 
 ## Быстрый старт текущего MVP
 
@@ -34,7 +34,7 @@ npm run dev
 
 После запуска приложение доступно по адресу [http://localhost:3000](http://localhost:3000).
 
-SQLite-файл создаётся в `.data/` и не коммитится. Для проверки подготовленного PostgreSQL-контура используйте [POSTGRESQL_SETUP.md](./POSTGRESQL_SETUP.md), но он пока не заменяет активный runtime.
+SQLite-файл создаётся в `.data/` и не коммитится. В production регистрация, вход и сессии работают через Neon PostgreSQL; заказы и остальные доменные репозитории ещё проходят поэтапный cutover и пока используют SQLite. Постоянный dual-write не используется.
 
 ## Переменные окружения
 
@@ -64,7 +64,7 @@ SQLite-файл создаётся в `.data/` и не коммитится. Д�
 
 ## База данных и миграции
 
-Активные repositories используют SQLite через `better-sqlite3`. Prisma-схема и PostgreSQL-инструменты находятся в переходном состоянии и не покрывают весь runtime-контракт. Постоянный dual-write запрещён.
+Регистрация, вход и server-side сессии в Vercel используют Neon PostgreSQL через Prisma. Остальные repositories пока используют SQLite через `better-sqlite3`; полная canonical PostgreSQL-схема и перенос доменных контрактов остаются отдельным этапом. Постоянный dual-write запрещён.
 
 ### Проверка подготовленной PostgreSQL-схемы
 
@@ -149,7 +149,7 @@ npm run lint && npm run typecheck && npm test && npm run build
 ## Границы текущего MVP
 
 - SQLite и хранение изображений в текущем MVP подходят только для локальной разработки и одного экземпляра приложения;
-- Prisma/PostgreSQL подготовлены частично, но ещё не являются canonical runtime;
+- Neon/PostgreSQL уже являются persistent storage для production-авторизации и сессий, но ещё не canonical runtime для заказов и marketplace;
 - обновления заказов используют polling fallback, отдельный realtime transport не подключён;
 - верификация мастеров выполняется администратором вручную;
 - приблизительное расстояние рассчитывается детерминированно без геокодинга и маршрутизации;
