@@ -1,7 +1,9 @@
 import { getDb } from "@/lib/db";
 
+import { listOrderChangeRequests, type OrderChangeRequest } from "./change-requests";
 import { specialistLabel } from "../marketplace/ranking";
 import type { OrderStatus, OrderSummary, OrderType, ScheduleKind } from "./types";
+import { listOrderWorkMedia, type WorkPhoto } from "./work-media";
 
 export type OrderHistoryEntry = {
   id: string;
@@ -59,6 +61,8 @@ export type OrderDetails = {
   };
   history: OrderHistoryEntry[];
   reviews: OrderReviewDetails[];
+  changeRequests: OrderChangeRequest[];
+  workPhotos: WorkPhoto[];
 };
 
 type DetailsRow = {
@@ -226,6 +230,8 @@ function loadDetails(row: DetailsRow): OrderDetails {
           createdAt: row.updatedAt,
         }],
     reviews,
+    changeRequests: listOrderChangeRequests(row.id),
+    workPhotos: listOrderWorkMedia(row.id),
   };
 }
 

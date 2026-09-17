@@ -4,8 +4,10 @@ import {
   AlertCircle,
   ArrowLeft,
   BadgeCheck,
+  Camera,
   CheckCircle2,
   Clock3,
+  ImagePlus,
   LoaderCircle,
   Mail,
   Map,
@@ -22,18 +24,22 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState, useTransition } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState, useTransition } from "react";
 
 import {
   advanceMasterOrderAction,
   cancelClientOrderAction,
+  proposeChangeOrderAction,
+  respondToChangeOrderAction,
   respondToCompletionAction,
   submitClientReviewAction,
   submitMasterReviewAction,
 } from "@/lib/orders/actions";
 import type { OrderDetails } from "@/lib/orders/details";
+import { ALLOWED_ORDER_PHOTO_TYPES, validateOrderPhoto } from "@/lib/orders/media";
 import { formatRubles, formatSchedule, ORDER_STATUS_LABEL } from "@/lib/orders/presentation";
 import type { OrderStatus } from "@/lib/orders/types";
+import type { WorkMediaStage, WorkPhoto } from "@/lib/orders/work-media";
 
 const activeStatuses: OrderStatus[] = [
   "MASTER_SELECTED",
@@ -85,6 +91,14 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
     ? clientStatusCopy[details.status]
     : { title: ORDER_STATUS_LABEL[details.status], text: "Следующий этап доступен после выполнения текущего действия." };
   const masterAction = masterNextAction[details.status];
+  const beforePhotos = details.workPhotos.filter((photo) => photo.stage === "BEFORE");
+  const afterPhotos = details.workPhotos.filter((photo) => photo.stage === "AFTER");
+  const pendingChangeRequest = details.changeRequests.find((request) => request.status === "PENDING");
+  const missingBeforePhoto = details.status === "MASTER_ARRIVED" && beforePhotos.length === 0;
+  const missingAfterPhoto = details.status === "IN_PROGRESS" && afterPhotos.length === 0;
+  const masterActionBlocked = audience === "MASTER"
+    && ((masterAction?.status === "IN_PROGRESS" && missingBeforePhoto)
+      || (masterAction?.status === "COMPLETED_BY_MASTER" && (missingAfterPhoto || Boolean(pendingChangeRequest))));
   const journeyIndex = orderJourney.findIndex((entry) => entry.status === details.status);
   const isJourneyStatus = journeyIndex >= 0;
   const nextJourneyStep = isJourneyStatus ? orderJourney[journeyIndex + 1] : null;
@@ -128,8 +142,7 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
   }
 
   function cancelOrder() {
-    const actor = audience === "CLIENT" ? "клиентом" : "мастером";
-    if (!window.confirm(`Отменить заказ ${actor}? Это действие будет сохранено в истории.`)) return;
+    if (!window.confirm("Отменить заказ? Восстановить его нельзя — потребуется создать новый. Отмена останется в истории.")) return;
     setError("");
     startTransition(async () => {
       const result = audience === "CLIENT"
@@ -152,7 +165,10 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
       ) : <section className="order-lifecycle-hero">
         <span><CheckCircle2 size={25} /></span><small>{audience === "CLIENT" ? "Активный заказ" : "Заказ клиента"}</small><h1>{statusCopy?.title ?? ORDER_STATUS_LABEL[details.status]}</h1><p>{statusCopy?.text}</p>
         <div className="order-next-step"><small>Что дальше</small><strong>{nextStepText}</strong></div>
-        {audience === "MASTER" && masterAction && <button className="button button--primary button--large" type="button" onClick={advance} disabled={isPending}>{isPending ? <><LoaderCircle className="spin" size={18} /> Обновляем…</> : masterAction.label}</button>}
+        {audience === "MASTER" && masterAction && <button className="button button--primary button--large" type="button" onClick={advance} disabled={isPending || masterActionBlocked}>{isPending ? <><LoaderCircle className="spin" size={18} /> Обновляем…</> : masterAction.label}</button>}
+        {audience === "MASTER" && missingBeforePhoto && <p className="order-gate-hint"><Camera size={15} /> Добавьте фото «до», чтобы начать работу</p>}
+        {audience === "MASTER" && missingAfterPhoto && <p className="order-gate-hint"><Camera size={15} /> Добавьте фото «после», чтобы завершить работу</p>}
+        {audience === "MASTER" && masterAction?.status === "COMPLETED_BY_MASTER" && pendingChangeRequest && <p className="order-gate-hint"><WalletCards size={15} /> Сначала дождитесь ответа клиента на изменение цены</p>}
         {audience === "CLIENT" && details.status === "COMPLETED_BY_MASTER" && <div className="order-completion-actions"><button className="button button--primary" type="button" onClick={() => respond(true)} disabled={isPending}>Да, всё выполнено</button><button className="button button--secondary" type="button" onClick={() => respond(false)} disabled={isPending}>Есть проблема</button></div>}
         {(canClientCancel || canMasterCancel) && <button className="button button--ghost is-danger" type="button" onClick={cancelOrder} disabled={isPending}><XCircle size={17} /> Отменить заказ</button>}
         {error && <p className="task-form-error" role="alert"><AlertCircle size={16} /> {error}</p>}
@@ -177,6 +193,19 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
       <div className="order-lifecycle-grid">
         <main>
           <section className="order-detail-card"><header><div><small>Задача</small><h2>{details.categoryName}{details.subcategoryName ? ` · ${details.subcategoryName}` : ""}</h2></div><strong>{formatRubles(details.agreedPriceRubles)}</strong></header><p>{details.description}</p>{details.photos.length > 0 && <div className="order-detail-photos">{details.photos.map((photo) => <Image key={photo.id} src={photo.url} alt={photo.fileName} width={150} height={110} unoptimized />)}</div>}</section>
+          {(pendingChangeRequest || (audience === "MASTER" && ["MASTER_ARRIVED", "IN_PROGRESS"].includes(details.status))) && (
+            <ChangeOrderCard orderId={details.id} audience={audience} pendingRequest={pendingChangeRequest} onDone={() => router.refresh()} />
+          )}
+          {(beforePhotos.length > 0 || afterPhotos.length > 0 || (audience === "MASTER" && (details.status === "MASTER_ARRIVED" || details.status === "IN_PROGRESS"))) && (
+            <WorkEvidenceCard
+              orderId={details.id}
+              audience={audience}
+              status={details.status}
+              beforePhotos={beforePhotos}
+              afterPhotos={afterPhotos}
+              onUploaded={() => router.refresh()}
+            />
+          )}
           <section className="order-detail-card"><header><div><small>История статусов</small><h2>Как менялся заказ</h2></div></header><ol className="order-timeline">{details.history.map((entry) => <li key={entry.id}><span /><div><strong>{ORDER_STATUS_LABEL[entry.toStatus]}</strong><p>{new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(entry.createdAt)}{entry.actorName ? ` · ${entry.actorName}` : ""}</p>{entry.reason && <small>{entry.reason}</small>}</div></li>)}</ol></section>
           {audience === "CLIENT" && details.status === "COMPLETED" && !details.reviews.some((review) => review.reviewerRole === "CLIENT") && <ClientReviewForm orderId={details.id} />}
           {audience === "MASTER" && ["COMPLETED", "REVIEWED"].includes(details.status) && !details.reviews.some((review) => review.reviewerRole === "MASTER") && <MasterReviewForm orderId={details.id} clientName={details.client.name} />}
@@ -262,4 +291,172 @@ function MasterReviewForm({ orderId, clientName }: { orderId: string; clientName
   const [rating, setRating] = useState(5); const [comment, setComment] = useState(""); const [error, setError] = useState(""); const [saving, setSaving] = useState(false);
   async function submit(event: FormEvent) { event.preventDefault(); setSaving(true); const result = await submitMasterReviewAction({ orderId, overallRating: rating, comment }); if (!result.ok) setError(result.message ?? "Не удалось отправить отзыв"); else router.refresh(); setSaving(false); }
   return <form className="order-detail-card order-review-form" onSubmit={submit}><header><div><small>Отзыв о клиенте</small><h2>Как прошла работа с {clientName.split(" ")[0]}?</h2></div></header><RatingButtons label="Общая оценка" value={rating} onChange={setRating} /><label>Комментарий <small>необязательно</small><textarea value={comment} onChange={(event) => setComment(event.target.value)} maxLength={1000} rows={3} /></label>{error && <p className="task-form-error"><AlertCircle size={16} /> {error}</p>}<button className="button button--primary" type="submit" disabled={saving}>Оставить отзыв</button></form>;
+}
+
+function ChangeOrderCard({
+  orderId,
+  audience,
+  pendingRequest,
+  onDone,
+}: {
+  orderId: string;
+  audience: "CLIENT" | "MASTER";
+  pendingRequest?: OrderDetails["changeRequests"][number];
+  onDone: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [price, setPrice] = useState("");
+  const [reason, setReason] = useState("");
+  const [error, setError] = useState("");
+
+  function propose(event: FormEvent) {
+    event.preventDefault();
+    setError("");
+    startTransition(async () => {
+      const result = await proposeChangeOrderAction({ orderId, proposedPriceRubles: Number(price), reason });
+      if (!result.ok) { setError(result.message ?? "Не удалось отправить запрос"); return; }
+      setIsFormOpen(false);
+      setPrice("");
+      setReason("");
+      onDone();
+    });
+  }
+
+  function respond(accept: boolean) {
+    if (!pendingRequest) return;
+    setError("");
+    startTransition(async () => {
+      const result = await respondToChangeOrderAction({ orderId, requestId: pendingRequest.id, accept });
+      if (!result.ok) setError(result.message ?? "Не удалось обработать ответ");
+      else onDone();
+    });
+  }
+
+  if (pendingRequest) {
+    const diff = pendingRequest.proposedPriceRubles - pendingRequest.previousPriceRubles;
+    return (
+      <section className="order-detail-card order-change-card">
+        <header><div><small>Изменение цены</small><h2>{audience === "CLIENT" ? "Мастер предлагает новую цену" : "Ждём ответа клиента"}</h2></div></header>
+        <div className="order-change-amounts">
+          <div><small>Было</small><strong>{formatRubles(pendingRequest.previousPriceRubles)}</strong></div>
+          <ArrowLeft size={16} className="order-change-arrow" aria-hidden="true" />
+          <div><small>Станет</small><strong>{formatRubles(pendingRequest.proposedPriceRubles)}</strong></div>
+          <span className={`order-change-diff ${diff > 0 ? "is-up" : "is-down"}`}>{diff > 0 ? "+" : ""}{formatRubles(diff)}</span>
+        </div>
+        <p className="order-change-reason"><strong>Причина:</strong> {pendingRequest.reason}</p>
+        {audience === "CLIENT" ? (
+          <div className="order-completion-actions">
+            <button className="button button--primary" type="button" onClick={() => respond(true)} disabled={isPending}>Принять новую цену</button>
+            <button className="button button--secondary" type="button" onClick={() => respond(false)} disabled={isPending}>Отклонить</button>
+          </div>
+        ) : (
+          <p className="field-hint">Работу нельзя завершить, пока клиент не ответит на этот запрос.</p>
+        )}
+        {error && <p className="task-form-error" role="alert"><AlertCircle size={16} /> {error}</p>}
+      </section>
+    );
+  }
+
+  return (
+    <section className="order-detail-card order-change-card">
+      <header><div><small>Изменение цены</small><h2>Нужна другая сумма?</h2></div>{!isFormOpen && <button className="button button--secondary" type="button" onClick={() => setIsFormOpen(true)}>Изменить стоимость</button>}</header>
+      {isFormOpen && (
+        <form onSubmit={propose} className="order-change-form">
+          <label>Новая итоговая цена, ₽<input type="number" inputMode="numeric" min="500" max="1000000" step="100" value={price} onChange={(event) => setPrice(event.target.value)} placeholder="3 500" required /></label>
+          <label>Причина для клиента<textarea value={reason} onChange={(event) => setReason(event.target.value)} maxLength={500} rows={3} placeholder="Например: нужен демонтаж старой плитки" required /></label>
+          {error && <p className="task-form-error" role="alert"><AlertCircle size={16} /> {error}</p>}
+          <div className="order-completion-actions">
+            <button className="button button--primary" type="submit" disabled={isPending}>{isPending ? <><LoaderCircle className="spin" size={17} /> Отправляем…</> : "Отправить клиенту"}</button>
+            <button className="button button--secondary" type="button" onClick={() => setIsFormOpen(false)} disabled={isPending}>Отмена</button>
+          </div>
+        </form>
+      )}
+    </section>
+  );
+}
+
+function WorkEvidenceCard({
+  orderId,
+  audience,
+  status,
+  beforePhotos,
+  afterPhotos,
+  onUploaded,
+}: {
+  orderId: string;
+  audience: "CLIENT" | "MASTER";
+  status: OrderStatus;
+  beforePhotos: WorkPhoto[];
+  afterPhotos: WorkPhoto[];
+  onUploaded: () => void;
+}) {
+  const [isUploading, setIsUploading] = useState<WorkMediaStage | null>(null);
+  const [error, setError] = useState("");
+  const canUploadBefore = audience === "MASTER" && status === "MASTER_ARRIVED";
+  const canUploadAfter = audience === "MASTER" && status === "IN_PROGRESS";
+
+  async function upload(stage: WorkMediaStage, event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    const validationError = validateOrderPhoto({ mimeType: file.type, byteSize: file.size });
+    if (validationError) { setError(validationError.message); return; }
+    setError("");
+    setIsUploading(stage);
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      const response = await fetch(`/api/master/orders/${orderId}/work-media?stage=${stage}`, { method: "POST", body: formData });
+      const payload = await response.json() as { message?: string };
+      if (!response.ok) throw new Error(payload.message ?? "Не удалось загрузить фотографию");
+      onUploaded();
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "Не удалось загрузить фотографию");
+    } finally {
+      setIsUploading(null);
+    }
+  }
+
+  return (
+    <section className="order-detail-card">
+      <header><div><small>Доказательство работы</small><h2>Фото до и после</h2></div></header>
+      <div className="work-evidence-grid">
+        <WorkEvidenceStage stage="BEFORE" label="До" photos={beforePhotos} canUpload={canUploadBefore} isUploading={isUploading} onUpload={upload} />
+        <WorkEvidenceStage stage="AFTER" label="После" photos={afterPhotos} canUpload={canUploadAfter} isUploading={isUploading} onUpload={upload} />
+      </div>
+      {error && <p className="task-form-error" role="alert"><AlertCircle size={16} /> {error}</p>}
+    </section>
+  );
+}
+
+function WorkEvidenceStage({
+  stage,
+  label,
+  photos,
+  canUpload,
+  isUploading,
+  onUpload,
+}: {
+  stage: WorkMediaStage;
+  label: string;
+  photos: WorkPhoto[];
+  canUpload: boolean;
+  isUploading: WorkMediaStage | null;
+  onUpload: (stage: WorkMediaStage, event: ChangeEvent<HTMLInputElement>) => void;
+}) {
+  if (photos.length === 0 && !canUpload) return null;
+  return (
+    <div className="work-evidence-stage">
+      <small>{label}</small>
+      {photos.length > 0 && <div className="order-detail-photos">{photos.map((photo) => <Image key={photo.id} src={photo.url} alt={`Фото «${label.toLowerCase()}»`} width={150} height={110} unoptimized />)}</div>}
+      {canUpload && photos.length < 5 && (
+        <label className="work-evidence-add">
+          <input type="file" accept={ALLOWED_ORDER_PHOTO_TYPES.join(",")} onChange={(event) => onUpload(stage, event)} disabled={isUploading !== null} />
+          {isUploading === stage ? <LoaderCircle className="spin" size={16} /> : <ImagePlus size={16} />}
+          {photos.length === 0 ? "Добавить обязательное фото" : "Добавить ещё"}
+        </label>
+      )}
+    </div>
+  );
 }

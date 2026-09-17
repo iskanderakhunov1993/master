@@ -412,6 +412,50 @@ function migrate(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS order_status_history_order_idx
       ON order_status_history(order_id, created_at, id);
 
+    -- Change order: a master-proposed new total price the client must accept
+    -- before it takes effect. The old price stays in force until then.
+    CREATE TABLE IF NOT EXISTS order_change_requests (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      requested_by_master_id TEXT NOT NULL,
+      previous_price_minor INTEGER NOT NULL,
+      proposed_price_minor INTEGER NOT NULL,
+      reason TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'PENDING'
+        CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED')),
+      created_at INTEGER NOT NULL,
+      responded_at INTEGER,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (requested_by_master_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS order_change_requests_one_pending
+      ON order_change_requests(order_id)
+      WHERE status = 'PENDING';
+
+    CREATE INDEX IF NOT EXISTS order_change_requests_order_idx
+      ON order_change_requests(order_id, created_at);
+
+    -- Work evidence: master-submitted proof photos, separate from the
+    -- client's intake photos in order_media. Never deletable once uploaded —
+    -- they are evidence, not draft attachments.
+    CREATE TABLE IF NOT EXISTS order_work_media (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      master_id TEXT NOT NULL,
+      stage TEXT NOT NULL CHECK (stage IN ('BEFORE', 'AFTER')),
+      file_name TEXT NOT NULL,
+      mime_type TEXT NOT NULL,
+      byte_size INTEGER NOT NULL,
+      content BLOB NOT NULL,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (master_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS order_work_media_order_idx
+      ON order_work_media(order_id, stage, created_at);
+
     CREATE TABLE IF NOT EXISTS order_reviews (
       id TEXT PRIMARY KEY,
       order_id TEXT NOT NULL,

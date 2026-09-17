@@ -176,6 +176,27 @@ export function transitionOrderInTransaction(
     throw new Error("ORDER_TRANSITION_NOT_ALLOWED");
   }
 
+  // Work is proven, not just declared: no "before" photo, no starting the
+  // job; no "after" photo, no marking it done. Enforced here, not just in
+  // the UI, so the guarantee holds regardless of which client calls this.
+  if (order.status === "MASTER_ARRIVED" && input.toStatus === "IN_PROGRESS") {
+    const hasBeforePhoto = database
+      .prepare("SELECT 1 FROM order_work_media WHERE order_id = ? AND stage = 'BEFORE' LIMIT 1")
+      .get(order.id);
+    if (!hasBeforePhoto) throw new Error("BEFORE_PHOTO_REQUIRED");
+  }
+  if (order.status === "IN_PROGRESS" && input.toStatus === "COMPLETED_BY_MASTER") {
+    const hasAfterPhoto = database
+      .prepare("SELECT 1 FROM order_work_media WHERE order_id = ? AND stage = 'AFTER' LIMIT 1")
+      .get(order.id);
+    if (!hasAfterPhoto) throw new Error("AFTER_PHOTO_REQUIRED");
+
+    const hasPendingChange = database
+      .prepare("SELECT 1 FROM order_change_requests WHERE order_id = ? AND status = 'PENDING'")
+      .get(order.id);
+    if (hasPendingChange) throw new Error("CHANGE_REQUEST_PENDING");
+  }
+
   const updated = database
     .prepare(
       `UPDATE orders
@@ -228,6 +249,15 @@ export function transitionOrderInTransaction(
         now,
         now,
       );
+  }
+
+  if (["CANCELLED_BY_CLIENT", "CANCELLED_BY_MASTER", "DISPUTED"].includes(input.toStatus)) {
+    database
+      .prepare(
+        `UPDATE order_change_requests SET status = 'CANCELLED', responded_at = ?
+        WHERE order_id = ? AND status = 'PENDING'`,
+      )
+      .run(now, order.id);
   }
 
   let nextSubscriptionOrderId: string | null = null;
