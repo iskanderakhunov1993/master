@@ -28,7 +28,7 @@ export function DashboardRouteError({
       <AsyncState
         icon={AlertTriangle}
         title="Временная ошибка"
-        description="Сервис не ответил. Уже выполненные действия не будут отправлены повторно автоматически."
+        description="Сервис не ответил. Повторите запрос — начатые действия не отправятся дважды."
         action={<button className="button button--primary" type="button" onClick={reset}><RotateCcw /> Повторить</button>}
       />
     </div>

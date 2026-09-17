@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
 
-import { SectionPage } from "@/components/dashboard/section-page";
 import { MasterDashboard } from "@/components/master/master-dashboard";
 import { MasterOnboarding } from "@/components/master/master-onboarding";
 import { MasterOrdersFeed } from "@/components/master/master-orders-feed";
@@ -14,15 +13,6 @@ import { listMatchedOrdersForMaster } from "@/lib/marketplace/matching";
 import { expireOffers } from "@/lib/marketplace/offers";
 import { getMasterOrderDetails, listMasterOrders } from "@/lib/orders/details";
 import { getMasterDashboardData, getMasterProfileData } from "@/lib/masters/repository";
-
-const sections: Record<string, { title: string; description: string }> = {
-  "new-orders": { title: "Новые заказы", description: "Подходящие задачи по вашим категориям и рабочим районам." },
-  orders: { title: "Мои заказы", description: "Принятые заказы и текущие этапы выполнения работ." },
-  calendar: { title: "Календарь", description: "Запланированные выезды и доступные рабочие интервалы." },
-  history: { title: "История", description: "Архив завершённых и отменённых заказов." },
-  reviews: { title: "Отзывы", description: "Оценки клиентов и показатели вашей репутации." },
-  settings: { title: "Настройки", description: "Уведомления, Online-статус и безопасность аккаунта." },
-};
 
 export default async function MasterPage({
   params,
@@ -62,7 +52,5 @@ export default async function MasterPage({
     if (!details) notFound();
     return <OrderLifecycleDetails details={details} audience="MASTER" />;
   }
-  if (slug.length !== 1 || !sections[slug[0]]) notFound();
-  const section = sections[slug[0]];
-  return <SectionPage eyebrow="Кабинет мастера" title={section.title} description={section.description} homeHref="/master" />;
+  notFound();
 }

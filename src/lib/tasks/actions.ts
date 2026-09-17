@@ -83,7 +83,7 @@ export async function moveTaskAction(input: {
     status: statusSchema,
     expectedUpdatedAt: z.number().int().positive(),
   }).safeParse(input);
-  if (!parsed.success) return { ok: false, message: "Недоступное перемещение" };
+  if (!parsed.success) return { ok: false, message: "Не удалось перенести задачу. Обновите страницу и попробуйте снова" };
   try {
     const task = moveClientTask(
       client.id,

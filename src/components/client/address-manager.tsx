@@ -81,7 +81,7 @@ export function AddressManager({ addresses }: { addresses: ClientAddress[] }) {
   }
 
   function removeAddress(address: ClientAddress) {
-    if (!window.confirm(`Удалить адрес «${address.street}, ${address.house}»?`)) return;
+    if (!window.confirm(`Удалить адрес «${address.street}, ${address.house}»? Он пропадёт из списка сохранённых. Заказы, где он уже указан, не изменятся.`)) return;
     setError("");
     startTransition(async () => {
       const result = await deleteAddressAction(address.id);

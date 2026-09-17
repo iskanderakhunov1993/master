@@ -58,7 +58,7 @@ function mapError(error: unknown): MasterActionResult {
   const messages: Record<string, string> = {
     MASTER_PROFILE_NOT_FOUND: "Профиль мастера не найден",
     SELECTION_REQUIRED: "Выберите хотя бы один вариант",
-    SELECTION_INVALID: "Один из выбранных вариантов больше недоступен",
+    SELECTION_INVALID: "Один из выбранных вариантов больше недоступен. Обновите страницу и выберите заново",
     VERIFICATION_PENDING: "Заявка уже находится на проверке",
     VERIFICATION_ALREADY_APPROVED: "Личность уже подтверждена",
     IDENTITY_DOCUMENT_REQUIRED: "Добавьте фотографию документа",
@@ -69,7 +69,7 @@ function mapError(error: unknown): MasterActionResult {
     AREAS_REQUIRED: "Выберите районы работы",
     EXPERIENCE_REQUIRED: "Добавьте описание опыта",
     ONBOARDING_REQUIRED: "Сначала завершите настройку профиля",
-    MASTER_NOT_VERIFIED: "Online станет доступен после подтверждения личности",
+    MASTER_NOT_VERIFIED: "Принимать заказы можно после подтверждения личности",
     MATCHING_SETTINGS_REQUIRED: "Выберите категории и районы работы",
     MASTER_BLOCKED: "Профиль заблокирован администратором",
     APPLICATION_NOT_FOUND: "Заявка уже обработана или не найдена",

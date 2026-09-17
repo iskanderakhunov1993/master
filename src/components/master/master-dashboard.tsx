@@ -65,22 +65,22 @@ export function MasterDashboard({ data }: { data: MasterDashboardData }) {
         <div className="master-presence__state">
           <span>{isOnline ? <Zap size={25} /> : <ToggleLeft size={25} />}</span>
           <div>
-            <small>Статус работы</small>
-            <h2>{isOnline ? "Вы Online" : "Вы Offline"}</h2>
+            <small>Приём заказов</small>
+            <h2>{isOnline ? "Приём заказов включён" : "Приём заказов выключен"}</h2>
             <p>{isOnline
-              ? "Вы получаете подходящие заказы в выбранных категориях и районах."
-              : "Новые realtime-заказы не поступают. Включите Online, когда будете готовы к работе."}</p>
+              ? "Вам приходят заказы по выбранным категориям и районам."
+              : "Новые заказы вам не приходят. Включите приём, когда будете готовы выехать."}</p>
           </div>
         </div>
         <button className="master-presence-toggle" type="button" aria-pressed={isOnline} onClick={togglePresence} disabled={isPending}>
           <span><b /></span>
-          {isPending ? <LoaderCircle className="spin" size={18} /> : isOnline ? "Перейти Offline" : "Выйти Online"}
+          {isPending ? <LoaderCircle className="spin" size={18} /> : isOnline ? "Выключить приём" : "Включить приём"}
         </button>
       </section>
 
       {error && <div className="master-alert master-alert--error" role="alert"><AlertCircle size={18} /> {error}</div>}
       {data.profile.verificationStatus !== "VERIFIED" && (
-        <div className="master-alert"><ShieldCheck size={19} /><div><strong>{VERIFICATION_LABEL[data.profile.verificationStatus]}</strong><p>Online станет доступен после ручной проверки администратором.</p></div><Link href="/master/onboarding?step=2">Открыть проверку</Link></div>
+        <div className="master-alert"><ShieldCheck size={19} /><div><strong>{VERIFICATION_LABEL[data.profile.verificationStatus]}</strong><p>Принимать заказы можно будет после ручной проверки администратором.</p></div><Link href="/master/onboarding?step=2">Открыть проверку</Link></div>
       )}
 
       <section className="master-stat-grid" aria-label="Статистика мастера">
@@ -93,9 +93,9 @@ export function MasterDashboard({ data }: { data: MasterDashboardData }) {
         <section className="master-panel master-panel--available">
           <PanelHeading eyebrow="Лента" title="Новые доступные заказы" href="/master/orders/new" />
           {!isOnline ? (
-            <MasterEmpty icon={PackageSearch} title="Включите Online" text="После этого здесь появятся заказы по вашим категориям и районам." />
+            <MasterEmpty icon={PackageSearch} title="Включите приём заказов" text="После этого здесь появятся заказы по вашим категориям и районам." />
           ) : data.availableOrders.length === 0 ? (
-            <MasterEmpty icon={CheckCircle2} title="Новых заказов пока нет" text="Оставьте Online включённым — лента обновится, когда появится подходящая задача." />
+            <MasterEmpty icon={CheckCircle2} title="Новых заказов пока нет" text="Оставьте приём включённым — лента обновится, когда появится подходящий заказ." />
           ) : (
             <div className="master-order-feed">{data.availableOrders.map((order) => <MasterOrderCardView order={order} key={order.id} />)}</div>
           )}

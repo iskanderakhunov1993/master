@@ -2,21 +2,17 @@
 
 import {
   AlertCircle,
-  ArrowLeft,
-  ArrowRight,
   CalendarDays,
   Camera,
   Check,
   Clock3,
   Hammer,
   ImagePlus,
-  Info,
   LoaderCircle,
   MapPin,
   Pencil,
   Plus,
   Search,
-  ShieldCheck,
   Sparkles,
   Trash2,
   Upload,
@@ -28,18 +24,16 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useMemo, useState, useTransition } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState, useTransition } from "react";
 
 import type { ClientAddressInput } from "@/lib/addresses/types";
 import {
   saveOrderAddressAction,
   saveOrderCategoryAction,
   saveOrderDescriptionAction,
-  saveOrderPhotoStepAction,
   saveOrderPriceAction,
   saveOrderScheduleAction,
   saveOrderTypeAction,
-  setOrderDraftStepAction,
   submitOrderAction,
   type OrderAddressInput,
 } from "@/lib/orders/actions";
@@ -55,17 +49,6 @@ import type {
   OrderWizardData,
   ScheduleKind,
 } from "@/lib/orders/types";
-
-const steps = ["Фото", "Описание", "Категория", "Адрес", "Когда", "Тип заказа", "Цена", "Проверка"];
-
-const stages = [
-  { title: "Опишите задачу", hint: "Фото · описание · категория", lastStep: 3 },
-  { title: "Выберите время", hint: "Адрес · когда", lastStep: 5 },
-  { title: "Согласуйте условия", hint: "Срочность · цена", lastStep: 7 },
-  { title: "Проверьте заказ", hint: "Перед поиском мастеров", lastStep: 8 },
-];
-
-const nextLabels = ["Далее: описание", "Далее: категория", "Далее: адрес", "Далее: время", "Далее: условия", "Далее: цена", "Проверить заказ"];
 
 const categoryImages: Record<string, string> = {
   plumbing: "/illustrations/categories/plumbing.png",
@@ -124,8 +107,10 @@ function formatMultiplier(multiplier: number) {
 export function OrderWizard({ data }: { data: OrderWizardData }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [step, setStep] = useState(Math.min(8, Math.max(1, data.draft.currentStep)));
+  const [attempted, setAttempted] = useState(false);
+  const [touched, setTouched] = useState<{ description: boolean; price: boolean }>({ description: false, price: false });
   const [error, setError] = useState("");
+  const [serverFieldError, setServerFieldError] = useState<{ key: string; message: string; signature: string } | null>(null);
   const [photos, setPhotos] = useState<OrderPhoto[]>(data.draft.photos);
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -152,21 +137,71 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
   const [orderType, setOrderType] = useState<OrderType>(data.draft.orderType);
   const [basePrice, setBasePrice] = useState(data.draft.basePriceRubles ? String(data.draft.basePriceRubles) : "");
 
+  const descriptionRef = useRef<HTMLElement>(null);
+  const categoryRef = useRef<HTMLElement>(null);
+  const addressRef = useRef<HTMLElement>(null);
+  const scheduleRef = useRef<HTMLElement>(null);
+  const priceRef = useRef<HTMLElement>(null);
+  const sectionRefs: Record<string, React.RefObject<HTMLElement | null>> = {
+    description: descriptionRef,
+    category: categoryRef,
+    address: addressRef,
+    schedule: scheduleRef,
+    price: priceRef,
+  };
+  const sectionLabels: Record<string, string> = {
+    description: "Что нужно сделать",
+    category: "Категория",
+    address: "Адрес",
+    schedule: "Когда нужен мастер",
+    price: "Цена",
+  };
+  const summaryRef = useRef<HTMLDivElement>(null);
+
   const selectedCategory = data.categories.find((category) => category.id === categoryId);
-  const selectedSubcategory = selectedCategory?.subcategories.find((subcategory) => subcategory.id === subcategoryId);
-  const selectedSavedAddress = data.addresses.find((address) => address.id === savedAddressId);
   const multiplier = orderType === "URGENT" ? data.urgencyMultiplier : 1;
   const numericBasePrice = Number(basePrice) || 0;
   const totalPrice = Math.round(numericBasePrice * multiplier);
-  const progress = (step / steps.length) * 100;
-  const currentStageIndex = stages.findIndex((stage) => step <= stage.lastStep);
-  const currentStage = stages[currentStageIndex] ?? stages.at(-1)!;
 
   const scheduledAt = useMemo(() => {
     if (scheduleKind === "NOW") return null;
     if (scheduleKind === "TODAY") return parseDateTime(todayDate, todayTime);
     return parseDateTime(customDate, customTime);
   }, [customDate, customTime, scheduleKind, todayDate, todayTime]);
+
+  const trimmedDescription = description.trim();
+  const hasAddress = addressMode === "saved"
+    ? Boolean(savedAddressId)
+    : Boolean(newAddress.city.trim() && newAddress.street.trim() && newAddress.house.trim());
+
+  const descriptionError = (attempted || touched.description) && trimmedDescription.length < 10 ? "Опишите задачу минимум в 10 символах" : undefined;
+  const categoryError = attempted && !categoryId ? "Выберите категорию" : undefined;
+  const addressError = attempted && !hasAddress
+    ? "Укажите город, улицу и дом или выберите сохранённый адрес"
+    : attempted && !serviceAreaId
+      ? "Выберите район"
+      : undefined;
+  const scheduleError = attempted && scheduleKind !== "NOW" && !scheduledAt ? "Укажите дату и время" : undefined;
+  const priceError = (attempted || touched.price) && (!basePrice || numericBasePrice < 500) ? "Укажите цену от 500 ₽" : undefined;
+
+  // A server-reported field error is only shown while the fields it was
+  // raised against are unchanged — editing anything relevant retires it
+  // without needing an effect just to clear state.
+  const fieldSignature = JSON.stringify([
+    description, categoryId, subcategoryId, addressMode, savedAddressId, serviceAreaId,
+    newAddress, scheduleKind, todayTime, customDate, customTime, orderType, basePrice,
+  ]);
+  const activeServerError = serverFieldError?.signature === fieldSignature ? serverFieldError : null;
+  const sectionErrors: Record<string, string | undefined> = {
+    description: descriptionError ?? (activeServerError?.key === "description" ? activeServerError.message : undefined),
+    category: categoryError ?? (activeServerError?.key === "category" ? activeServerError.message : undefined),
+    address: addressError ?? (activeServerError?.key === "address" ? activeServerError.message : undefined),
+    schedule: scheduleError ?? (activeServerError?.key === "schedule" ? activeServerError.message : undefined),
+    price: priceError ?? (activeServerError?.key === "price" ? activeServerError.message : undefined),
+  };
+  const summaryItems = attempted
+    ? (Object.keys(sectionLabels) as (keyof typeof sectionLabels)[]).filter((key) => sectionErrors[key])
+    : [];
 
   function updateAddressField(field: keyof ClientAddressInput, value: string) {
     setNewAddress((current) => ({ ...current, [field]: value }));
@@ -247,62 +282,73 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
     }
   }
 
-  function nextStep() {
-    setError("");
-    startTransition(async () => {
-      let result;
-      if (step === 1) result = await saveOrderPhotoStepAction(data.draft.id);
-      else if (step === 2) result = await saveOrderDescriptionAction(data.draft.id, description);
-      else if (step === 3) result = await saveOrderCategoryAction(data.draft.id, { categoryId, subcategoryId });
-      else if (step === 4) {
-        const input: OrderAddressInput = addressMode === "saved"
-          ? { mode: "saved", addressId: savedAddressId, serviceAreaId }
-          : {
-              mode: "new",
-              serviceAreaId,
-              city: newAddress.city,
-              street: newAddress.street,
-              house: newAddress.house,
-              apartment: newAddress.apartment,
-              comment: newAddress.comment,
-              saveAddress: saveNewAddress,
-            };
-        result = await saveOrderAddressAction(data.draft.id, input);
-      } else if (step === 5) result = await saveOrderScheduleAction(data.draft.id, { scheduleKind, scheduledAt });
-      else if (step === 6) result = await saveOrderTypeAction(data.draft.id, orderType);
-      else result = await saveOrderPriceAction(data.draft.id, Number(basePrice));
-
-      if (!result.ok) {
-        setError(result.message ?? "Проверьте введённые данные");
-        return;
-      }
-      setStep((current) => Math.min(8, current + 1));
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+  function firstInvalidSection(): keyof typeof sectionRefs | null {
+    if (trimmedDescription.length < 10) return "description";
+    if (!categoryId) return "category";
+    if (!hasAddress || !serviceAreaId) return "address";
+    if (scheduleKind !== "NOW" && !scheduledAt) return "schedule";
+    if (!basePrice || numericBasePrice < 500) return "price";
+    return null;
   }
 
-  function previousStep() {
-    setError("");
-    const previous = Math.max(1, step - 1);
-    setStep(previous);
-    startTransition(async () => {
-      await setOrderDraftStepAction(data.draft.id, previous);
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  function scrollToSection(key: keyof typeof sectionRefs) {
+    sectionRefs[key].current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  function goToStep(targetStep: number) {
-    setError("");
-    setStep(targetStep);
-    startTransition(async () => {
-      await setOrderDraftStepAction(data.draft.id, targetStep);
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+  const focusSummaryRef = useRef(false);
+  useEffect(() => {
+    if (focusSummaryRef.current && summaryItems.length > 0) {
+      summaryRef.current?.focus();
+      focusSummaryRef.current = false;
+    }
+  });
+
 
   function submit() {
+    setAttempted(true);
     setError("");
+    setServerFieldError(null);
+
+    const invalidSection = firstInvalidSection();
+    if (invalidSection) {
+      setError("Заполните обязательные поля — они отмечены ниже.");
+      focusSummaryRef.current = true;
+      return;
+    }
+
     startTransition(async () => {
+      const addressInput: OrderAddressInput = addressMode === "saved"
+        ? { mode: "saved", addressId: savedAddressId, serviceAreaId }
+        : {
+            mode: "new",
+            serviceAreaId,
+            city: newAddress.city,
+            street: newAddress.street,
+            house: newAddress.house,
+            apartment: newAddress.apartment,
+            comment: newAddress.comment,
+            saveAddress: saveNewAddress,
+          };
+
+      const steps: { key: keyof typeof sectionRefs; run: () => Promise<{ ok: boolean; message?: string }> }[] = [
+        { key: "description", run: () => saveOrderDescriptionAction(data.draft.id, description) },
+        { key: "category", run: () => saveOrderCategoryAction(data.draft.id, { categoryId, subcategoryId }) },
+        { key: "address", run: () => saveOrderAddressAction(data.draft.id, addressInput) },
+        { key: "schedule", run: () => saveOrderScheduleAction(data.draft.id, { scheduleKind, scheduledAt }) },
+        { key: "price", run: () => saveOrderTypeAction(data.draft.id, orderType).then(() => saveOrderPriceAction(data.draft.id, Number(basePrice))) },
+      ];
+
+      for (const step of steps) {
+        const result = await step.run();
+        if (!result.ok) {
+          const message = result.message ?? "Проверьте введённые данные";
+          setError(message);
+          setServerFieldError({ key: step.key, message, signature: fieldSignature });
+          scrollToSection(step.key);
+          return;
+        }
+      }
+
       const result = await submitOrderAction(data.draft.id);
       if (!result.ok || !result.orderId) {
         setError(result.message ?? "Не удалось отправить заказ");
@@ -312,11 +358,50 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
     });
   }
 
-  function renderStep() {
-    if (step === 1) {
-      return (
-        <section className="wizard-step">
-          <StepHeading icon={Camera} title="Покажите задачу" description="Фото помогает мастеру быстрее понять объём работы. Этот шаг можно пропустить." />
+  return (
+    <div className="order-wizard-page">
+      <header className="wizard-topbar">
+        <Link href="/client"><X size={20} /><span>Закрыть</span></Link>
+        <div><strong>Новый заказ</strong><small>Опишите задачу — обычно занимает около минуты</small></div>
+        <span className="wizard-draft-status"><Check size={14} /> Черновик</span>
+      </header>
+
+      <div className="wizard-content">
+        <h1 className="order-form-title">Расскажите, что нужно сделать</h1>
+
+        {summaryItems.length > 0 && (
+          <div className="order-error-summary" ref={summaryRef} tabIndex={-1} role="alert" aria-labelledby="order-error-summary-title">
+            <p className="order-error-summary__title" id="order-error-summary-title"><AlertCircle size={16} /> Есть незаполненные поля</p>
+            <ul>
+              {summaryItems.map((key) => (
+                <li key={key}>
+                  <a href={`#section-${key}`} onClick={(event) => { event.preventDefault(); scrollToSection(key); }}>
+                    {sectionLabels[key]}: {sectionErrors[key]}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <OrderSection sectionRef={descriptionRef} id="section-description" icon={Pencil} title="Что нужно сделать?" error={sectionErrors.description}>
+          <label className="wizard-textarea">
+            <textarea
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              onBlur={() => setTouched((current) => ({ ...current, description: true }))}
+              maxLength={1000}
+              rows={6}
+              placeholder="Например: течёт под раковиной после включения воды"
+              className={sectionErrors.description ? "is-invalid" : ""}
+              aria-invalid={Boolean(sectionErrors.description)}
+              aria-describedby={sectionErrors.description ? "section-description-error" : undefined}
+            />
+            <span className={description.length >= 950 ? "is-limit" : ""}>{description.length} / 1000</span>
+          </label>
+        </OrderSection>
+
+        <OrderSection icon={Camera} title="Фото" description="Необязательно">
           <div className="photo-uploader">
             <input id="order-photos" type="file" accept={ALLOWED_ORDER_PHOTO_TYPES.join(",")} multiple onChange={handlePhotoSelection} disabled={isUploading || photos.length >= MAX_ORDER_PHOTOS} />
             <label htmlFor="order-photos"><span><Upload size={27} /></span><strong>{photos.length ? "Добавить ещё фотографии" : "Добавить фотографии"}</strong><small>JPG, PNG или WebP · до 8 МБ · максимум 5</small></label>
@@ -335,25 +420,9 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
               {photos.length + pendingPhotos.length < MAX_ORDER_PHOTOS && <label className="photo-preview-add" htmlFor="order-photos"><ImagePlus size={23} /><span>Добавить</span></label>}
             </div>
           )}
-          <div className="wizard-tip"><Info size={18} /><p><strong>Совет:</strong> сделайте общий план и крупное фото проблемного места.</p></div>
-        </section>
-      );
-    }
+        </OrderSection>
 
-    if (step === 2) {
-      return (
-        <section className="wizard-step">
-          <StepHeading icon={Pencil} title="Что нужно сделать?" description="Опишите проблему простыми словами — мастер уточнит детали в предложении." />
-          <label className="wizard-textarea"><textarea value={description} onChange={(event) => setDescription(event.target.value)} maxLength={1000} rows={8} placeholder="Например: течёт под раковиной после включения воды" autoFocus /><span className={description.length >= 950 ? "is-limit" : ""}>{description.length} / 1000</span></label>
-          <div className="wizard-examples"><span>Можно указать:</span><ul><li>что произошло;</li><li>когда появилась проблема;</li><li>что уже пробовали сделать.</li></ul></div>
-        </section>
-      );
-    }
-
-    if (step === 3) {
-      return (
-        <section className="wizard-step">
-          <StepHeading icon={Hammer} title="Выберите категорию" description="Так заказ увидят мастера с подходящими навыками." />
+        <OrderSection sectionRef={categoryRef} id="section-category" icon={Hammer} title="Категория" error={sectionErrors.category}>
           <div className="category-grid">
             {data.categories.map((category) => {
               const imageSrc = categoryImages[category.slug] ?? categoryImages.other;
@@ -361,14 +430,9 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
             })}
           </div>
           {selectedCategory && selectedCategory.subcategories.length > 0 && <div className="subcategory-picker"><span>Уточните задачу <small>необязательно</small></span><div>{selectedCategory.subcategories.map((subcategory) => <button className={subcategoryId === subcategory.id ? "is-selected" : ""} type="button" key={subcategory.id} onClick={() => setSubcategoryId(subcategory.id === subcategoryId ? "" : subcategory.id)}>{subcategory.name}</button>)}</div></div>}
-        </section>
-      );
-    }
+        </OrderSection>
 
-    if (step === 4) {
-      return (
-        <section className="wizard-step">
-          <StepHeading icon={MapPin} title="Куда нужен мастер?" description="Точный адрес будет доступен только выбранному вами мастеру." />
+        <OrderSection sectionRef={addressRef} id="section-address" icon={MapPin} title="Адрес" description="Точный адрес увидит только выбранный вами мастер." error={sectionErrors.address}>
           {data.addresses.length > 0 && <div className="address-mode-tabs"><button className={addressMode === "saved" ? "is-active" : ""} type="button" onClick={() => setAddressMode("saved")}>Сохранённые</button><button className={addressMode === "new" ? "is-active" : ""} type="button" onClick={() => setAddressMode("new")}><Plus size={15} /> Новый адрес</button></div>}
           {addressMode === "saved" && data.addresses.length > 0 ? (
             <div className="wizard-address-list">{data.addresses.map((address) => <button className={savedAddressId === address.id ? "is-selected" : ""} type="button" key={address.id} onClick={() => setSavedAddressId(address.id)}><span><MapPin size={20} /></span><div><strong>{address.street}, {address.house}{address.apartment ? `, кв. ${address.apartment}` : ""}</strong><small>{address.city}{address.isPrimary ? " · Основной" : ""}</small></div><span className="wizard-radio"><Check size={14} /></span></button>)}</div>
@@ -384,7 +448,13 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
           )}
           <label className="service-area-picker">
             <span>Район</span>
-            <select value={serviceAreaId} onChange={(event) => setServiceAreaId(event.target.value)}>
+            <select
+              value={serviceAreaId}
+              onChange={(event) => setServiceAreaId(event.target.value)}
+              className={attempted && !serviceAreaId ? "is-invalid" : ""}
+              aria-invalid={attempted && !serviceAreaId}
+              aria-describedby={sectionErrors.address ? "section-address-error" : undefined}
+            >
               <option value="">Выберите район</option>
               {data.serviceAreas.map((area) => (
                 <option key={area.id} value={area.id}>{area.name} · {area.city}</option>
@@ -392,15 +462,9 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
             </select>
             <small>Мастера увидят этот район вместо точного адреса.</small>
           </label>
-          <div className="privacy-notice"><ShieldCheck size={19} /><p><strong>Адрес защищён.</strong> До выбора исполнителя мастера увидят только город и примерный район.</p></div>
-        </section>
-      );
-    }
+        </OrderSection>
 
-    if (step === 5) {
-      return (
-        <section className="wizard-step">
-          <StepHeading icon={Clock3} title="Когда нужен мастер?" description="Выберите удобный вариант. Точное время можно согласовать с мастером." />
+        <OrderSection sectionRef={scheduleRef} id="section-schedule" icon={Clock3} title="Когда" error={sectionErrors.schedule}>
           <div className="schedule-options">
             <button className={scheduleKind === "NOW" ? "is-selected" : ""} type="button" onClick={() => setScheduleKind("NOW")}><span><Sparkles size={22} /></span><div><strong>Сейчас</strong><small>Начать поиск немедленно</small></div><span className="wizard-radio"><Check size={14} /></span></button>
             <button className={scheduleKind === "TODAY" ? "is-selected" : ""} type="button" onClick={() => setScheduleKind("TODAY")}><span><Clock3 size={22} /></span><div><strong>Сегодня</strong><small>В удобное время сегодня</small></div><span className="wizard-radio"><Check size={14} /></span></button>
@@ -408,89 +472,84 @@ export function OrderWizard({ data }: { data: OrderWizardData }) {
           </div>
           {scheduleKind === "TODAY" && <label className="schedule-time-field">Удобное время<input type="time" value={todayTime} onChange={(event) => setTodayTime(event.target.value)} /></label>}
           {scheduleKind === "CUSTOM" && <div className="schedule-custom-fields"><label>Дата<input type="date" min={todayDate} value={customDate} onChange={(event) => setCustomDate(event.target.value)} /></label><label>Время<input type="time" value={customTime} onChange={(event) => setCustomTime(event.target.value)} /></label></div>}
-        </section>
-      );
-    }
 
-    if (step === 6) {
-      return (
-        <section className="wizard-step">
-          <StepHeading icon={Zap} title="Обычный или срочный заказ?" description="Срочные заказы получают повышенный приоритет у мастеров онлайн." />
+          <div className="order-type-divider"><span>Обычный или срочный заказ?</span></div>
           <div className="order-type-grid">
             <button className={orderType === "NORMAL" ? "is-selected" : ""} type="button" onClick={() => setOrderType("NORMAL")}><span><Clock3 size={24} /></span><div><strong>Обычный</strong><p>Подходит, если можно спокойно сравнить предложения.</p><small>Без дополнительного коэффициента</small></div><span className="wizard-radio"><Check size={14} /></span></button>
             <button className={`is-urgent ${orderType === "URGENT" ? "is-selected" : ""}`} type="button" onClick={() => setOrderType("URGENT")}><span><Zap size={24} /></span><div><strong>Срочный</strong><p>Для задачи, которую нужно решить как можно быстрее.</p><small>Коэффициент ×{formatMultiplier(data.urgencyMultiplier)}</small></div><span className="wizard-radio"><Check size={14} /></span></button>
           </div>
-          {orderType === "URGENT" && <div className="urgency-explainer"><Info size={19} /><div><strong>Как считается срочная цена</strong><p>К вашей базовой цене применяется настроенный коэффициент ×{formatMultiplier(data.urgencyMultiplier)}. Точный расчёт будет показан на следующем шаге.</p></div></div>}
-        </section>
-      );
-    }
+        </OrderSection>
 
-    if (step === 7) {
-      return (
-        <section className="wizard-step">
-          <StepHeading icon={WalletCards} title="Сколько вы готовы заплатить?" description="Вы предлагаете цену. Мастер сможет принять её или предложить другую." />
-          <div className="price-field"><label htmlFor="order-price">{orderType === "URGENT" ? "Ваша базовая цена" : "Предлагаемая цена"}</label><div><input id="order-price" type="number" inputMode="numeric" min="500" max="1000000" step="100" value={basePrice} onChange={(event) => setBasePrice(event.target.value)} placeholder="3 000" autoFocus /><span>₽</span></div></div>
+        <OrderSection sectionRef={priceRef} id="section-price" icon={WalletCards} title="Ваша цена" description="Мастер примет её или предложит свою." error={sectionErrors.price}>
+          <div className="price-field">
+            <label htmlFor="order-price">{orderType === "URGENT" ? "Ваша базовая цена" : "Предлагаемая цена"}</label>
+            <div>
+              <input
+                id="order-price"
+                type="number"
+                inputMode="numeric"
+                min="500"
+                max="1000000"
+                step="100"
+                value={basePrice}
+                onChange={(event) => setBasePrice(event.target.value)}
+                onBlur={() => setTouched((current) => ({ ...current, price: true }))}
+                placeholder="3 000"
+                className={sectionErrors.price ? "is-invalid" : ""}
+                aria-invalid={Boolean(sectionErrors.price)}
+                aria-describedby={sectionErrors.price ? "section-price-error" : undefined}
+              />
+              <span>₽</span>
+            </div>
+          </div>
           <div className="price-suggestions"><span>Быстрый выбор</span><div>{[1500, 3000, 5000, 8000].map((price) => <button type="button" key={price} onClick={() => setBasePrice(String(price))}>{formatRubles(price)}</button>)}</div></div>
           <div className={`price-calculation ${orderType === "URGENT" ? "is-urgent" : ""}`}>
             <div><span>Ваша базовая цена</span><strong>{formatRubles(numericBasePrice)}</strong></div>
             {orderType === "URGENT" && <div><span>Срочный коэффициент</span><strong>×{formatMultiplier(data.urgencyMultiplier)}</strong></div>}
             <div className="price-calculation__total"><span>Итоговая цена заказа</span><strong>{formatRubles(totalPrice)}</strong></div>
           </div>
-        </section>
-      );
-    }
+        </OrderSection>
+      </div>
 
-    const reviewAddress = addressMode === "saved" && selectedSavedAddress ? selectedSavedAddress : newAddress;
-    const scheduleLabel = scheduleKind === "NOW"
-      ? "Сейчас"
-      : scheduleKind === "TODAY"
-        ? `Сегодня, ${todayTime}`
-        : scheduledAt
-          ? `${new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(scheduledAt)}, ${customTime}`
-          : "Дата и время не выбраны";
-
-    return (
-      <section className="wizard-step wizard-review">
-        <StepHeading icon={Check} title="Проверьте заказ" description="Убедитесь, что всё верно. После отправки начнём искать мастеров." />
-        <ReviewRow title="Фотографии" onEdit={() => goToStep(1)}>{photos.length ? <div className="review-photos">{photos.map((photo, index) => <Image key={photo.id} src={photo.url} alt={`Фото задачи ${index + 1}`} width={78} height={62} unoptimized />)}</div> : <span className="review-empty">Без фотографий</span>}</ReviewRow>
-        <ReviewRow title="Описание" onEdit={() => goToStep(2)}><p>{description}</p></ReviewRow>
-        <ReviewRow title="Категория" onEdit={() => goToStep(3)}><p>{selectedCategory?.name}{selectedSubcategory ? ` → ${selectedSubcategory.name}` : ""}</p></ReviewRow>
-        <ReviewRow title="Адрес" onEdit={() => goToStep(4)}><p>{reviewAddress.city}, {reviewAddress.street}, {reviewAddress.house}{reviewAddress.apartment ? `, кв. ${reviewAddress.apartment}` : ""}</p><small>Район: {data.serviceAreas.find((area) => area.id === serviceAreaId)?.name ?? "не выбран"}</small>{reviewAddress.comment && <small>{reviewAddress.comment}</small>}</ReviewRow>
-        <div className="review-grid-row"><ReviewRow title="Когда" onEdit={() => goToStep(5)}><p>{scheduleLabel}</p></ReviewRow><ReviewRow title="Тип заказа" onEdit={() => goToStep(6)}><p>{orderType === "URGENT" ? "Срочный" : "Обычный"}</p></ReviewRow></div>
-        <ReviewRow title="Цена" onEdit={() => goToStep(7)}><div className="review-price"><strong>{formatRubles(totalPrice)}</strong>{orderType === "URGENT" && <small>{formatRubles(numericBasePrice)} × {formatMultiplier(data.urgencyMultiplier)}</small>}</div></ReviewRow>
-        <div className="review-privacy"><ShieldCheck size={19} /><p>Точный адрес увидит только выбранный вами мастер.</p></div>
-      </section>
-    );
-  }
-
-  return (
-    <div className="order-wizard-page">
-      <header className="wizard-topbar">
-        <Link href="/client"><X size={20} /><span>Закрыть</span></Link>
-        <div><span>Этап {currentStageIndex + 1} из {stages.length}</span><strong>{currentStage.title}</strong><small>{currentStage.hint}</small></div>
-        <span className="wizard-draft-status"><Check size={14} /> Черновик</span>
-      </header>
-      <div className="wizard-progress" aria-label={`Шаг ${step} из ${steps.length}`}><span style={{ width: `${progress}%` }} /></div>
-      <ol className="wizard-stepper" aria-label="Этапы создания заказа">{stages.map((stage, index) => <li className={index === currentStageIndex ? "is-current" : index < currentStageIndex ? "is-complete" : ""} key={stage.title}><span>{index < currentStageIndex ? <Check size={12} /> : index + 1}</span><small>{stage.title}</small></li>)}</ol>
-      <div className="wizard-content">{renderStep()}</div>
       <footer className="wizard-footer">
         <div>
-          {step > 1 ? <button className="button button--secondary" type="button" onClick={previousStep} disabled={isPending || isUploading}><ArrowLeft size={17} /> Назад</button> : <Link className="button button--secondary" href="/client"><ArrowLeft size={17} /> Назад</Link>}
-          <span className="wizard-save-note"><Check size={13} /> Данные сохраняются по шагам</span>
+          <Link className="button button--secondary" href="/client"><X size={17} /> Закрыть</Link>
+          <span className="wizard-save-note"><Check size={13} /> Черновик сохраняется автоматически</span>
         </div>
         <div>
           {error && <span className="wizard-error" role="alert"><AlertCircle size={16} /> {error}</span>}
-          {step < 8 ? <button className="button button--primary button--large" type="button" onClick={nextStep} disabled={isPending || isUploading}>{isPending ? <><LoaderCircle className="spin" size={18} /> Сохраняем…</> : <>{nextLabels[step - 1]} <ArrowRight size={18} /></>}</button> : <button className="button button--primary button--large" type="button" onClick={submit} disabled={isPending}>{isPending ? <><LoaderCircle className="spin" size={18} /> Публикуем…</> : <><Search size={18} /> Найти мастера</>}</button>}
+          <button className="button button--primary button--large" type="button" onClick={submit} disabled={isPending || isUploading}>{isPending ? <><LoaderCircle className="spin" size={18} /> Создаём заказ…</> : <><Search size={18} /> Создать заказ</>}</button>
         </div>
       </footer>
     </div>
   );
 }
 
-function StepHeading({ icon: Icon, title, description }: { icon: LucideIcon; title: string; description: string }) {
-  return <header className="wizard-step-heading"><span><Icon size={23} /></span><div><h1>{title}</h1><p>{description}</p></div></header>;
-}
-
-function ReviewRow({ title, onEdit, children }: { title: string; onEdit: () => void; children: React.ReactNode }) {
-  return <section className="review-row"><div><span>{title}</span><button type="button" onClick={onEdit}><Pencil size={14} /> Изменить</button></div>{children}</section>;
+function OrderSection({
+  sectionRef,
+  id,
+  icon: Icon,
+  title,
+  description,
+  error,
+  children,
+}: {
+  sectionRef?: React.RefObject<HTMLElement | null>;
+  id?: string;
+  icon: LucideIcon;
+  title: string;
+  description?: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className={`order-section${error ? " has-error" : ""}`} id={id} ref={sectionRef as React.RefObject<HTMLElement>}>
+      <header className="wizard-step-heading">
+        <span><Icon size={23} /></span>
+        <div><h2>{title}</h2>{description && <p>{description}</p>}</div>
+      </header>
+      {children}
+      {error && <p className="order-field-error" id={id ? `${id}-error` : undefined} role="alert"><AlertCircle size={14} /> {error}</p>}
+    </section>
+  );
 }
