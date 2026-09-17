@@ -2502,6 +2502,74 @@ svg {
   margin-bottom: 18px;
 }
 
+/* Account settings: name/email + password, on any role's /profile. */
+.account-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.account-card {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid #e1e8e4;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.account-card > header {
+  margin-bottom: 2px;
+}
+
+.account-card > header small {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 780;
+  text-transform: uppercase;
+}
+
+.account-card > header h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+
+.account-card label {
+  display: grid;
+  gap: 6px;
+  color: #4a576b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.account-card > label > input {
+  height: 44px;
+  padding: 0 13px;
+  color: var(--ink);
+  border: 1px solid #d5ddea;
+  border-radius: 11px;
+  outline: none;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.account-card > label > input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(55, 104, 232, 0.1);
+}
+
+.account-card > .button { justify-self: start; }
+
+@media (max-width: 780px) {
+  .account-grid { grid-template-columns: 1fr; }
+}
+
 .client-primary-cta,
 .client-urgent-cta {
   display: grid;

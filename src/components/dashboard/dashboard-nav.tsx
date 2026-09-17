@@ -44,6 +44,7 @@ export const dashboardNavigation: Record<Role, DashboardNavigationItem[]> = {
     { href: "/client/calendar", label: "Календарь", icon: CalendarDays, secondary: true },
     { href: "/client/subscriptions", label: "Подписки", icon: Repeat2, secondary: true },
     { href: "/client/addresses", label: "Адреса", icon: MapPinned, secondary: true },
+    { href: "/client/profile", label: "Профиль", icon: UserRound, secondary: true },
   ],
   MASTER: [
     { href: "/master", label: "Главная", icon: House, mobile: true },

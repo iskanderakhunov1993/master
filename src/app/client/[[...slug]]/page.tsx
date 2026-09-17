@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 
+import { AccountSettings } from "@/components/account/account-settings";
 import { AddressManager } from "@/components/client/address-manager";
 import { ClientDashboard } from "@/components/client/client-dashboard";
 import { HomePassport } from "@/components/client/home-passport";
@@ -44,6 +45,10 @@ export default async function ClientPage({
 
   if (slug.length === 1 && slug[0] === "addresses") {
     return <AddressManager addresses={listClientAddresses(user.id)} />;
+  }
+
+  if (slug.length === 1 && slug[0] === "profile") {
+    return <AccountSettings role="CLIENT" name={user.name} email={user.email} />;
   }
 
   if (slug.length === 1 && slug[0] === "home") {
