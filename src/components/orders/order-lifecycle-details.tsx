@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   BadgeCheck,
   Camera,
+  Check,
   CheckCircle2,
   Clock3,
   ImagePlus,
@@ -15,6 +16,7 @@ import {
   Navigation,
   Phone,
   Send,
+  ShieldCheck,
   Star,
   UserRound,
   WalletCards,
@@ -29,6 +31,7 @@ import { ChangeEvent, FormEvent, useEffect, useRef, useState, useTransition } fr
 import {
   advanceMasterOrderAction,
   cancelClientOrderAction,
+  fileWarrantyClaimAction,
   proposeChangeOrderAction,
   respondToChangeOrderAction,
   respondToCompletionAction,
@@ -40,6 +43,7 @@ import type { OrderDetails } from "@/lib/orders/details";
 import { ALLOWED_ORDER_PHOTO_TYPES, validateOrderPhoto } from "@/lib/orders/media";
 import { formatRubles, formatSchedule, ORDER_STATUS_LABEL } from "@/lib/orders/presentation";
 import type { OrderStatus } from "@/lib/orders/types";
+import type { OrderWarranty } from "@/lib/orders/warranty";
 import type { WorkMediaStage, WorkPhoto } from "@/lib/orders/work-media";
 
 const activeStatuses: OrderStatus[] = [
@@ -211,6 +215,7 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
           {audience === "CLIENT" && details.status === "COMPLETED" && !details.reviews.some((review) => review.reviewerRole === "CLIENT") && <ClientReviewForm orderId={details.id} />}
           {audience === "MASTER" && ["COMPLETED", "REVIEWED"].includes(details.status) && !details.reviews.some((review) => review.reviewerRole === "MASTER") && <MasterReviewForm orderId={details.id} clientName={details.client.name} />}
           {details.reviews.length > 0 && <section className="order-detail-card"><header><div><small>Отзывы</small><h2>Оценки по заказу</h2></div></header><div className="order-reviews">{details.reviews.map((review) => <article key={review.id}><div><strong>{review.reviewerName}</strong><span><Star size={14} fill="currentColor" /> {review.overallRating}</span></div>{review.comment && <p>{review.comment}</p>}</article>)}</div></section>}
+          {audience === "CLIENT" && details.warranty && <WarrantyCard warranty={details.warranty} onFiled={() => router.refresh()} />}
         </main>
         <aside>
           {details.master && <section className="order-person-card"><div className="order-person-avatar">{details.master.avatarUrl ? <Image src={details.master.avatarUrl} alt={details.master.name} fill sizes="64px" unoptimized /> : <UserRound size={25} />}</div><div><small>Мастер</small><h2>{details.master.name}</h2><p>{details.master.specialization}</p><span><BadgeCheck size={14} /> Личность подтверждена</span>{details.master.rating && <b><Star size={14} fill="currentColor" /> {details.master.rating.toFixed(1)} · {details.master.reviewsCount} отзывов</b>}</div>{audience === "CLIENT" && <footer>{details.master.phone && <a href={`tel:${details.master.phone}`}><Phone size={16} /> Позвонить</a>}<Link href={`/masters/${details.master.id}`}>Профиль</Link></footer>}</section>}
@@ -519,6 +524,51 @@ function OrderChatCard({
         </button>
       </form>
       {error && <p className="task-form-error" role="alert"><AlertCircle size={16} /> {error}</p>}
+    </section>
+  );
+}
+
+function WarrantyCard({ warranty, onFiled }: { warranty: OrderWarranty; onFiled: () => void }) {
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [description, setDescription] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
+
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    setError("");
+    startTransition(async () => {
+      const result = await fileWarrantyClaimAction({ warrantyId: warranty.id, description });
+      if (!result.ok) { setError(result.message ?? "Не удалось отправить обращение"); return; }
+      setDone(true);
+      onFiled();
+    });
+  }
+
+  return (
+    <section className="order-detail-card">
+      <header><div><small><ShieldCheck size={13} /> Гарантия мастера</small><h2>{warranty.isActive ? `Действует ещё ${warranty.daysRemaining} дн.` : "Гарантия истекла"}</h2></div></header>
+      <p>Гарантию на эту работу предоставляет мастер — платформа фиксирует срок ({warranty.durationDays} дн. с {new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long" }).format(warranty.startedAt)}) и помогает открыть обращение.</p>
+      {warranty.claimComplaintId || done ? (
+        <p className="task-form-success"><Check size={16} /> Обращение открыто и передано администратору.</p>
+      ) : warranty.isActive ? (
+        isFormOpen ? (
+          <form className="order-change-form" onSubmit={submit}>
+            <label>
+              Что случилось?
+              <textarea value={description} onChange={(event) => setDescription(event.target.value)} maxLength={1000} rows={3} placeholder="Опишите проблему — например, снова протекает то же соединение" required minLength={10} />
+            </label>
+            {error && <p className="task-form-error" role="alert"><AlertCircle size={16} /> {error}</p>}
+            <div className="order-completion-actions">
+              <button className="button button--primary" type="submit" disabled={isPending}>{isPending ? <LoaderCircle className="spin" size={17} /> : "Отправить обращение"}</button>
+              <button className="button button--secondary" type="button" onClick={() => setIsFormOpen(false)} disabled={isPending}>Отмена</button>
+            </div>
+          </form>
+        ) : (
+          <button className="button button--secondary" type="button" onClick={() => setIsFormOpen(true)}>Сообщить о проблеме по гарантии</button>
+        )
+      ) : null}
     </section>
   );
 }

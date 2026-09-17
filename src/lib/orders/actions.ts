@@ -12,6 +12,7 @@ import type { ClientAddress } from "@/lib/addresses/types";
 import { createChangeRequest, respondToChangeRequest } from "./change-requests";
 import { sendOrderMessage } from "./chat";
 import { transitionOrder } from "./lifecycle";
+import { fileWarrantyClaim } from "./warranty";
 import {
   saveAddressStep,
   saveCategoryStep,
@@ -98,6 +99,9 @@ function failure(error: unknown): LifecycleActionResult {
     CHANGE_REQUEST_NOT_FOUND: "Запрос на изменение цены не найден",
     CHANGE_REQUEST_STALE: "Запрос уже обработан. Обновите страницу",
     CHAT_NOT_AVAILABLE: "Чат откроется после того, как вы выберете мастера",
+    WARRANTY_NOT_FOUND: "Гарантия не найдена",
+    WARRANTY_ALREADY_CLAIMED: "По этой гарантии уже открыто обращение",
+    WARRANTY_EXPIRED: "Срок гарантии истёк",
   };
   return { ok: false, message: messages[code] ?? "Не удалось выполнить действие. Попробуйте ещё раз" };
 }
@@ -399,6 +403,24 @@ export async function sendOrderMessageAction(orderId: string, body: string): Pro
   try {
     sendOrderMessage({ orderId, senderId: user.id, body: parsed.data });
     revalidateOrder(orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function fileWarrantyClaimAction(input: { warrantyId: string; description: string }): Promise<LifecycleActionResult> {
+  const client = await requireRole("CLIENT");
+  const parsed = z.object({
+    warrantyId: z.string().min(1),
+    description: z.string().trim().min(10, "Опишите проблему минимум в 10 символах").max(1000, "Описание слишком длинное"),
+  }).safeParse(input);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message };
+
+  try {
+    fileWarrantyClaim({ clientId: client.id, warrantyId: parsed.data.warrantyId, description: parsed.data.description });
+    revalidatePath("/client/home");
+    revalidatePath("/admin/complaints");
     return { ok: true };
   } catch (error) {
     return failure(error);

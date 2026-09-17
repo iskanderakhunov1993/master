@@ -19,6 +19,7 @@ import { listClientCalendarEvents } from "@/lib/calendar/repository";
 import { listRankedCandidates } from "@/lib/marketplace/ranking";
 import { getOrderSearchMeta } from "@/lib/marketplace/matching";
 import { getClientOrderDetails } from "@/lib/orders/details";
+import { listClientWarranties } from "@/lib/orders/warranty";
 import {
   getClientDashboardData,
   getClientOrder,
@@ -53,7 +54,14 @@ export default async function ClientPage({
 
   if (slug.length === 1 && slug[0] === "home") {
     const dashboard = getClientDashboardData(user.id);
-    return <HomePassport addresses={listClientAddresses(user.id)} activeOrder={dashboard.activeOrder} recentOrders={dashboard.recentOrders} />;
+    return (
+      <HomePassport
+        addresses={listClientAddresses(user.id)}
+        activeOrder={dashboard.activeOrder}
+        recentOrders={dashboard.recentOrders}
+        warranties={listClientWarranties(user.id)}
+      />
+    );
   }
 
   if (slug.length === 1 && slug[0] === "tasks") {

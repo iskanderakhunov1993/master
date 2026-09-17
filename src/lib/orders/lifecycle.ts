@@ -7,6 +7,7 @@ import { matchOrder } from "@/lib/marketplace/matching";
 import { advanceSubscriptionAfterCompletedOrder } from "@/lib/subscriptions/sync";
 import { syncTaskStatusForOrder } from "@/lib/tasks/sync";
 
+import { getWarrantyDurationDays } from "./config";
 import type { OrderStatus } from "./types";
 
 export type OrderActorRole = "CLIENT" | "MASTER" | "ADMIN" | "SYSTEM";
@@ -145,6 +146,16 @@ function applyCompletionSideEffects(
       order.description || "Работа выполнена и подтверждена клиентом.",
       now,
     );
+
+  const durationDays = getWarrantyDurationDays();
+  const endsAt = now + durationDays * 24 * 60 * 60 * 1000;
+  database
+    .prepare(
+      `INSERT OR IGNORE INTO order_warranties (
+        id, order_id, client_id, master_id, duration_days, started_at, ends_at, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .run(randomUUID(), order.id, order.clientId, order.selectedMasterId, durationDays, now, endsAt, now);
 }
 
 export function transitionOrderInTransaction(

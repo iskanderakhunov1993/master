@@ -472,6 +472,27 @@ function migrate(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS order_messages_order_idx
       ON order_messages(order_id, created_at);
 
+    -- Warranty: platform records the master's commitment and helps open a
+    -- claim, but the master carries the obligation, not the platform.
+    CREATE TABLE IF NOT EXISTS order_warranties (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL UNIQUE,
+      client_id TEXT NOT NULL,
+      master_id TEXT NOT NULL,
+      duration_days INTEGER NOT NULL,
+      started_at INTEGER NOT NULL,
+      ends_at INTEGER NOT NULL,
+      claim_complaint_id TEXT,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (master_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (claim_complaint_id) REFERENCES complaints(id) ON DELETE SET NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS order_warranties_client_idx
+      ON order_warranties(client_id, ends_at DESC);
+
     CREATE TABLE IF NOT EXISTS order_reviews (
       id TEXT PRIMARY KEY,
       order_id TEXT NOT NULL,

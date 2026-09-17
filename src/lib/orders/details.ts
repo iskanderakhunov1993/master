@@ -4,6 +4,7 @@ import { listOrderChangeRequests, type OrderChangeRequest } from "./change-reque
 import { listOrderMessages, type OrderMessage } from "./chat";
 import { specialistLabel } from "../marketplace/ranking";
 import type { OrderStatus, OrderSummary, OrderType, ScheduleKind } from "./types";
+import { getWarrantyForOrder, type OrderWarranty } from "./warranty";
 import { listOrderWorkMedia, type WorkPhoto } from "./work-media";
 
 export type OrderHistoryEntry = {
@@ -65,6 +66,7 @@ export type OrderDetails = {
   changeRequests: OrderChangeRequest[];
   workPhotos: WorkPhoto[];
   messages: OrderMessage[];
+  warranty: OrderWarranty | null;
 };
 
 type DetailsRow = {
@@ -235,6 +237,7 @@ function loadDetails(row: DetailsRow): OrderDetails {
     changeRequests: listOrderChangeRequests(row.id),
     workPhotos: listOrderWorkMedia(row.id),
     messages: row.masterId ? listOrderMessages(row.id) : [],
+    warranty: getWarrantyForOrder(row.id),
   };
 }
 

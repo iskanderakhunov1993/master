@@ -2426,17 +2426,30 @@ svg {
 .home-passport-summary span { display: grid; gap: 3px; }
 .home-passport-summary small { color: var(--muted); font-size: 9px; }
 .home-passport-summary strong { font-size: 15px; }
-.home-work-log { padding: 22px; border: 1px solid #cecec8; border-radius: 20px; background: #fff; }
-.home-work-log > header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.home-work-log > header h2 { margin: 3px 0 0; font-size: 21px; }
-.home-work-log ol { margin: 18px 0 0; padding: 0; list-style: none; }
-.home-work-log li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 13px; padding: 15px 0; border-top: 1px solid #e6e6e0; }
+.home-work-log,
+.home-warranty-list { padding: 22px; border: 1px solid #cecec8; border-radius: 20px; background: #fff; }
+.home-work-log > header,
+.home-warranty-list > header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.home-work-log > header h2,
+.home-warranty-list > header h2 { margin: 3px 0 0; font-size: 21px; }
+.home-work-log ol,
+.home-warranty-list ol { margin: 18px 0 0; padding: 0; list-style: none; }
+.home-work-log li,
+.home-warranty-list li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 13px; padding: 15px 0; border-top: 1px solid #e6e6e0; }
 .home-work-log__icon { display: grid; width: 43px; height: 43px; place-items: center; color: var(--primary); border-radius: 13px; background: #edf1ff; }
-.home-work-log li > div { display: grid; gap: 3px; }
+.home-warranty-list li:not(.is-expired) .home-work-log__icon { color: #2f7d55; background: #e7f5ec; }
+.home-warranty-list li.is-expired .home-work-log__icon { color: #8b96a6; background: #f1f2f4; }
+.home-warranty-list li.is-expired p { color: #a3443c; }
+.home-work-log li > div,
+.home-warranty-list li > div { display: grid; gap: 3px; }
 .home-work-log li small { color: var(--muted); font-size: 9px; }
-.home-work-log li strong { font-size: 13px; }
-.home-work-log li p { margin: 0; color: var(--muted); font-size: 10px; }
-.home-work-log li > a { display: grid; width: 40px; height: 40px; place-items: center; color: #171717; border-radius: 999px; }
+.home-work-log li strong,
+.home-warranty-list li strong { font-size: 13px; }
+.home-work-log li p,
+.home-warranty-list li p { margin: 0; color: var(--muted); font-size: 10px; }
+.home-work-log li > a,
+.home-warranty-list li > a { display: grid; width: 40px; height: 40px; place-items: center; color: #171717; border-radius: 999px; }
+.home-warranty-list { margin-bottom: 18px; }
 .home-passport-empty { display: grid; min-height: 180px; margin-top: 17px; place-items: center; align-content: center; gap: 7px; color: var(--muted); text-align: center; border-top: 1px solid #e6e6e0; }
 .home-passport-empty svg { color: var(--primary); }
 .home-passport-empty p { margin: 0; font-size: 11px; }

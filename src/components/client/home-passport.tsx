@@ -5,20 +5,24 @@ import Link from "next/link";
 import type { ClientAddress } from "@/lib/addresses/types";
 import { formatOrderCategory, formatRubles, ORDER_STATUS_LABEL } from "@/lib/orders/presentation";
 import type { OrderSummary } from "@/lib/orders/types";
+import type { OrderWarranty } from "@/lib/orders/warranty";
 
 export function HomePassport({
   addresses,
   activeOrder,
   recentOrders,
+  warranties,
 }: {
   addresses: ClientAddress[];
   activeOrder: OrderSummary | null;
   recentOrders: OrderSummary[];
+  warranties: OrderWarranty[];
 }) {
   const home = addresses.find((address) => address.isPrimary) ?? addresses[0];
   const completed = recentOrders.filter((order) => ["COMPLETED", "REVIEWED"].includes(order.status));
   const total = completed.reduce((sum, order) => sum + order.totalPriceRubles, 0);
   const showTracking = activeOrder?.status === "MASTER_ON_THE_WAY";
+  const activeWarranties = warranties.filter((warranty) => warranty.isActive);
 
   return (
     <div className="home-passport-page">
@@ -37,9 +41,33 @@ export function HomePassport({
 
       <section className="home-passport-summary" aria-label="Сводка по дому">
         <div><WalletCards size={20} /><span><small>Расходы в истории</small><strong>{formatRubles(total)}</strong></span></div>
-        <div><ShieldCheck size={20} /><span><small>Активные гарантии</small><strong>{completed.length > 0 ? "1" : "Нет"}</strong></span></div>
+        <div><ShieldCheck size={20} /><span><small>Активные гарантии</small><strong>{activeWarranties.length > 0 ? activeWarranties.length : "Нет"}</strong></span></div>
         <div><CalendarDays size={20} /><span><small>Следующий визит</small><strong>{activeOrder ? "По заказу" : "Не запланирован"}</strong></span></div>
       </section>
+
+      {warranties.length > 0 && (
+        <section className="home-warranty-list">
+          <header><div><span>Паспорт дома</span><h2>Гарантии</h2></div></header>
+          <ol>
+            {warranties.slice(0, 5).map((warranty) => (
+              <li key={warranty.id} className={warranty.isActive ? "" : "is-expired"}>
+                <span className="home-work-log__icon"><ShieldCheck size={18} /></span>
+                <div>
+                  <strong>{warranty.categoryName}</strong>
+                  <p>
+                    {warranty.claimComplaintId
+                      ? "Обращение открыто"
+                      : warranty.isActive
+                        ? `Осталось ${warranty.daysRemaining} дн. из ${warranty.durationDays}`
+                        : "Гарантия истекла"}
+                  </p>
+                </div>
+                <Link href={`/client/orders/${warranty.orderId}`} aria-label={`Открыть заказ ${warranty.categoryName}`}><ArrowRight size={18} /></Link>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       <section className="home-work-log">
         <header><div><span>Паспорт дома</span><h2>Журнал работ</h2></div><Link href="/client/orders?tab=COMPLETED">Все работы <ArrowRight size={15} /></Link></header>
