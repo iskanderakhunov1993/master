@@ -7,6 +7,7 @@ import { requireRole } from "@/lib/auth/guards";
 
 import {
   createAdminCategory,
+  resolveComplaint,
   setAdminCategoryActive,
   setUserBlocked,
   updateAdminCategory,
@@ -22,6 +23,7 @@ function errorResult(error: unknown): AdminActionResult {
     USER_UPDATE_CONFLICT: "Статус уже изменился. Обновите страницу",
     CATEGORY_NOT_FOUND: "Категория не найдена",
     ADMIN_ACCESS_REQUIRED: "Недостаточно прав для этого действия",
+    COMPLAINT_NOT_ACTIONABLE: "Обращение уже закрыто или не найдено. Обновите страницу",
   };
   return { ok: false, message: messages[code] ?? "Не удалось выполнить действие. Попробуйте ещё раз" };
 }
@@ -31,6 +33,7 @@ function revalidateAdmin() {
   revalidatePath("/admin/users");
   revalidatePath("/admin/masters");
   revalidatePath("/admin/categories");
+  revalidatePath("/admin/complaints");
 }
 
 export async function setUserBlockedAction(input: {
@@ -89,6 +92,43 @@ export async function setCategoryActiveAction(input: { categoryId: string; isAct
   if (!parsed.success) return { ok: false, message: "Категория не найдена" };
   try {
     setAdminCategoryActive(admin.id, parsed.data.categoryId, parsed.data.isActive);
+    revalidateAdmin();
+    return { ok: true };
+  } catch (error) {
+    return errorResult(error);
+  }
+}
+
+export async function claimComplaintAction(complaintId: string): Promise<AdminActionResult> {
+  const admin = await requireRole("ADMIN");
+  try {
+    resolveComplaint({ adminId: admin.id, complaintId, status: "IN_REVIEW" });
+    revalidateAdmin();
+    return { ok: true };
+  } catch (error) {
+    return errorResult(error);
+  }
+}
+
+export async function resolveComplaintAction(input: {
+  complaintId: string;
+  decision: "RESOLVED" | "REJECTED";
+  resolution: string;
+}): Promise<AdminActionResult> {
+  const admin = await requireRole("ADMIN");
+  const parsed = z.object({
+    complaintId: z.string().min(1),
+    decision: z.enum(["RESOLVED", "REJECTED"]),
+    resolution: z.string().trim().min(10, "Опишите решение минимум в 10 символах").max(1000, "Решение слишком длинное"),
+  }).safeParse(input);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message };
+  try {
+    resolveComplaint({
+      adminId: admin.id,
+      complaintId: parsed.data.complaintId,
+      status: parsed.data.decision,
+      resolution: parsed.data.resolution,
+    });
     revalidateAdmin();
     return { ok: true };
   } catch (error) {

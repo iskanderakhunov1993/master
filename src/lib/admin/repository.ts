@@ -6,11 +6,37 @@ import { getDb } from "@/lib/db";
 import type {
   AdminCategory,
   AdminComplaint,
+  AdminComplaintCase,
   AdminDashboardData,
   AdminMaster,
   AdminOrder,
   AdminUser,
 } from "./types";
+
+type AdminComplaintCaseRow = {
+  id: string;
+  orderId: string;
+  status: AdminComplaintCase["status"];
+  kind: AdminComplaintCase["kind"];
+  subject: string;
+  description: string;
+  resolution: string;
+  createdAt: number;
+  resolvedAt: number | null;
+  reporterId: string;
+  reporterName: string;
+  againstId: string | null;
+  againstName: string;
+  resolvedByName: string | null;
+  orderStatus: AdminComplaintCase["order"]["status"];
+  orderDescription: string | null;
+  priceMinor: number;
+  categoryName: string | null;
+  clientName: string;
+  clientEmail: string;
+  masterName: string | null;
+  masterEmail: string | null;
+};
 
 function assertAdmin(adminId: string) {
   const role = getDb()
@@ -211,6 +237,89 @@ export function setAdminCategoryActive(adminId: string, categoryId: string, isAc
     .run(isActive ? 1 : 0, categoryId);
   if (updated.changes !== 1) throw new Error("CATEGORY_NOT_FOUND");
   audit(adminId, isActive ? "CATEGORY_ENABLED" : "CATEGORY_DISABLED", "CATEGORY", categoryId);
+}
+
+export function getAdminComplaintCase(complaintId: string): AdminComplaintCase | undefined {
+  const row = getDb()
+    .prepare(
+      `SELECT
+        complaints.id, complaints.order_id AS orderId, complaints.status, complaints.kind,
+        complaints.subject, COALESCE(complaints.description, '') AS description,
+        COALESCE(complaints.resolution, '') AS resolution,
+        complaints.created_at AS createdAt, complaints.resolved_at AS resolvedAt,
+        reporter.id AS reporterId, reporter.name AS reporterName,
+        against_user.id AS againstId, COALESCE(against_user.name, '') AS againstName,
+        resolver.name AS resolvedByName,
+        orders.status AS orderStatus, orders.description AS orderDescription,
+        COALESCE(orders.agreed_price_minor, orders.total_price_minor, 0) AS priceMinor,
+        service_categories.name AS categoryName,
+        client.name AS clientName, client.email AS clientEmail,
+        master.name AS masterName, master.email AS masterEmail
+      FROM complaints
+      INNER JOIN users AS reporter ON reporter.id = complaints.reporter_id
+      LEFT JOIN users AS against_user ON against_user.id = complaints.against_user_id
+      LEFT JOIN users AS resolver ON resolver.id = complaints.resolved_by
+      INNER JOIN orders ON orders.id = complaints.order_id
+      LEFT JOIN service_categories ON service_categories.id = orders.category_id
+      INNER JOIN users AS client ON client.id = orders.client_id
+      LEFT JOIN users AS master ON master.id = orders.selected_master_id
+      WHERE complaints.id = ?`,
+    )
+    .get(complaintId) as AdminComplaintCaseRow | undefined;
+  if (!row) return undefined;
+
+  return {
+    id: row.id,
+    orderId: row.orderId,
+    status: row.status,
+    kind: row.kind,
+    subject: row.subject,
+    description: row.description,
+    resolution: row.resolution,
+    createdAt: row.createdAt,
+    resolvedAt: row.resolvedAt,
+    resolvedByName: row.resolvedByName,
+    reporterId: row.reporterId,
+    reporterName: row.reporterName,
+    againstId: row.againstId,
+    againstName: row.againstName,
+    order: {
+      status: row.orderStatus,
+      description: row.orderDescription ?? "",
+      categoryName: row.categoryName ?? "Без категории",
+      priceRubles: row.priceMinor / 100,
+      client: { name: row.clientName, email: row.clientEmail },
+      master: row.masterName ? { name: row.masterName, email: row.masterEmail ?? "" } : null,
+    },
+  };
+}
+
+export function resolveComplaint(input: {
+  adminId: string;
+  complaintId: string;
+  status: "IN_REVIEW" | "RESOLVED" | "REJECTED";
+  resolution?: string;
+}) {
+  assertAdmin(input.adminId);
+  const now = Date.now();
+  const isFinal = input.status === "RESOLVED" || input.status === "REJECTED";
+
+  const updated = getDb()
+    .prepare(
+      `UPDATE complaints
+      SET status = ?, resolution = ?, resolved_at = ?, resolved_by = ?
+      WHERE id = ? AND status IN ('OPEN', 'IN_REVIEW')`,
+    )
+    .run(
+      input.status,
+      input.resolution?.trim() || null,
+      isFinal ? now : null,
+      isFinal ? input.adminId : null,
+      input.complaintId,
+    );
+  if (updated.changes !== 1) throw new Error("COMPLAINT_NOT_ACTIONABLE");
+
+  audit(input.adminId, `COMPLAINT_${input.status}`, "COMPLAINT", input.complaintId, { resolution: input.resolution });
 }
 
 export function listAdminComplaints() {

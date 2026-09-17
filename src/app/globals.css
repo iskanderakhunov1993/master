@@ -3791,6 +3791,13 @@ svg {
 .admin-complaint-list dt { color: var(--muted); font-size: 8px; }
 .admin-complaint-list dd { margin: 2px 0 0; font-size: 10px; font-weight: 720; }
 .admin-complaint-list > article > a { color: var(--primary); font-size: 10px; font-weight: 750; }
+
+/* Dispute case detail page. */
+.admin-case-grid { display: grid; gap: 12px; max-width: 760px; }
+.admin-case-facts { display: grid; gap: 10px; margin: 14px 0 0; }
+.admin-case-facts > div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 10px; background: #f6f8fb; }
+.admin-case-facts dt { color: var(--muted); font-size: 9px; font-weight: 720; text-transform: uppercase; }
+.admin-case-facts dd { margin: 0; color: #2c3646; font-size: 11px; font-weight: 620; text-align: right; }
 .admin-loading-card { display: flex; min-height: 280px; align-items: center; justify-content: center; gap: 10px; color: var(--muted); border: 1px solid var(--line); border-radius: 19px; background: #fff; }
 .admin-loading-card svg { color: var(--primary); }
 .order-search-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 18px; }

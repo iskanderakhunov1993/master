@@ -82,3 +82,12 @@ export function getOrderWorkMediaForViewer(userId: string, mediaId: string) {
     )
     .get(mediaId, userId, userId) as { mimeType: string; content: Buffer; byteSize: number } | undefined;
 }
+
+/** Admins reviewing a dispute may view any order's evidence photos. */
+export function getOrderWorkMediaForAdmin(mediaId: string) {
+  return getDb()
+    .prepare(
+      "SELECT mime_type AS mimeType, content, byte_size AS byteSize FROM order_work_media WHERE id = ?",
+    )
+    .get(mediaId) as { mimeType: string; content: Buffer; byteSize: number } | undefined;
+}
