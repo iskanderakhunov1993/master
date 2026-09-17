@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/db";
 
 import { listOrderChangeRequests, type OrderChangeRequest } from "./change-requests";
+import { listOrderMessages, type OrderMessage } from "./chat";
 import { specialistLabel } from "../marketplace/ranking";
 import type { OrderStatus, OrderSummary, OrderType, ScheduleKind } from "./types";
 import { listOrderWorkMedia, type WorkPhoto } from "./work-media";
@@ -63,6 +64,7 @@ export type OrderDetails = {
   reviews: OrderReviewDetails[];
   changeRequests: OrderChangeRequest[];
   workPhotos: WorkPhoto[];
+  messages: OrderMessage[];
 };
 
 type DetailsRow = {
@@ -232,6 +234,7 @@ function loadDetails(row: DetailsRow): OrderDetails {
     reviews,
     changeRequests: listOrderChangeRequests(row.id),
     workPhotos: listOrderWorkMedia(row.id),
+    messages: row.masterId ? listOrderMessages(row.id) : [],
   };
 }
 

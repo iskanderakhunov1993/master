@@ -9,12 +9,12 @@ import {
   Clock3,
   ImagePlus,
   LoaderCircle,
-  Mail,
   Map,
   MapPin,
   MessageCircle,
   Navigation,
   Phone,
+  Send,
   Star,
   UserRound,
   WalletCards,
@@ -24,7 +24,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useEffect, useState, useTransition } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState, useTransition } from "react";
 
 import {
   advanceMasterOrderAction,
@@ -32,6 +32,7 @@ import {
   proposeChangeOrderAction,
   respondToChangeOrderAction,
   respondToCompletionAction,
+  sendOrderMessageAction,
   submitClientReviewAction,
   submitMasterReviewAction,
 } from "@/lib/orders/actions";
@@ -213,8 +214,9 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
         </main>
         <aside>
           {details.master && <section className="order-person-card"><div className="order-person-avatar">{details.master.avatarUrl ? <Image src={details.master.avatarUrl} alt={details.master.name} fill sizes="64px" unoptimized /> : <UserRound size={25} />}</div><div><small>Мастер</small><h2>{details.master.name}</h2><p>{details.master.specialization}</p><span><BadgeCheck size={14} /> Личность подтверждена</span>{details.master.rating && <b><Star size={14} fill="currentColor" /> {details.master.rating.toFixed(1)} · {details.master.reviewsCount} отзывов</b>}</div>{audience === "CLIENT" && <footer>{details.master.phone && <a href={`tel:${details.master.phone}`}><Phone size={16} /> Позвонить</a>}<Link href={`/masters/${details.master.id}`}>Профиль</Link></footer>}</section>}
-          {audience === "MASTER" && <section className="order-person-card"><div className="order-person-avatar"><UserRound size={25} /></div><div><small>Клиент</small><h2>{details.client.name}</h2><p>{details.client.email}</p></div><footer><a href={`mailto:${details.client.email}`}><Mail size={16} /> Написать</a></footer></section>}
+          {audience === "MASTER" && <section className="order-person-card"><div className="order-person-avatar"><UserRound size={25} /></div><div><small>Клиент</small><h2>{details.client.name}</h2><p>{details.client.email}</p></div><footer><a href="#order-chat"><MessageCircle size={16} /> Написать</a></footer></section>}
           <section className="order-facts-card"><div><MapPin size={18} /><span><small>Адрес</small><strong>{details.city}, {details.street}, {details.house}{details.apartment ? `, кв. ${details.apartment}` : ""}</strong>{details.addressComment && <p>{details.addressComment}</p>}</span></div><div><Clock3 size={18} /><span><small>Когда</small><strong>{formatSchedule(details.scheduleKind, details.scheduledAt)}</strong>{details.etaMinutes && <p>Ориентир прибытия: {details.etaMinutes} минут</p>}</span></div><div><WalletCards size={18} /><span><small>Согласованная цена</small><strong>{formatRubles(details.agreedPriceRubles)}</strong></span></div></section>
+          {details.master && <OrderChatCard orderId={details.id} messages={details.messages} audience={audience} onSent={() => router.refresh()} />}
         </aside>
       </div>
     </div>
@@ -237,7 +239,7 @@ function LiveTrackingCard({ details }: { details: OrderDetails }) {
         <div className="order-person-avatar">{details.master?.avatarUrl ? <Image src={details.master.avatarUrl} alt={details.master.name} fill sizes="62px" unoptimized /> : <UserRound size={25} />}</div>
         <div><small>Ваш мастер</small><h2>{details.master?.name}</h2><p>{details.master?.specialization} · <Star size={13} fill="currentColor" /> {details.master?.rating?.toFixed(1) ?? "Новый"}</p></div>
         <div className="live-tracking-contact">
-          <button type="button" aria-label="Написать мастеру"><MessageCircle size={20} /></button>
+          <a href="#order-chat" aria-label="Написать мастеру"><MessageCircle size={20} /></a>
           {details.master?.phone && <a href={`tel:${details.master.phone}`} aria-label="Позвонить мастеру"><Phone size={20} /></a>}
         </div>
       </div>
@@ -263,7 +265,7 @@ function LiveTrackingOverlay({ details }: { details: OrderDetails }) {
         <div className="live-tracking-master">
           <div className="order-person-avatar">{details.master?.avatarUrl ? <Image src={details.master.avatarUrl} alt={details.master.name} fill sizes="64px" unoptimized /> : <UserRound size={25} />}</div>
           <div><small>Выбранный мастер</small><h2>{details.master?.name}</h2><p>{details.master?.specialization} · <Star size={13} fill="currentColor" /> {details.master?.rating?.toFixed(1) ?? "Новый"}</p></div>
-          <div className="live-tracking-contact"><button type="button" aria-label="Написать мастеру"><MessageCircle size={20} /></button>{details.master?.phone && <a href={`tel:${details.master.phone}`} aria-label="Позвонить мастеру"><Phone size={20} /></a>}</div>
+          <div className="live-tracking-contact"><a href="#order-chat" aria-label="Написать мастеру"><MessageCircle size={20} /></a>{details.master?.phone && <a href={`tel:${details.master.phone}`} aria-label="Позвонить мастеру"><Phone size={20} /></a>}</div>
         </div>
         <dl className="live-tracking-facts"><div><dt>Адрес</dt><dd>{details.street}, {details.house}</dd></div><div><dt>Цена</dt><dd>{formatRubles(details.agreedPriceRubles)}</dd></div></dl>
         <a className="button button--primary tracking-overlay__close" href="#"><Map size={18} /> Вернуться к заказу</a>
@@ -458,5 +460,65 @@ function WorkEvidenceStage({
         </label>
       )}
     </div>
+  );
+}
+
+function OrderChatCard({
+  orderId,
+  messages,
+  audience,
+  onSent,
+}: {
+  orderId: string;
+  messages: OrderDetails["messages"];
+  audience: "CLIENT" | "MASTER";
+  onSent: () => void;
+}) {
+  const [body, setBody] = useState("");
+  const [error, setError] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (list) list.scrollTop = list.scrollHeight;
+  }, [messages.length]);
+
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    const trimmed = body.trim();
+    if (!trimmed) return;
+    setError("");
+    startTransition(async () => {
+      const result = await sendOrderMessageAction(orderId, trimmed);
+      if (!result.ok) { setError(result.message ?? "Не удалось отправить сообщение"); return; }
+      setBody("");
+      onSent();
+    });
+  }
+
+  return (
+    <section className="order-chat-card" id="order-chat">
+      <header><small><MessageCircle size={13} /> Чат заказа</small><h2>Сообщения</h2></header>
+      <div className="order-chat-list" ref={listRef}>
+        {messages.length === 0 && <p className="order-chat-empty">Договоритесь о деталях здесь — переписка останется в заказе.</p>}
+        {messages.map((message) => {
+          const isOwn = message.senderRole === audience;
+          return (
+            <div className={`order-chat-message${isOwn ? " is-own" : ""}`} key={message.id}>
+              <span className="order-chat-message__meta">{isOwn ? "Вы" : message.senderName} · {new Intl.DateTimeFormat("ru-RU", { hour: "2-digit", minute: "2-digit" }).format(message.createdAt)}</span>
+              <p>{message.body}</p>
+            </div>
+          );
+        })}
+      </div>
+      <form className="order-chat-form" onSubmit={submit}>
+        <textarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={2000} rows={2} placeholder="Написать сообщение…" disabled={isPending} />
+        <button className="button button--primary" type="submit" aria-label="Отправить" disabled={isPending || !body.trim()}>
+          {isPending ? <LoaderCircle className="spin" size={17} /> : <Send size={17} />}
+        </button>
+      </form>
+      {error && <p className="task-form-error" role="alert"><AlertCircle size={16} /> {error}</p>}
+    </section>
   );
 }

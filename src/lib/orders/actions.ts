@@ -4,11 +4,13 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { requireRole } from "@/lib/auth/guards";
+import { getSession } from "@/lib/auth/session";
 import { matchOrder } from "@/lib/marketplace/matching";
 import { createClientAddress, findClientAddress } from "@/lib/addresses/repository";
 import type { ClientAddress } from "@/lib/addresses/types";
 
 import { createChangeRequest, respondToChangeRequest } from "./change-requests";
+import { sendOrderMessage } from "./chat";
 import { transitionOrder } from "./lifecycle";
 import {
   saveAddressStep,
@@ -95,6 +97,7 @@ function failure(error: unknown): LifecycleActionResult {
     CHANGE_REQUEST_ALREADY_PENDING: "По этому заказу уже есть запрос на изменение цены",
     CHANGE_REQUEST_NOT_FOUND: "Запрос на изменение цены не найден",
     CHANGE_REQUEST_STALE: "Запрос уже обработан. Обновите страницу",
+    CHAT_NOT_AVAILABLE: "Чат откроется после того, как вы выберете мастера",
   };
   return { ok: false, message: messages[code] ?? "Не удалось выполнить действие. Попробуйте ещё раз" };
 }
@@ -380,6 +383,22 @@ export async function respondToChangeOrderAction(input: {
       accept: parsed.data.accept,
     });
     revalidateOrder(parsed.data.orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function sendOrderMessageAction(orderId: string, body: string): Promise<LifecycleActionResult> {
+  const user = await getSession();
+  if (!user) return { ok: false, message: "Требуется вход" };
+
+  const parsed = z.string().trim().min(1, "Введите сообщение").max(2000, "Сообщение слишком длинное").safeParse(body);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message };
+
+  try {
+    sendOrderMessage({ orderId, senderId: user.id, body: parsed.data });
+    revalidateOrder(orderId);
     return { ok: true };
   } catch (error) {
     return failure(error);

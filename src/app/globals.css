@@ -641,6 +641,22 @@
 .order-facts-card span { display: grid; gap: 3px; }
 .order-facts-card strong { color: #2a3932; font-size: 10px; line-height: 1.45; }
 .order-facts-card p { margin: 0; color: #7c8882; font-size: 8px; }
+
+/* Order chat: kept in-app so agreements stay on record. */
+.order-chat-card { display: grid; gap: 10px; padding: 17px; border: 1px solid #e1e8e4; border-radius: 16px; background: #fff; }
+.order-chat-card > header small { display: flex; align-items: center; gap: 5px; color: #39795f; font-size: 8px; font-weight: 780; text-transform: uppercase; }
+.order-chat-card > header h2 { margin: 3px 0 0; font-size: 14px; }
+.order-chat-list { display: flex; flex-direction: column; gap: 9px; max-height: 280px; padding-right: 2px; overflow-y: auto; }
+.order-chat-empty { margin: 6px 0; color: #8a938d; font-size: 10px; line-height: 1.55; }
+.order-chat-message { max-width: 88%; padding: 8px 11px; border-radius: 12px 12px 12px 3px; background: #f2f5f9; align-self: flex-start; }
+.order-chat-message.is-own { border-radius: 12px 12px 3px 12px; background: #e9efff; align-self: flex-end; }
+.order-chat-message__meta { display: block; margin-bottom: 3px; color: #8b96a6; font-size: 8px; font-weight: 700; }
+.order-chat-message p { margin: 0; color: #2c3646; font-size: 11px; line-height: 1.5; word-break: break-word; }
+.order-chat-form { display: flex; gap: 8px; align-items: flex-end; }
+.order-chat-form textarea { flex: 1; padding: 9px 12px; color: var(--ink); border: 1px solid #d7deea; border-radius: 11px; outline: none; background: #fff; font: inherit; font-size: 12px; line-height: 1.5; resize: none; }
+.order-chat-form textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(55, 104, 232, 0.1); }
+.order-chat-form button[type="submit"] { flex: none; width: 42px; height: 42px; padding: 0; border-radius: 11px; }
+
 .order-review-form { display: grid; gap: 13px; }
 .review-rating { margin: 0; padding: 0; border: 0; }
 .review-rating legend { margin-bottom: 5px; color: #5d6b64; font-size: 8px; font-weight: 720; }

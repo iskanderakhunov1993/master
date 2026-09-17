@@ -456,6 +456,22 @@ function migrate(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS order_work_media_order_idx
       ON order_work_media(order_id, stage, created_at);
 
+    -- Order chat: kept in-app and tied to the order so agreements have a
+    -- record, instead of leaking into phone calls the platform can't see.
+    CREATE TABLE IF NOT EXISTS order_messages (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      sender_id TEXT NOT NULL,
+      sender_role TEXT NOT NULL CHECK (sender_role IN ('CLIENT', 'MASTER')),
+      body TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS order_messages_order_idx
+      ON order_messages(order_id, created_at);
+
     CREATE TABLE IF NOT EXISTS order_reviews (
       id TEXT PRIMARY KEY,
       order_id TEXT NOT NULL,
