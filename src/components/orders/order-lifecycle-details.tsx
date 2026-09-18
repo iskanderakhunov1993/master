@@ -33,6 +33,7 @@ import {
   cancelClientOrderAction,
   fileWarrantyClaimAction,
   proposeChangeOrderAction,
+  reportMasterNoShowAction,
   respondToChangeOrderAction,
   respondToCompletionAction,
   sendOrderMessageAction,
@@ -158,8 +159,30 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
     });
   }
 
+  function reportNoShow() {
+    if (!window.confirm("Мастер не приехал в назначенное время? Заказ будет отменён по вине мастера, это повлияет на его надёжность.")) return;
+    setError("");
+    startTransition(async () => {
+      const result = await reportMasterNoShowAction(details.id);
+      if (!result.ok) setError(result.message ?? "Не удалось зафиксировать неявку");
+      else router.refresh();
+    });
+  }
+
   const canClientCancel = audience === "CLIENT" && ["MASTER_SELECTED", "MASTER_CONFIRMED"].includes(details.status);
   const canMasterCancel = audience === "MASTER" && ["MASTER_SELECTED", "MASTER_CONFIRMED", "MASTER_ON_THE_WAY", "MASTER_ARRIVED"].includes(details.status);
+  // Mirrors NO_SHOW_MIN_OVERDUE_MS server-side — this only decides whether
+  // to show the button; the server re-checks the same window regardless.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(interval);
+  }, []);
+  const canReportNoShow = audience === "CLIENT"
+    && ["MASTER_CONFIRMED", "MASTER_ON_THE_WAY"].includes(details.status)
+    && details.scheduleKind !== "NOW"
+    && Boolean(details.scheduledAt)
+    && now > details.scheduledAt! + 60 * 60 * 1000;
   const showLiveTracking = audience === "CLIENT" && details.status === "MASTER_ON_THE_WAY" && Boolean(details.master);
 
   return (
@@ -175,6 +198,7 @@ export function OrderLifecycleDetails({ details, audience }: { details: OrderDet
         {audience === "MASTER" && missingAfterPhoto && <p className="order-gate-hint"><Camera size={15} /> Добавьте фото «после», чтобы завершить работу</p>}
         {audience === "MASTER" && masterAction?.status === "COMPLETED_BY_MASTER" && pendingChangeRequest && <p className="order-gate-hint"><WalletCards size={15} /> Сначала дождитесь ответа клиента на изменение цены</p>}
         {audience === "CLIENT" && details.status === "COMPLETED_BY_MASTER" && <div className="order-completion-actions"><button className="button button--primary" type="button" onClick={() => respond(true)} disabled={isPending}>Да, всё выполнено</button><button className="button button--secondary" type="button" onClick={() => respond(false)} disabled={isPending}>Есть проблема</button></div>}
+        {canReportNoShow && <button className="button button--secondary" type="button" onClick={reportNoShow} disabled={isPending}><AlertCircle size={17} /> Мастер не приехал</button>}
         {(canClientCancel || canMasterCancel) && <button className="button button--ghost is-danger" type="button" onClick={cancelOrder} disabled={isPending}><XCircle size={17} /> Отменить заказ</button>}
         {error && <p className="task-form-error" role="alert"><AlertCircle size={16} /> {error}</p>}
       </section>}

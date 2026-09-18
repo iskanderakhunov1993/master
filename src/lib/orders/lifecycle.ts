@@ -35,6 +35,11 @@ export const ORDER_TRANSITION_RULES: readonly TransitionRule[] = [
   { from: "MASTER_CONFIRMED", to: "CANCELLED_BY_MASTER", role: "MASTER" },
   { from: "MASTER_ON_THE_WAY", to: "CANCELLED_BY_MASTER", role: "MASTER" },
   { from: "MASTER_ARRIVED", to: "CANCELLED_BY_MASTER", role: "MASTER" },
+  // No-show: the client gives up waiting past the grace window. Same target
+  // status as a master's own cancellation (fault is the master's either
+  // way), gated by reportMasterNoShow's overdue check before this ever runs.
+  { from: "MASTER_CONFIRMED", to: "CANCELLED_BY_MASTER", role: "CLIENT" },
+  { from: "MASTER_ON_THE_WAY", to: "CANCELLED_BY_MASTER", role: "CLIENT" },
 ] as const;
 
 export function canTransitionOrder(
@@ -95,7 +100,15 @@ type LifecycleOrderRow = {
   categoryName: string | null;
   subcategoryName: string | null;
   description: string | null;
+  scheduleKind: string | null;
+  scheduledAt: number | null;
 };
+
+// A scheduled visit (not "NOW") is late once it's this far past the agreed
+// time; the same window is the minimum overdue before a client can report
+// the master as a no-show outright.
+export const LATE_ARRIVAL_THRESHOLD_MS = 15 * 60 * 1000;
+export const NO_SHOW_MIN_OVERDUE_MS = 60 * 60 * 1000;
 
 function requireActorAccess(order: LifecycleOrderRow, actorId: string, role: OrderActorRole) {
   if (role === "CLIENT" && order.clientId !== actorId) throw new Error("ORDER_ACCESS_DENIED");
@@ -173,7 +186,9 @@ export function transitionOrderInTransaction(
         orders.category_id AS categoryId,
         service_categories.name AS categoryName,
         service_subcategories.name AS subcategoryName,
-        orders.description
+        orders.description,
+        orders.schedule_kind AS scheduleKind,
+        orders.scheduled_at AS scheduledAt
       FROM orders
       LEFT JOIN service_categories ON service_categories.id = orders.category_id
       LEFT JOIN service_subcategories ON service_subcategories.id = orders.subcategory_id
@@ -276,12 +291,31 @@ export function transitionOrderInTransaction(
     applyCompletionSideEffects(database, order, now);
     nextSubscriptionOrderId = advanceSubscriptionAfterCompletedOrder(database, order.id, now);
   }
+  // A master who cancels on themselves is a cancellation; a master a client
+  // gives up waiting for (via reportNoShow, always CLIENT-actored) is a
+  // no-show. Both land on CANCELLED_BY_MASTER but must count separately —
+  // conflating them would double-penalize or under-penalize reliability.
   if (input.toStatus === "CANCELLED_BY_MASTER" && order.selectedMasterId) {
+    const column = input.actorRole === "MASTER" ? "master_cancellations" : "no_shows";
     database
       .prepare(
-        `UPDATE master_profiles
-        SET master_cancellations = master_cancellations + 1, updated_at = ?
-        WHERE master_id = ?`,
+        `UPDATE master_profiles SET ${column} = ${column} + 1, updated_at = ? WHERE master_id = ?`,
+      )
+      .run(now, order.selectedMasterId);
+  }
+  // Arriving more than the grace window after a scheduled (non-"NOW") time
+  // counts as late, tracked automatically — no one has to report it.
+  if (
+    input.toStatus === "MASTER_ARRIVED"
+    && order.selectedMasterId
+    && order.scheduleKind
+    && order.scheduleKind !== "NOW"
+    && order.scheduledAt
+    && now > order.scheduledAt + LATE_ARRIVAL_THRESHOLD_MS
+  ) {
+    database
+      .prepare(
+        `UPDATE master_profiles SET late_arrivals = late_arrivals + 1, updated_at = ? WHERE master_id = ?`,
       )
       .run(now, order.selectedMasterId);
   }
@@ -299,4 +333,36 @@ export function transitionOrder(input: TransitionOrderInput) {
   const result = database.transaction(() => transitionOrderInTransaction(database, input))();
   if (result.nextSubscriptionOrderId) matchOrder(result.nextSubscriptionOrderId, result.updatedAt);
   return result;
+}
+
+/**
+ * A client may declare the master a no-show — but only for a scheduled
+ * (non-"NOW") visit, only while the master still hasn't arrived, and only
+ * once the grace window has actually passed. This is the enforcement point:
+ * the transition rule alone would let a client fire this the instant they
+ * feel impatient, so the overdue check lives here, ahead of the transition.
+ */
+export function reportMasterNoShow(input: { orderId: string; clientId: string; now?: number }) {
+  const now = input.now ?? Date.now();
+  const order = getDb()
+    .prepare(
+      `SELECT id, client_id AS clientId, status, schedule_kind AS scheduleKind, scheduled_at AS scheduledAt
+      FROM orders WHERE id = ?`,
+    )
+    .get(input.orderId) as { id: string; clientId: string; status: OrderStatus; scheduleKind: string | null; scheduledAt: number | null } | undefined;
+
+  if (!order) throw new Error("ORDER_NOT_FOUND");
+  if (order.clientId !== input.clientId) throw new Error("ORDER_ACCESS_DENIED");
+  if (!["MASTER_CONFIRMED", "MASTER_ON_THE_WAY"].includes(order.status)) throw new Error("NO_SHOW_NOT_ELIGIBLE");
+  if (!order.scheduleKind || order.scheduleKind === "NOW" || !order.scheduledAt) throw new Error("NO_SHOW_REQUIRES_SCHEDULE");
+  if (now <= order.scheduledAt + NO_SHOW_MIN_OVERDUE_MS) throw new Error("NO_SHOW_TOO_EARLY");
+
+  return transitionOrder({
+    orderId: input.orderId,
+    actorId: input.clientId,
+    actorRole: "CLIENT",
+    toStatus: "CANCELLED_BY_MASTER",
+    reason: "Клиент сообщил о неявке мастера",
+    now,
+  });
 }

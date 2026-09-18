@@ -11,7 +11,7 @@ import type { ClientAddress } from "@/lib/addresses/types";
 
 import { createChangeRequest, respondToChangeRequest } from "./change-requests";
 import { sendOrderMessage } from "./chat";
-import { transitionOrder } from "./lifecycle";
+import { reportMasterNoShow, transitionOrder } from "./lifecycle";
 import { fileWarrantyClaim } from "./warranty";
 import {
   saveAddressStep,
@@ -102,6 +102,9 @@ function failure(error: unknown): LifecycleActionResult {
     WARRANTY_NOT_FOUND: "Гарантия не найдена",
     WARRANTY_ALREADY_CLAIMED: "По этой гарантии уже открыто обращение",
     WARRANTY_EXPIRED: "Срок гарантии истёк",
+    NO_SHOW_NOT_ELIGIBLE: "Сейчас нельзя сообщить о неявке — мастер уже приступил к заказу",
+    NO_SHOW_REQUIRES_SCHEDULE: "Неявку можно зафиксировать только для заказа с назначенным временем",
+    NO_SHOW_TOO_EARLY: "Подождите ещё немного — мастер может опаздывать",
   };
   return { ok: false, message: messages[code] ?? "Не удалось выполнить действие. Попробуйте ещё раз" };
 }
@@ -313,6 +316,18 @@ export async function cancelClientOrderAction(orderId: string): Promise<Lifecycl
   if (!orderId) return { ok: false, message: "Заказ не найден" };
   try {
     transitionOrder({ orderId, actorId: client.id, actorRole: "CLIENT", toStatus: "CANCELLED_BY_CLIENT" });
+    revalidateOrder(orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function reportMasterNoShowAction(orderId: string): Promise<LifecycleActionResult> {
+  const client = await requireRole("CLIENT");
+  if (!orderId) return { ok: false, message: "Заказ не найден" };
+  try {
+    reportMasterNoShow({ orderId, clientId: client.id });
     revalidateOrder(orderId);
     return { ok: true };
   } catch (error) {
