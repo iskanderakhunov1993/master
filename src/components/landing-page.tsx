@@ -77,7 +77,7 @@ export function LandingPage() {
                 Цена известна <em>до выезда</em>
               </h1>
               <p className="nz-hero__lead">
-                Вы называете свою цену. Подходящие мастера отвечают своей. Вы выбираете, кто приедет — и только
+                Вы называете свою цену. Подходящие мастера отвечают своей. Вы выбираете, кто приедет, и только
                 тогда он видит ваш адрес.
               </p>
               <div className="nz-hero__actions">
@@ -223,7 +223,7 @@ export function LandingPage() {
               </ul>
               <div className="nz-masters__cta">
                 <Link className="nz-btn nz-btn--onsteel" href="/register?role=MASTER">
-                  Начать работать
+                  Работать мастером
                   <ArrowRight size={17} aria-hidden="true" />
                 </Link>
               </div>
