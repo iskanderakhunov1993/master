@@ -33,8 +33,13 @@ export function HomePassport({
 
       {activeOrder && (
         <section className="home-live-visit">
-          <header><div><small>{showTracking ? "Мастер в пути" : ORDER_STATUS_LABEL[activeOrder.status]}</small><h2>{formatOrderCategory(activeOrder)}</h2></div>{showTracking && <strong>24 мин</strong>}</header>
-          {showTracking && <div className="home-live-visit__map"><Image src="/maps/master-en-route.png" alt="Маршрут мастера к дому" fill sizes="(max-width: 850px) 100vw, 900px" /></div>}
+          <header><div><small>{showTracking ? "Мастер в пути" : ORDER_STATUS_LABEL[activeOrder.status]}</small><h2>{formatOrderCategory(activeOrder)}</h2></div>{showTracking && <strong>~{activeOrder.etaMinutes ?? 24} мин</strong>}</header>
+          {showTracking && (
+            <div className="home-live-visit__map">
+              <Image src="/maps/master-en-route.png" alt="Схематичный маршрут мастера к дому" fill sizes="(max-width: 850px) 100vw, 900px" />
+              <span className="home-live-visit__map-badge">Схема маршрута, не трансляция</span>
+            </div>
+          )}
           <footer><span>{formatRubles(activeOrder.totalPriceRubles)}</span><Link href={`/client/orders/${activeOrder.id}`}>Открыть заказ <ArrowRight size={16} /></Link></footer>
         </section>
       )}

@@ -710,114 +710,6 @@
   border-radius: 5px;
 }
 
-/* Reviews */
-.nz-reviews {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-}
-
-.nz-review {
-  display: flex;
-  flex-direction: column;
-  padding: 28px;
-  border: 1px solid var(--nz-line);
-  border-radius: 5px;
-  background: var(--nz-card);
-}
-
-.nz-review > p {
-  flex: 1;
-  font-size: 15.5px;
-  line-height: 1.6;
-}
-
-.nz-review footer {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid var(--nz-line-soft);
-}
-
-.nz-review__avatar {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 3px;
-  background: var(--nz-ground);
-  font-family: var(--nz-mono);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.nz-review strong {
-  display: block;
-  font-size: 14.5px;
-  font-weight: 600;
-}
-
-.nz-review small {
-  font-family: var(--nz-mono);
-  font-size: 11px;
-  color: var(--nz-zinc);
-}
-
-/* FAQ — clauses of the order. */
-.nz-faq__grid {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 64px;
-  align-items: start;
-}
-
-.nz-faq__list {
-  border-top: 1.5px solid var(--nz-ink);
-}
-
-.nz-faq__list details {
-  border-bottom: 1px solid var(--nz-line);
-}
-
-.nz-faq__list summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 20px 0;
-  font-size: 16.5px;
-  font-weight: 600;
-  cursor: pointer;
-  list-style: none;
-}
-
-.nz-faq__list summary::-webkit-details-marker {
-  display: none;
-}
-
-.nz-faq__list summary span {
-  flex: none;
-  font-family: var(--nz-mono);
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--nz-enamel);
-  transition: transform 180ms ease;
-}
-
-.nz-faq__list details[open] summary span {
-  transform: rotate(45deg);
-}
-
-.nz-faq__list details p {
-  max-width: 62ch;
-  padding: 0 0 22px;
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--nz-zinc);
-}
-
 /* Final call */
 .nz-final {
   padding: 84px 0;
@@ -928,8 +820,7 @@
   }
 
   .nz-hero__grid,
-  .nz-masters__grid,
-  .nz-faq__grid {
+  .nz-masters__grid {
     grid-template-columns: 1fr;
     gap: 52px;
   }
@@ -943,8 +834,7 @@
   }
 
   .nz-stages,
-  .nz-terms,
-  .nz-reviews {
+  .nz-terms {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -1002,7 +892,6 @@
 
   .nz-stages,
   .nz-terms,
-  .nz-reviews,
   .nz-footer__grid {
     grid-template-columns: 1fr;
   }
@@ -1020,8 +909,7 @@
     bottom: -18px;
   }
 
-  .nz-term,
-  .nz-review {
+  .nz-term {
     padding: 22px;
   }
 }

@@ -258,11 +258,12 @@ function LiveTrackingCard({ details }: { details: OrderDetails }) {
     <section className="live-tracking-card" aria-labelledby="live-tracking-title">
       <header>
         <div><small>Активный заказ</small><h1 id="live-tracking-title">Мастер в пути</h1><p>{details.categoryName}{details.subcategoryName ? ` · ${details.subcategoryName}` : ""}</p></div>
-        <strong><span>{eta}</span> мин</strong>
+        <strong>~<span>{eta}</span> мин</strong>
       </header>
-      <a className="live-tracking-map" href="#live-tracking-map" aria-label="Открыть полноэкранную карту движения мастера">
-        <Image src="/maps/master-en-route.png" alt="Маршрут выбранного мастера Александра до дома на Тверской, 18" fill sizes="(max-width: 850px) 100vw, 900px" priority />
-        <span><Navigation size={16} /> Следить на карте</span>
+      <a className="live-tracking-map" href="#live-tracking-map" aria-label="Открыть схему маршрута мастера крупнее. Это иллюстрация, не трансляция в реальном времени">
+        <Image src="/maps/master-en-route.png" alt="Схематичный маршрут мастера до адреса клиента" fill sizes="(max-width: 850px) 100vw, 900px" priority />
+        <span className="live-tracking-map__badge">Схема маршрута, не трансляция</span>
+        <span><Navigation size={16} /> Смотреть крупнее</span>
       </a>
       <div className="live-tracking-master">
         <div className="order-person-avatar">{details.master?.avatarUrl ? <Image src={details.master.avatarUrl} alt={details.master.name} fill sizes="62px" unoptimized /> : <UserRound size={25} />}</div>
@@ -274,7 +275,7 @@ function LiveTrackingCard({ details }: { details: OrderDetails }) {
       </div>
       <dl className="live-tracking-facts">
         <div><dt>Согласованная цена</dt><dd>{formatRubles(details.agreedPriceRubles)}</dd></div>
-        <div><dt>Ожидаем прибытие</dt><dd>через {eta} мин</dd></div>
+        <div><dt>Ожидаем прибытие</dt><dd>через ~{eta} мин, по оценке мастера</dd></div>
       </dl>
       <div className="live-tracking-next"><span><Navigation size={18} /></span><div><small>Следующий этап</small><strong>По прибытии мастер добавит фото «до»</strong></div></div>
     </section>
@@ -286,9 +287,10 @@ function LiveTrackingOverlay({ details }: { details: OrderDetails }) {
   return (
     <div className="tracking-overlay" id="live-tracking-map" role="dialog" aria-modal="true" aria-labelledby="tracking-overlay-title">
       <div className="tracking-overlay__map">
-        <Image src="/maps/master-en-route.png" alt="Маршрут мастера до адреса клиента" fill sizes="100vw" priority />
+        <Image src="/maps/master-en-route.png" alt="Схематичный маршрут мастера до адреса клиента" fill sizes="100vw" priority />
+        <span className="tracking-overlay__map-badge">Схема маршрута, не трансляция в реальном времени</span>
       </div>
-      <header><a href="#" aria-label="Закрыть карту"><X size={22} /></a><div><small>Заказ № {details.id === "demo-active-order" ? "MR-1048" : details.id.slice(-6).toUpperCase()}</small><h2 id="tracking-overlay-title">Мастер в пути</h2></div><strong>{eta} мин</strong></header>
+      <header><a href="#" aria-label="Закрыть схему маршрута"><X size={22} /></a><div><small>Заказ № {details.id === "demo-active-order" ? "MR-1048" : details.id.slice(-6).toUpperCase()}</small><h2 id="tracking-overlay-title">Мастер в пути</h2></div><strong>~{eta} мин</strong></header>
       <section className="tracking-overlay__sheet">
         <span className="tracking-overlay__handle" />
         <div className="live-tracking-master">

@@ -333,6 +333,7 @@ export function listMasterOrders(masterId: string, limit = 50): OrderSummary[] {
     submittedAt: row.submittedAt,
     updatedAt: row.updatedAt,
     photoCount: row.photoCount,
+    etaMinutes: null,
   }));
 }
 

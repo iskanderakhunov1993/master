@@ -89,6 +89,7 @@ export type OrderSummary = {
   submittedAt: number | null;
   updatedAt: number;
   photoCount: number;
+  etaMinutes: number | null;
 };
 
 export type ClientTaskSummary = {
