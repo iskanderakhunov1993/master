@@ -17,8 +17,10 @@ export function UserBlockButton({ userId, userName, isBlocked, disabled = false 
   const [error, setError] = useState("");
 
   function toggle() {
-    const verb = isBlocked ? "разблокировать" : "заблокировать";
-    if (!window.confirm(`Вы уверены, что хотите ${verb} пользователя «${userName}»?`)) return;
+    const question = isBlocked
+      ? `Разблокировать «${userName}»? Пользователь снова сможет войти в аккаунт.`
+      : `Заблокировать «${userName}»? Пользователь не сможет войти, пока вы не снимете блокировку.`;
+    if (!window.confirm(question)) return;
     setError("");
     startTransition(async () => {
       const result = await setUserBlockedAction({ userId, blocked: !isBlocked });

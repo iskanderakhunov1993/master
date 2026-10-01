@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 
+import { AccountSettings } from "@/components/account/account-settings";
 import { AddressManager } from "@/components/client/address-manager";
 import { ClientDashboard } from "@/components/client/client-dashboard";
 import { HomePassport } from "@/components/client/home-passport";
@@ -12,13 +13,13 @@ import { TaskBoard } from "@/components/client/task-board";
 import { TaskDetails } from "@/components/client/task-details";
 import { SubscriptionManager } from "@/components/client/subscription-manager";
 import { CalendarView } from "@/components/calendar/calendar-view";
-import { SectionPage } from "@/components/dashboard/section-page";
 import { listClientAddresses } from "@/lib/addresses/repository";
 import { requireRole } from "@/lib/auth/guards";
 import { listClientCalendarEvents } from "@/lib/calendar/repository";
 import { listRankedCandidates } from "@/lib/marketplace/ranking";
 import { getOrderSearchMeta } from "@/lib/marketplace/matching";
 import { getClientOrderDetails } from "@/lib/orders/details";
+import { listClientWarranties } from "@/lib/orders/warranty";
 import {
   getClientDashboardData,
   getClientOrder,
@@ -28,14 +29,6 @@ import {
 } from "@/lib/orders/repository";
 import { getClientTask, listClientTasks } from "@/lib/tasks/repository";
 import { getSubscriptionPageData } from "@/lib/subscriptions/repository";
-
-const sections: Record<string, { title: string; description: string }> = {
-  tasks: { title: "Задачи", description: "Планируйте бытовые дела и превращайте их в заказы, когда нужна помощь." },
-  calendar: { title: "Календарь", description: "Все задачи и заказы с назначенным временем в одном календаре." },
-  history: { title: "История", description: "Завершённые и отменённые заказы с сохранёнными деталями." },
-  profile: { title: "Профиль", description: "Ваши личные данные и настройки публичного отображения." },
-  settings: { title: "Настройки", description: "Уведомления, безопасность аккаунта и предпочтения сервиса." },
-};
 
 export default async function ClientPage({
   params,
@@ -55,9 +48,20 @@ export default async function ClientPage({
     return <AddressManager addresses={listClientAddresses(user.id)} />;
   }
 
+  if (slug.length === 1 && slug[0] === "profile") {
+    return <AccountSettings role="CLIENT" name={user.name} email={user.email} />;
+  }
+
   if (slug.length === 1 && slug[0] === "home") {
     const dashboard = getClientDashboardData(user.id);
-    return <HomePassport addresses={listClientAddresses(user.id)} activeOrder={dashboard.activeOrder} recentOrders={dashboard.recentOrders} />;
+    return (
+      <HomePassport
+        addresses={listClientAddresses(user.id)}
+        activeOrder={dashboard.activeOrder}
+        recentOrders={dashboard.recentOrders}
+        warranties={listClientWarranties(user.id)}
+      />
+    );
   }
 
   if (slug.length === 1 && slug[0] === "tasks") {
@@ -114,7 +118,5 @@ export default async function ClientPage({
     return <OrderSearching order={order} matchedMasters={getOrderSearchMeta(order.id).matchedMasters} />;
   }
 
-  if (slug.length !== 1 || !sections[slug[0]]) notFound();
-  const section = sections[slug[0]];
-  return <SectionPage eyebrow="Кабинет клиента" title={section.title} description={section.description} homeHref="/client" />;
+  notFound();
 }

@@ -1,275 +1,237 @@
-import {
-  ArrowRight,
-  BadgeCheck,
-  CalendarClock,
-  Check,
-  CircleDollarSign,
-  Clock3,
-  MapPin,
-  Quote,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  UserCheck,
-  Wrench,
-} from "lucide-react";
+import { ArrowRight, Check, EyeOff, ReceiptText, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { Brand } from "./brand";
 import { PublicHeader } from "./public-header";
 
-const benefits = [
+const facts = [
+  { label: "Личность", value: "Мастер проходит подтверждение до первого заказа" },
+  { label: "Цена", value: "Согласована до выезда, без доплат на месте" },
+  { label: "Адрес", value: "Открывается только выбранному мастеру" },
+];
+
+const stages = [
+  { title: "Опишите задачу", text: "Фото, район, время и ваша цена." },
+  { title: "Получите отклики", text: "До трёх мастеров вашей категории и района." },
+  { title: "Выберите мастера", text: "Профиль, рейтинг, история работ. Адрес откроется только ему." },
+  { title: "Примите работу", text: "Подтвердите результат и оцените мастера." },
+];
+
+const terms = [
   {
-    icon: BadgeCheck,
-    title: "Проверенные мастера",
-    text: "Вы видите профиль, историю, рейтинг и подтверждение личности.",
-    accent: "mint",
+    icon: ReceiptText,
+    title: "Цену называете вы",
+    text: "Вы ставите сумму. Мастер принимает или предлагает свою.",
+    rows: [
+      ["Ваша цена", "2 500 ₽"],
+      ["Встречные", "до 3"],
+      ["Доплаты на месте", "нет"],
+    ],
   },
   {
-    icon: CircleDollarSign,
-    title: "Цена заранее",
-    text: "Вы предлагаете цену. Мастер принимает её или предлагает свою.",
-    accent: "peach",
+    icon: EyeOff,
+    title: "Адрес скрыт до выбора",
+    text: "До выбора мастер видит только район.",
+    rows: [
+      ["До выбора", "район"],
+      ["После выбора", "полный адрес"],
+      ["Остальным мастерам", "закрыт"],
+    ],
   },
   {
-    icon: Clock3,
-    title: "Быстро",
-    text: "Подходящие мастера получают ваш заказ и могут сразу откликнуться.",
-    accent: "blue",
-  },
-  {
-    icon: UserCheck,
-    title: "Вы знаете, кто приедет",
-    text: "Вы сами выбираете конкретного мастера.",
-    accent: "lilac",
+    icon: Star,
+    title: "Отзыв только после заказа",
+    text: "Оценку ставит тот, кто принял работу.",
+    rows: [
+      ["Источник оценки", "заказ"],
+      ["Аноним", "нет"],
+      ["Платное место", "нет"],
+    ],
   },
 ];
 
-const steps = [
-  "Создайте заказ",
-  "Получите предложения",
-  "Изучите профили",
-  "Выберите мастера",
-  "Мастер выполнит работу",
-  "Оцените результат",
+const masterPoints = [
+  "Заказы только по вашим категориям и районам",
+  "Без покупки лидов и платного продвижения",
+  "Принимайте цену клиента или предлагайте свою",
+  "Выключайте приём заказов, когда не готовы",
 ];
 
-const masterBenefits = [
-  "Без покупки лидов",
-  "Прозрачные условия",
-  "Можно принять цену клиента",
-  "Можно предложить свою",
-  "Собственная репутация",
-  "История выполненных заказов",
-];
-
-const reviews = [
-  {
-    text: "Удобно, что я сначала увидела отзывы и цены, а уже потом выбрала мастера. Никаких неожиданных условий.",
-    name: "Мария",
-    detail: "Ремонт смесителя",
-  },
-  {
-    text: "Получил три предложения за короткое время. Выбрал мастера с хорошей историей — всё сделал аккуратно.",
-    name: "Алексей",
-    detail: "Установка светильника",
-  },
-  {
-    text: "Беру только те заказы, которые подходят по району и цене. Можно спокойно планировать рабочий день.",
-    name: "Сергей",
-    detail: "Мастер по бытовому ремонту",
-  },
-];
-
-const faqs = [
-  {
-    question: "Как проверяются мастера?",
-    answer:
-      "Перед началом работы мастер заполняет профиль и проходит подтверждение личности. В профиле видны статус проверки, история заказов и отзывы клиентов.",
-  },
-  {
-    question: "Кто устанавливает цену?",
-    answer:
-      "Вы указываете желаемую цену при создании заказа. Мастер может принять её или отправить встречное предложение — окончательное решение всегда за вами.",
-  },
-  {
-    question: "Когда мастер увидит точный адрес?",
-    answer:
-      "До выбора мастер видит только примерный район. Точный адрес становится доступен только тому мастеру, которого вы назначили на заказ.",
-  },
-  {
-    question: "Можно вызвать мастера срочно?",
-    answer:
-      "Да. Отметьте заказ как срочный, и его увидят подходящие мастера, которые сейчас находятся онлайн и работают в вашем районе.",
-  },
-  {
-    question: "Как начать получать заказы?",
-    answer:
-      "Зарегистрируйтесь как мастер, заполните профиль, выберите категории и районы работы, затем пройдите подтверждение личности.",
-  },
+const offers = [
+  { name: "Илья Р.", initials: "ИР", rating: "4.9", sum: "2 500 ₽", picked: true },
+  { name: "Виктор С.", initials: "ВС", rating: "4.8", sum: "2 800 ₽", picked: false },
+  { name: "Денис М.", initials: "ДМ", rating: "4.9", sum: "3 000 ₽", picked: false },
 ];
 
 export function LandingPage() {
   return (
-    <div className="landing-page">
+    <div className="nz-page">
       <PublicHeader />
 
       <main>
-        <section className="hero">
-          <div className="container hero__grid">
-            <div className="hero__content">
-              <div className="eyebrow">
-                <Sparkles size={16} aria-hidden="true" />
-                Надёжная помощь рядом
-              </div>
+        <section className="nz-hero">
+          <div className="nz-wrap nz-hero__grid">
+            <div>
+              <span className="nz-field nz-hero__eyebrow">Бытовой ремонт по согласованной цене</span>
               <h1>
-                Нужен мастер?
-                <span>Решим задачу быстро и безопасно</span>
+                Цена известна <em>до выезда</em>
               </h1>
-              <p className="hero__lead">
-                Создайте заказ за минуту и получите предложения от подходящих мастеров рядом с вами.
+              <p className="nz-hero__lead">
+                Вы называете свою цену. Подходящие мастера отвечают своей. Вы выбираете, кто приедет — и только
+                тогда он видит ваш адрес.
               </p>
-              <div className="hero__actions">
-                <Link className="button button--primary button--large" href="/register?role=CLIENT">
-                  Найти мастера
-                  <ArrowRight size={18} aria-hidden="true" />
+              <div className="nz-hero__actions">
+                <Link className="nz-btn nz-btn--primary" href="/register?role=CLIENT">
+                  Создать заказ
+                  <ArrowRight size={17} aria-hidden="true" />
                 </Link>
-                <Link className="button button--secondary button--large" href="/register?role=MASTER">
-                  Стать мастером
+                <Link className="nz-btn nz-btn--outline" href="/register?role=MASTER">
+                  Работать мастером
                 </Link>
               </div>
-              <ul className="hero__trust" aria-label="Преимущества сервиса">
-                <li><ShieldCheck size={18} /> Проверка личности</li>
-                <li><Star size={18} /> Профили и отзывы</li>
-                <li><MapPin size={18} /> Мастера рядом</li>
-              </ul>
+
+              <dl className="nz-facts">
+                {facts.map(({ label, value }) => (
+                  <div key={label}>
+                    <dt className="nz-field">{label}</dt>
+                    <dd style={{ margin: 0 }}>
+                      <p>{value}</p>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
 
-            <div className="hero__visual" aria-label="Клиент выбирает проверенного мастера">
-              <div className="hero__visual-card">
-                <Image
-                  src="/illustrations/hero-editorial.png"
-                  alt="Клиент выбирает бытовую услугу в приложении"
-                  width={1373}
-                  height={1146}
-                  priority
-                />
+            <div className="nz-ticket" role="img" aria-label="Пример наряд-заказа: течёт смеситель на Тверском, три предложения мастеров от 2 500 до 3 000 рублей, выбран Илья Р. за 2 500 рублей">
+              <div className="nz-ticket__head">
+                <span className="nz-field">Наряд-заказ</span>
+                <span className="nz-ticket__no">№ 4417</span>
               </div>
-              <div className="floating-card floating-card--top">
-                <span className="floating-card__icon"><BadgeCheck size={18} /></span>
-                <span><strong>Личность подтверждена</strong><small>Проверенный профиль</small></span>
-              </div>
-              <div className="floating-card floating-card--bottom">
-                <div className="avatar-stack" aria-hidden="true">
-                  <span>АК</span><span>МП</span><span>СВ</span>
+
+              <div className="nz-ticket__body">
+                <div className="nz-ticket__row nz-anim" style={{ animationDelay: "150ms" }}>
+                  <span className="nz-field">Задача</span>
+                  <b>
+                    Течёт смеситель
+                    <span>Кухня, соединение под раковиной</span>
+                  </b>
                 </div>
-                <span><strong>3 предложения</strong><small>Выберите подходящего</small></span>
+                <div className="nz-ticket__row nz-anim" style={{ animationDelay: "450ms" }}>
+                  <span className="nz-field">Район</span>
+                  <b>Тверской</b>
+                </div>
+                <div className="nz-ticket__row nz-anim" style={{ animationDelay: "750ms" }}>
+                  <span className="nz-field">Когда</span>
+                  <b>Сегодня, после 18:00</b>
+                </div>
+                <div className="nz-ticket__row nz-anim" style={{ animationDelay: "1050ms" }}>
+                  <span className="nz-field">Ваша цена</span>
+                  <b className="nz-ticket__price">2 500 ₽</b>
+                </div>
+
+                <div className="nz-ticket__rule nz-anim" style={{ animationDelay: "1300ms" }}>
+                  <span className="nz-field">Предложения · 3</span>
+                </div>
+
+                {offers.map((offer, index) => (
+                  <div
+                    className={`nz-offer nz-anim${offer.picked ? " nz-offer--picked" : ""}`}
+                    key={offer.name}
+                    style={{ animationDelay: `${1450 + index * 260}ms` }}
+                  >
+                    <span className="nz-offer__avatar">{offer.initials}</span>
+                    <span>
+                      <span className="nz-offer__who">{offer.name}</span>
+                      <span className="nz-offer__meta">
+                        <Star size={11} fill="currentColor" aria-hidden="true" />
+                        {offer.rating} · Личность подтверждена
+                      </span>
+                    </span>
+                    <span className="nz-offer__sum">{offer.sum}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="nz-ticket__stamp" aria-hidden="true">
+                <b>ЦЕНА СОГЛАСОВАНА</b>
+                <span>ДО ВЫЕЗДА МАСТЕРА</span>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="section section--white" id="benefits">
-          <div className="container">
-            <div className="section-heading section-heading--center">
-              <span className="section-kicker">Главное — ваш выбор</span>
-              <h2>Помощь без неприятных сюрпризов</h2>
-              <p>Сравнивайте условия и выбирайте мастера, которому готовы доверить задачу.</p>
+        <section className="nz-section nz-section--card" id="how-it-works">
+          <div className="nz-wrap">
+            <div className="nz-section__head">
+              <h2>Как это работает</h2>
             </div>
-            <div className="benefits-grid">
-              {benefits.map(({ icon: Icon, title, text, accent }) => (
-                <article className="benefit-card" key={title}>
-                  <span className={`feature-icon feature-icon--${accent}`}><Icon size={25} /></span>
+            <ol className="nz-stages">
+              {stages.map(({ title, text }, index) => (
+                <li key={title}>
+                  <span className="nz-stages__no">{String(index + 1).padStart(2, "0")}</span>
                   <h3>{title}</h3>
                   <p>{text}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="section how" id="how-it-works">
-          <div className="container">
-            <div className="section-heading">
-              <span className="section-kicker">Как это работает</span>
-              <h2>От задачи до результата — шесть понятных шагов</h2>
-            </div>
-            <ol className="steps-grid">
-              {steps.map((step, index) => (
-                <li key={step}>
-                  <span className="step-number">{String(index + 1).padStart(2, "0")}</span>
-                  <div>
-                    <h3>{step}</h3>
-                    <p>{[
-                      "Добавьте фото, описание, адрес и удобное время.",
-                      "Подходящие мастера откликнутся на ваш заказ.",
-                      "Сравните опыт, рейтинг, отзывы и условия.",
-                      "Назначьте того, кто подходит именно вам.",
-                      "Следите за статусом заказа в личном кабинете.",
-                      "Подтвердите выполнение и оставьте честный отзыв.",
-                    ][index]}</p>
-                  </div>
                 </li>
               ))}
             </ol>
           </div>
         </section>
 
-        <section className="section section--white" id="for-clients">
-          <div className="container client-promo">
-            <div className="client-promo__panel">
-              <span className="mini-badge"><CalendarClock size={16} /> Обычный или срочный заказ</span>
-              <div className="client-promo__task">
-                <span className="client-promo__task-icon"><Wrench size={24} /></span>
-                <div><strong>Починить дверную ручку</strong><small>Сегодня · после 18:00</small></div>
-                <span className="status-pill">Идёт поиск</span>
-              </div>
-              <div className="client-promo__offers">
-                {["Илья Р.", "Виктор С.", "Денис М."].map((name, index) => (
-                  <div key={name}>
-                    <span className="offer-avatar">{name.slice(0, 1)}</span>
-                    <span><strong>{name}</strong><small><Star size={12} fill="currentColor" /> {(4.9 - index * 0.1).toFixed(1)} · Проверен</small></span>
-                    <b>{["2 500 ₽", "2 800 ₽", "3 000 ₽"][index]}</b>
-                  </div>
-                ))}
-              </div>
+        <section className="nz-section" id="terms">
+          <div className="nz-wrap">
+            <div className="nz-section__head">
+              <h2>Три правила</h2>
             </div>
-            <div className="client-promo__content">
-              <span className="section-kicker">Для клиентов</span>
-              <h2>Вы управляете заказом на каждом этапе</h2>
-              <p>Опишите задачу один раз — дальше сравнивайте только подходящие предложения.</p>
-              <ul className="check-list">
-                <li><Check size={17} /> Точный адрес скрыт до выбора мастера</li>
-                <li><Check size={17} /> Цена и условия видны до назначения</li>
-                <li><Check size={17} /> Все статусы сохраняются в истории</li>
-              </ul>
-              <Link className="text-link" href="/register?role=CLIENT">
-                Создать первый заказ <ArrowRight size={17} />
-              </Link>
+            <div className="nz-terms">
+              {terms.map(({ icon: Icon, title, text, rows }) => (
+                <article className="nz-term" key={title}>
+                  <span className="nz-term__icon">
+                    <Icon size={20} aria-hidden="true" />
+                  </span>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                  <dl>
+                    {rows.map(([label, value]) => (
+                      <div key={label}>
+                        <dt className="nz-field">{label}</dt>
+                        <dd>{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </article>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="section masters" id="for-masters">
-          <div className="container masters__grid">
-            <div className="masters__content">
-              <span className="section-kicker section-kicker--light">Для мастеров</span>
-              <h2>Получайте подходящие заказы в своём районе</h2>
-              <p>Выбирайте удобные задачи, заранее договаривайтесь о цене и развивайте собственную репутацию.</p>
-              <ul className="masters__benefits">
-                {masterBenefits.map((item) => (
-                  <li key={item}><span><Check size={15} /></span>{item}</li>
+        <section className="nz-section nz-masters" id="for-masters">
+          <div className="nz-wrap nz-masters__grid">
+            <div>
+              <div className="nz-section__head" style={{ marginBottom: 34 }}>
+                <span className="nz-field">Мастерам</span>
+                <h2>Заказы по вашему району и цене</h2>
+              </div>
+              <ul className="nz-masters__list">
+                {masterPoints.map((point) => (
+                  <li key={point}>
+                    <span aria-hidden="true">
+                      <Check size={12} strokeWidth={3} />
+                    </span>
+                    {point}
+                  </li>
                 ))}
               </ul>
-              <Link className="button button--light button--large" href="/register?role=MASTER">
-                Стать мастером <ArrowRight size={18} />
-              </Link>
+              <div className="nz-masters__cta">
+                <Link className="nz-btn nz-btn--onsteel" href="/register?role=MASTER">
+                  Начать работать
+                  <ArrowRight size={17} aria-hidden="true" />
+                </Link>
+              </div>
             </div>
-            <div className="masters__visual">
+            <div className="nz-masters__visual">
               <Image
                 src="/illustrations/master-editorial.png"
-                alt="Мастер получает подходящий заказ рядом с домом"
+                alt="Мастер разбирает заказ рядом с домом"
                 width={1373}
                 height={1146}
               />
@@ -277,78 +239,55 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="section section--white" id="reviews">
-          <div className="container">
-            <div className="section-heading section-heading--center">
-              <span className="section-kicker">Отзывы</span>
-              <h2>Доверие строится на реальном опыте</h2>
-              <p>После завершения заказа клиент может оценить результат и поделиться впечатлением.</p>
-            </div>
-            <div className="reviews-grid">
-              {reviews.map((review) => (
-                <article className="review-card" key={review.name}>
-                  <Quote size={25} aria-hidden="true" />
-                  <p>«{review.text}»</p>
-                  <div>
-                    <span className="review-avatar">{review.name.slice(0, 1)}</span>
-                    <span><strong>{review.name}</strong><small>{review.detail}</small></span>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="section faq" id="faq">
-          <div className="container faq__grid">
-            <div className="section-heading">
-              <span className="section-kicker">FAQ</span>
-              <h2>Частые вопросы</h2>
-              <p>Не нашли ответ? Напишите нам — поможем разобраться.</p>
-            </div>
-            <div className="faq__list">
-              {faqs.map((faq) => (
-                <details key={faq.question}>
-                  <summary>{faq.question}<span aria-hidden="true">+</span></summary>
-                  <p>{faq.answer}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="final-cta">
-          <div className="container final-cta__inner">
+        <section className="nz-final">
+          <div className="nz-wrap nz-final__inner">
             <div>
-              <span className="section-kicker section-kicker--light">Можно начинать</span>
-              <h2>Расскажите, что нужно сделать</h2>
-              <p>Создание заказа займёт около минуты.</p>
+              <h2>Расскажите, что сломалось</h2>
+              <p>Заказ займёт около минуты.</p>
             </div>
-            <div className="final-cta__actions">
-              <Link className="button button--light button--large" href="/register?role=CLIENT">Найти мастера</Link>
-              <Link className="button button--outline-light button--large" href="/register?role=MASTER">Стать мастером</Link>
+            <div className="nz-final__actions">
+              <Link className="nz-btn nz-btn--onsteel" href="/register?role=CLIENT">
+                Создать заказ
+                <ArrowRight size={17} aria-hidden="true" />
+              </Link>
+              <Link className="nz-btn nz-btn--onsteel-outline" href="/register?role=MASTER">
+                Работать мастером
+              </Link>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="footer">
-        <div className="container footer__grid">
-          <div><Brand inverse /><p>Надёжные бытовые мастера рядом с вами.</p></div>
-          <nav aria-label="Навигация в подвале">
-            <strong>Сервис</strong>
-            <Link href="#how-it-works">Как это работает</Link>
-            <Link href="#benefits">Преимущества</Link>
-            <Link href="#faq">FAQ</Link>
-          </nav>
-          <nav aria-label="Разделы для пользователей">
-            <strong>Пользователям</strong>
-            <Link href="/register?role=CLIENT">Найти мастера</Link>
-            <Link href="/register?role=MASTER">Стать мастером</Link>
-            <Link href="/login">Войти</Link>
-          </nav>
+      <footer className="nz-footer">
+        <div className="nz-wrap">
+          <div className="nz-footer__grid">
+            <div>
+              <span className="nz-logo">
+                <span className="nz-logo__mark" aria-hidden="true">
+                  М
+                </span>
+                Мастер рядом
+              </span>
+              <p>Цена известна до выезда.</p>
+            </div>
+            <nav aria-label="О сервисе">
+              <strong>Сервис</strong>
+              <Link href="#how-it-works">Как это работает</Link>
+              <Link href="#terms">Условия</Link>
+              <Link href="#for-masters">Мастерам</Link>
+            </nav>
+            <nav aria-label="Разделы для пользователей">
+              <strong>Пользователям</strong>
+              <Link href="/register?role=CLIENT">Создать заказ</Link>
+              <Link href="/register?role=MASTER">Работать мастером</Link>
+              <Link href="/login">Войти</Link>
+            </nav>
+          </div>
+          <div className="nz-footer__bottom">
+            <span>© 2026 МАСТЕР РЯДОМ</span>
+            <span>АДРЕС ОТКРЫВАЕТСЯ ТОЛЬКО ВЫБРАННОМУ МАСТЕРУ</span>
+          </div>
         </div>
-        <div className="container footer__bottom"><span>© 2026 Мастер рядом</span><span>Помощь начинается с доверия</span></div>
       </footer>
     </div>
   );

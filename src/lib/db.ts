@@ -412,6 +412,87 @@ function migrate(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS order_status_history_order_idx
       ON order_status_history(order_id, created_at, id);
 
+    -- Change order: a master-proposed new total price the client must accept
+    -- before it takes effect. The old price stays in force until then.
+    CREATE TABLE IF NOT EXISTS order_change_requests (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      requested_by_master_id TEXT NOT NULL,
+      previous_price_minor INTEGER NOT NULL,
+      proposed_price_minor INTEGER NOT NULL,
+      reason TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'PENDING'
+        CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED')),
+      created_at INTEGER NOT NULL,
+      responded_at INTEGER,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (requested_by_master_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS order_change_requests_one_pending
+      ON order_change_requests(order_id)
+      WHERE status = 'PENDING';
+
+    CREATE INDEX IF NOT EXISTS order_change_requests_order_idx
+      ON order_change_requests(order_id, created_at);
+
+    -- Work evidence: master-submitted proof photos, separate from the
+    -- client's intake photos in order_media. Never deletable once uploaded —
+    -- they are evidence, not draft attachments.
+    CREATE TABLE IF NOT EXISTS order_work_media (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      master_id TEXT NOT NULL,
+      stage TEXT NOT NULL CHECK (stage IN ('BEFORE', 'AFTER')),
+      file_name TEXT NOT NULL,
+      mime_type TEXT NOT NULL,
+      byte_size INTEGER NOT NULL,
+      content BLOB NOT NULL,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (master_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS order_work_media_order_idx
+      ON order_work_media(order_id, stage, created_at);
+
+    -- Order chat: kept in-app and tied to the order so agreements have a
+    -- record, instead of leaking into phone calls the platform can't see.
+    CREATE TABLE IF NOT EXISTS order_messages (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      sender_id TEXT NOT NULL,
+      sender_role TEXT NOT NULL CHECK (sender_role IN ('CLIENT', 'MASTER')),
+      body TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS order_messages_order_idx
+      ON order_messages(order_id, created_at);
+
+    -- Warranty: platform records the master's commitment and helps open a
+    -- claim, but the master carries the obligation, not the platform.
+    CREATE TABLE IF NOT EXISTS order_warranties (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL UNIQUE,
+      client_id TEXT NOT NULL,
+      master_id TEXT NOT NULL,
+      duration_days INTEGER NOT NULL,
+      started_at INTEGER NOT NULL,
+      ends_at INTEGER NOT NULL,
+      claim_complaint_id TEXT,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (master_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (claim_complaint_id) REFERENCES complaints(id) ON DELETE SET NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS order_warranties_client_idx
+      ON order_warranties(client_id, ends_at DESC);
+
     CREATE TABLE IF NOT EXISTS order_reviews (
       id TEXT PRIMARY KEY,
       order_id TEXT NOT NULL,

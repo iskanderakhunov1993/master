@@ -1,7 +1,11 @@
 import { getDb } from "@/lib/db";
 
+import { listOrderChangeRequests, type OrderChangeRequest } from "./change-requests";
+import { listOrderMessages, type OrderMessage } from "./chat";
 import { specialistLabel } from "../marketplace/ranking";
 import type { OrderStatus, OrderSummary, OrderType, ScheduleKind } from "./types";
+import { getWarrantyForOrder, type OrderWarranty } from "./warranty";
+import { listOrderWorkMedia, type WorkPhoto } from "./work-media";
 
 export type OrderHistoryEntry = {
   id: string;
@@ -59,6 +63,10 @@ export type OrderDetails = {
   };
   history: OrderHistoryEntry[];
   reviews: OrderReviewDetails[];
+  changeRequests: OrderChangeRequest[];
+  workPhotos: WorkPhoto[];
+  messages: OrderMessage[];
+  warranty: OrderWarranty | null;
 };
 
 type DetailsRow = {
@@ -226,6 +234,10 @@ function loadDetails(row: DetailsRow): OrderDetails {
           createdAt: row.updatedAt,
         }],
     reviews,
+    changeRequests: listOrderChangeRequests(row.id),
+    workPhotos: listOrderWorkMedia(row.id),
+    messages: row.masterId ? listOrderMessages(row.id) : [],
+    warranty: getWarrantyForOrder(row.id),
   };
 }
 
@@ -321,6 +333,7 @@ export function listMasterOrders(masterId: string, limit = 50): OrderSummary[] {
     submittedAt: row.submittedAt,
     updatedAt: row.updatedAt,
     photoCount: row.photoCount,
+    etaMinutes: null,
   }));
 }
 

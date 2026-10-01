@@ -68,4 +68,29 @@ export type AdminComplaint = {
   createdAt: number;
 };
 
+export type AdminComplaintCase = {
+  id: string;
+  orderId: string;
+  status: "OPEN" | "IN_REVIEW" | "RESOLVED" | "REJECTED";
+  kind: "DISPUTE" | "COMPLAINT";
+  subject: string;
+  description: string;
+  resolution: string;
+  createdAt: number;
+  resolvedAt: number | null;
+  resolvedByName: string | null;
+  reporterId: string;
+  reporterName: string;
+  againstId: string | null;
+  againstName: string;
+  order: {
+    status: OrderStatus;
+    description: string;
+    categoryName: string;
+    priceRubles: number;
+    client: { name: string; email: string };
+    master: { name: string; email: string } | null;
+  };
+};
+
 export type AdminActionResult = { ok: boolean; message?: string };

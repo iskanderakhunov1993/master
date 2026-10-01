@@ -62,6 +62,7 @@ type SummaryRow = {
   submittedAt: number | null;
   updatedAt: number;
   photoCount: number;
+  etaMinutes: number | null;
 };
 
 const draftSelect = `
@@ -105,10 +106,12 @@ const summarySelect = `
     orders.total_price_minor AS totalPriceMinor,
     orders.submitted_at AS submittedAt,
     orders.updated_at AS updatedAt,
+    master_offers.eta_minutes AS etaMinutes,
     COUNT(order_media.id) AS photoCount
   FROM orders
   LEFT JOIN service_categories ON service_categories.id = orders.category_id
   LEFT JOIN service_subcategories ON service_subcategories.id = orders.subcategory_id
+  LEFT JOIN master_offers ON master_offers.id = orders.selected_offer_id
   LEFT JOIN order_media ON order_media.order_id = orders.id`;
 
 function mapDraft(row: DraftRow): OrderDraft {
@@ -157,6 +160,7 @@ function mapSummary(row: SummaryRow): OrderSummary {
     submittedAt: row.submittedAt,
     updatedAt: row.updatedAt,
     photoCount: row.photoCount,
+    etaMinutes: row.etaMinutes,
   };
 }
 

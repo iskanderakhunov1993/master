@@ -23,6 +23,7 @@ test("complete client → master → review loop keeps privacy, history, metrics
   const { classifyOrderForHistory, getClientOrderDetails, getMasterOrderDetails, listMasterOrders } = await import("../src/lib/orders/details");
   const { transitionOrder } = await import("../src/lib/orders/lifecycle");
   const { submitClientReview } = await import("../src/lib/orders/reviews");
+  const { addOrderWorkMedia } = await import("../src/lib/orders/work-media");
   const {
     getClientDashboardData,
     getClientOrder,
@@ -136,17 +137,37 @@ test("complete client → master → review loop keeps privacy, history, metrics
     "MASTER_CONFIRMED",
     "MASTER_ON_THE_WAY",
     "MASTER_ARRIVED",
-    "IN_PROGRESS",
-    "COMPLETED_BY_MASTER",
   ].entries()) {
     transitionOrder({
       orderId: wizard.draft.id,
       actorId: master.id,
       actorRole: "MASTER",
-      toStatus: status as "MASTER_CONFIRMED" | "MASTER_ON_THE_WAY" | "MASTER_ARRIVED" | "IN_PROGRESS" | "COMPLETED_BY_MASTER",
+      toStatus: status as "MASTER_CONFIRMED" | "MASTER_ON_THE_WAY" | "MASTER_ARRIVED",
       now: now + (index + 5) * 1_000,
     });
   }
+
+  // Work must be proven, not just declared: no "before"/"after" evidence, no transition.
+  addOrderWorkMedia({
+    masterId: master.id,
+    orderId: wizard.draft.id,
+    stage: "BEFORE",
+    fileName: "before.jpg",
+    mimeType: "image/jpeg",
+    byteSize: 4,
+    content: Buffer.from([0xff, 0xd8, 0xff, 0x00]),
+  });
+  transitionOrder({ orderId: wizard.draft.id, actorId: master.id, actorRole: "MASTER", toStatus: "IN_PROGRESS", now: now + 8_000 });
+  addOrderWorkMedia({
+    masterId: master.id,
+    orderId: wizard.draft.id,
+    stage: "AFTER",
+    fileName: "after.jpg",
+    mimeType: "image/jpeg",
+    byteSize: 4,
+    content: Buffer.from([0xff, 0xd8, 0xff, 0x00]),
+  });
+  transitionOrder({ orderId: wizard.draft.id, actorId: master.id, actorRole: "MASTER", toStatus: "COMPLETED_BY_MASTER", now: now + 9_000 });
   transitionOrder({
     orderId: wizard.draft.id,
     actorId: client.id,

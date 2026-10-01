@@ -17,6 +17,7 @@ test("task prefills an order and follows the selected/completed lifecycle", asyn
   const { getOrCreateOrderWizardData } = await import("../src/lib/orders/repository");
   const { addTaskMedia, createClientTask, getClientTask } = await import("../src/lib/tasks/repository");
   const { syncTaskStatusForOrder } = await import("../src/lib/tasks/sync");
+  const { addOrderWorkMedia } = await import("../src/lib/orders/work-media");
 
   const database = getDb();
   const now = Date.now();
@@ -88,8 +89,6 @@ test("task prefills an order and follows the selected/completed lifecycle", asyn
     "MASTER_CONFIRMED",
     "MASTER_ON_THE_WAY",
     "MASTER_ARRIVED",
-    "IN_PROGRESS",
-    "COMPLETED_BY_MASTER",
   ] as const;
   for (const [index, status] of masterTransitions.entries()) {
     transitionOrder({
@@ -100,6 +99,28 @@ test("task prefills an order and follows the selected/completed lifecycle", asyn
       now: now + (index + 1) * 1000,
     });
   }
+
+  // Work must be proven, not just declared: no "before"/"after" evidence, no transition.
+  addOrderWorkMedia({
+    masterId,
+    orderId: wizard.draft.id,
+    stage: "BEFORE",
+    fileName: "before.jpg",
+    mimeType: "image/jpeg",
+    byteSize: 4,
+    content: Buffer.from([0xff, 0xd8, 0xff, 0x00]),
+  });
+  transitionOrder({ orderId: wizard.draft.id, actorId: masterId, actorRole: "MASTER", toStatus: "IN_PROGRESS", now: now + 4_000 });
+  addOrderWorkMedia({
+    masterId,
+    orderId: wizard.draft.id,
+    stage: "AFTER",
+    fileName: "after.jpg",
+    mimeType: "image/jpeg",
+    byteSize: 4,
+    content: Buffer.from([0xff, 0xd8, 0xff, 0x00]),
+  });
+  transitionOrder({ orderId: wizard.draft.id, actorId: masterId, actorRole: "MASTER", toStatus: "COMPLETED_BY_MASTER", now: now + 5_000 });
   transitionOrder({
     orderId: wizard.draft.id,
     actorId: clientId,

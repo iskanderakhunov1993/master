@@ -4,11 +4,15 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { requireRole } from "@/lib/auth/guards";
+import { getSession } from "@/lib/auth/session";
 import { matchOrder } from "@/lib/marketplace/matching";
 import { createClientAddress, findClientAddress } from "@/lib/addresses/repository";
 import type { ClientAddress } from "@/lib/addresses/types";
 
-import { transitionOrder } from "./lifecycle";
+import { createChangeRequest, respondToChangeRequest } from "./change-requests";
+import { sendOrderMessage } from "./chat";
+import { reportMasterNoShow, transitionOrder } from "./lifecycle";
+import { fileWarrantyClaim } from "./warranty";
 import {
   saveAddressStep,
   saveCategoryStep,
@@ -86,6 +90,21 @@ function failure(error: unknown): LifecycleActionResult {
     REVIEW_ORDER_NOT_COMPLETED: "Отзыв можно оставить только после завершения заказа",
     REVIEW_RATING_INVALID: "Поставьте оценку от 1 до 5",
     REVIEW_COMMENT_TOO_LONG: "Комментарий не должен превышать 1000 символов",
+    BEFORE_PHOTO_REQUIRED: "Добавьте фото «до» — без него нельзя начать работу",
+    AFTER_PHOTO_REQUIRED: "Добавьте фото «после» — без него нельзя завершить работу",
+    CHANGE_REQUEST_PENDING: "Сначала дождитесь ответа клиента на изменение цены",
+    CHANGE_REQUEST_NOT_ALLOWED: "Изменить цену можно только пока вы на месте или выполняете работу",
+    CHANGE_REQUEST_SAME_PRICE: "Новая цена совпадает с текущей",
+    CHANGE_REQUEST_ALREADY_PENDING: "По этому заказу уже есть запрос на изменение цены",
+    CHANGE_REQUEST_NOT_FOUND: "Запрос на изменение цены не найден",
+    CHANGE_REQUEST_STALE: "Запрос уже обработан. Обновите страницу",
+    CHAT_NOT_AVAILABLE: "Чат откроется после того, как вы выберете мастера",
+    WARRANTY_NOT_FOUND: "Гарантия не найдена",
+    WARRANTY_ALREADY_CLAIMED: "По этой гарантии уже открыто обращение",
+    WARRANTY_EXPIRED: "Срок гарантии истёк",
+    NO_SHOW_NOT_ELIGIBLE: "Сейчас нельзя сообщить о неявке — мастер уже приступил к заказу",
+    NO_SHOW_REQUIRES_SCHEDULE: "Неявку можно зафиксировать только для заказа с назначенным временем",
+    NO_SHOW_TOO_EARLY: "Подождите ещё немного — мастер может опаздывать",
   };
   return { ok: false, message: messages[code] ?? "Не удалось выполнить действие. Попробуйте ещё раз" };
 }
@@ -217,7 +236,7 @@ export async function saveOrderScheduleAction(
     scheduleKind: z.enum(["NOW", "TODAY", "CUSTOM"]),
     scheduledAt: z.number().int().positive().nullable(),
   }).safeParse(input);
-  if (!parsed.success) return { ok: false, message: "Укажите дату и время" };
+  if (!parsed.success) return { ok: false, message: "Укажите дату и время выезда" };
   if (parsed.data.scheduleKind !== "NOW" && (!parsed.data.scheduledAt || parsed.data.scheduledAt <= Date.now())) {
     return { ok: false, message: "Дата и время должны быть в будущем" };
   }
@@ -304,13 +323,25 @@ export async function cancelClientOrderAction(orderId: string): Promise<Lifecycl
   }
 }
 
+export async function reportMasterNoShowAction(orderId: string): Promise<LifecycleActionResult> {
+  const client = await requireRole("CLIENT");
+  if (!orderId) return { ok: false, message: "Заказ не найден" };
+  try {
+    reportMasterNoShow({ orderId, clientId: client.id });
+    revalidateOrder(orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
 export async function advanceMasterOrderAction(input: {
   orderId: string;
   toStatus: z.infer<typeof masterStatusSchema>;
 }): Promise<LifecycleActionResult> {
   const master = await requireRole("MASTER");
   const parsed = z.object({ orderId: z.string().min(1), toStatus: masterStatusSchema }).safeParse(input);
-  if (!parsed.success) return { ok: false, message: "Недоступное действие" };
+  if (!parsed.success) return { ok: false, message: "Не удалось обновить статус заказа. Обновите страницу и попробуйте снова" };
   try {
     transitionOrder({
       orderId: parsed.data.orderId,
@@ -319,6 +350,92 @@ export async function advanceMasterOrderAction(input: {
       toStatus: parsed.data.toStatus,
     });
     revalidateOrder(parsed.data.orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function proposeChangeOrderAction(input: {
+  orderId: string;
+  proposedPriceRubles: number;
+  reason: string;
+}): Promise<LifecycleActionResult> {
+  const master = await requireRole("MASTER");
+  const parsed = z.object({
+    orderId: z.string().min(1),
+    proposedPriceRubles: z.number().int().min(500, "Цена — от 500 до 1 000 000 ₽").max(1_000_000),
+    reason: z.string().trim().min(10, "Опишите причину минимум в 10 символах").max(500),
+  }).safeParse(input);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message };
+  try {
+    createChangeRequest({
+      masterId: master.id,
+      orderId: parsed.data.orderId,
+      proposedPriceRubles: parsed.data.proposedPriceRubles,
+      reason: parsed.data.reason,
+    });
+    revalidateOrder(parsed.data.orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function respondToChangeOrderAction(input: {
+  orderId: string;
+  requestId: string;
+  accept: boolean;
+}): Promise<LifecycleActionResult> {
+  const client = await requireRole("CLIENT");
+  const parsed = z.object({
+    orderId: z.string().min(1),
+    requestId: z.string().min(1),
+    accept: z.boolean(),
+  }).safeParse(input);
+  if (!parsed.success) return { ok: false, message: "Не удалось обработать ответ. Обновите страницу" };
+  try {
+    respondToChangeRequest({
+      clientId: client.id,
+      orderId: parsed.data.orderId,
+      requestId: parsed.data.requestId,
+      accept: parsed.data.accept,
+    });
+    revalidateOrder(parsed.data.orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function sendOrderMessageAction(orderId: string, body: string): Promise<LifecycleActionResult> {
+  const user = await getSession();
+  if (!user) return { ok: false, message: "Требуется вход" };
+
+  const parsed = z.string().trim().min(1, "Введите сообщение").max(2000, "Сообщение слишком длинное").safeParse(body);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message };
+
+  try {
+    sendOrderMessage({ orderId, senderId: user.id, body: parsed.data });
+    revalidateOrder(orderId);
+    return { ok: true };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function fileWarrantyClaimAction(input: { warrantyId: string; description: string }): Promise<LifecycleActionResult> {
+  const client = await requireRole("CLIENT");
+  const parsed = z.object({
+    warrantyId: z.string().min(1),
+    description: z.string().trim().min(10, "Опишите проблему минимум в 10 символах").max(1000, "Описание слишком длинное"),
+  }).safeParse(input);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message };
+
+  try {
+    fileWarrantyClaim({ clientId: client.id, warrantyId: parsed.data.warrantyId, description: parsed.data.description });
+    revalidatePath("/client/home");
+    revalidatePath("/admin/complaints");
     return { ok: true };
   } catch (error) {
     return failure(error);

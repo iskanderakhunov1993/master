@@ -67,7 +67,7 @@ export async function setSubscriptionStatusAction(
     subscriptionId: z.string().min(1),
     status: z.enum(["ACTIVE", "PAUSED", "CANCELLED"]),
   }).safeParse({ subscriptionId, status });
-  if (!parsed.success) return { ok: false, message: "Недоступное действие" };
+  if (!parsed.success) return { ok: false, message: "Не удалось изменить подписку. Обновите страницу и попробуйте снова" };
   try {
     updateClientSubscriptionStatus(client.id, parsed.data.subscriptionId, parsed.data.status);
     refreshSubscriptions();

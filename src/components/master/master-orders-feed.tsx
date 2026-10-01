@@ -84,8 +84,8 @@ export function MasterOrdersFeed({
       {!isOnline ? (
         <section className="client-empty-card">
           <span><PackageSearch size={29} /></span>
-          <h2>Сейчас вы Offline</h2>
-          <p>Включите Online на главной, чтобы получать новые подходящие заказы.</p>
+          <h2>Приём заказов выключен</h2>
+          <p>Включите приём заказов на главной, чтобы получать подходящие заказы.</p>
           <Link className="button button--primary" href="/master">Управлять статусом</Link>
         </section>
       ) : (
@@ -116,7 +116,7 @@ export function MasterOrdersFeed({
             <section className="client-empty-card">
               <span><CheckCircle2 size={29} /></span>
               <h2>{orders.length ? "В этой вкладке пока пусто" : "Подходящих заказов пока нет"}</h2>
-              <p>Новые задачи появятся автоматически с учётом ваших категорий, районов и статуса Online.</p>
+              <p>Новые заказы появятся здесь автоматически — по вашим категориям и районам.</p>
             </section>
           ) : (
             <div className="marketplace-order-list">

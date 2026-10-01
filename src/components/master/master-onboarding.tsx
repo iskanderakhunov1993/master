@@ -243,7 +243,7 @@ export function MasterOnboarding({ data, initialStep }: { data: MasterProfileDat
       <OnboardingSection icon={ImagePlus} title="Портфолио" description="Добавьте фотографии выполненных работ. Этот шаг необязательный.">
         <div className="portfolio-upload"><input id="master-portfolio" type="file" accept={imageAccept} multiple onChange={uploadPortfolio} disabled={portfolio.length >= MAX_MASTER_PORTFOLIO_ITEMS} /><label htmlFor="master-portfolio"><span><ImagePlus size={25} /></span><strong>Добавить фотографии работ</strong><small>До {MAX_MASTER_PORTFOLIO_ITEMS} изображений · без личных данных клиентов</small></label></div>
         {portfolio.length > 0 && <div className="master-portfolio-grid">{portfolio.map((item, index) => <article key={item.id}><Image src={item.url} alt={`Работа ${index + 1}`} fill sizes="180px" unoptimized /><button type="button" aria-label={`Удалить работу ${index + 1}`} onClick={() => deletePortfolioItem(item.id)}><Trash2 size={16} /></button></article>)}</div>}
-        <div className="onboarding-ready-card"><Check size={22} /><div><strong>Профиль почти готов</strong><p>После завершения вы попадёте в кабинет. Online будет доступен после подтверждения личности.</p></div></div>
+        <div className="onboarding-ready-card"><Check size={22} /><div><strong>Профиль почти готов</strong><p>После завершения вы попадёте в кабинет. Принимать заказы можно будет после подтверждения личности.</p></div></div>
       </OnboardingSection>
     );
   }

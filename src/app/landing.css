@@ -1,0 +1,915 @@
+/* «Наряд-заказ» — landing surface.
+   Structure, palette and type are derived from the printed work order that
+   Russian household-repair services actually run on. Scoped to .nz-page so the
+   dashboards keep their own visual system. */
+
+.nz-page {
+  --nz-ink: #16191d;
+  --nz-steel: #1b1f24;
+  --nz-ground: #e7e9e3;
+  --nz-card: #ffffff;
+  --nz-enamel: #123a9e;
+  --nz-enamel-lift: #1a4cc4;
+  --nz-brass: #855f11;
+  --nz-zinc: #5f666d;
+  --nz-line: #c9ccc4;
+  --nz-line-soft: #dfe1da;
+
+  --nz-display: var(--font-display), "Trebuchet MS", ui-sans-serif, sans-serif;
+  --nz-body: var(--font-body), ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+  --nz-mono: var(--font-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  color: var(--nz-ink);
+  background: var(--nz-ground);
+  /* The stamp animates in from scale(1.7) and would briefly widen the page.
+     `clip` contains it without breaking the sticky header. */
+  overflow-x: clip;
+  font-family: var(--nz-body);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.nz-page *,
+.nz-page *::before,
+.nz-page *::after {
+  box-sizing: border-box;
+}
+
+.nz-page :focus-visible {
+  outline: 3px solid var(--nz-enamel);
+  outline-offset: 3px;
+}
+
+.nz-wrap {
+  width: min(1180px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+/* Field label — the work order's own voice. Used for every label on the page. */
+.nz-field {
+  font-family: var(--nz-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--nz-zinc);
+}
+
+.nz-page h1,
+.nz-page h2 {
+  font-family: var(--nz-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.nz-page h3 {
+  font-family: var(--nz-body);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.nz-page p {
+  margin: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+
+.nz-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
+  font-family: var(--nz-body);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.nz-btn--primary {
+  color: #fff;
+  background: var(--nz-enamel);
+}
+
+.nz-btn--primary:hover {
+  background: var(--nz-enamel-lift);
+}
+
+.nz-btn--outline {
+  color: var(--nz-ink);
+  border-color: var(--nz-ink);
+  background: transparent;
+}
+
+.nz-btn--outline:hover {
+  color: #fff;
+  background: var(--nz-ink);
+}
+
+.nz-btn--onsteel {
+  color: var(--nz-steel);
+  background: #fff;
+}
+
+.nz-btn--onsteel:hover {
+  background: var(--nz-ground);
+}
+
+.nz-btn--onsteel-outline {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.nz-btn--onsteel-outline:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nz-btn--sm {
+  min-height: 42px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+
+.nz-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--nz-line);
+  background: rgba(231, 233, 227, 0.92);
+  backdrop-filter: blur(14px);
+}
+
+.nz-header__bar {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: 72px;
+}
+
+.nz-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--nz-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.nz-logo__mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  color: #fff;
+  background: var(--nz-enamel);
+}
+
+.nz-nav {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  margin-inline: auto;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--nz-zinc);
+}
+
+.nz-nav a {
+  padding-block: 4px;
+  border-bottom: 1.5px solid transparent;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.nz-nav a:hover {
+  color: var(--nz-ink);
+  border-bottom-color: var(--nz-enamel);
+}
+
+.nz-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nz-burger {
+  display: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  place-items: center;
+  border: 1.5px solid var(--nz-line);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nz-mobile-nav {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 18px;
+  border-top: 1px solid var(--nz-line);
+}
+
+.nz-mobile-nav a {
+  padding: 13px 2px;
+  border-bottom: 1px solid var(--nz-line-soft);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.nz-mobile-nav__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* ── Hero ────────────────────────────────────────────────── */
+
+.nz-hero {
+  padding: 84px 0 96px;
+}
+
+.nz-hero__grid {
+  display: grid;
+  grid-template-columns: 1fr 0.92fr;
+  align-items: start;
+  gap: 68px;
+}
+
+.nz-hero__eyebrow {
+  display: block;
+  margin-bottom: 26px;
+  padding-bottom: 14px;
+  border-bottom: 1.5px solid var(--nz-ink);
+}
+
+.nz-hero h1 {
+  font-size: clamp(40px, 5.6vw, 76px);
+}
+
+.nz-hero h1 em {
+  font-style: normal;
+  color: var(--nz-enamel);
+}
+
+.nz-hero__lead {
+  max-width: 46ch;
+  margin-top: 34px;
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--nz-zinc);
+}
+
+.nz-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+/* Trust facts, set as work-order field rows rather than a badge row. */
+.nz-facts {
+  display: grid;
+  gap: 0;
+  margin-top: 44px;
+  border-top: 1px solid var(--nz-line);
+}
+
+.nz-facts div {
+  display: grid;
+  grid-template-columns: 168px 1fr;
+  align-items: baseline;
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--nz-line);
+}
+
+.nz-facts p {
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+/* ── Signature: the live work-order ticket ───────────────── */
+
+.nz-ticket {
+  position: relative;
+  border: 1.5px solid var(--nz-ink);
+  border-radius: 5px;
+  background: var(--nz-card);
+  box-shadow: 6px 6px 0 rgba(22, 25, 29, 0.1);
+}
+
+.nz-ticket__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1.5px solid var(--nz-ink);
+  background: var(--nz-ink);
+  border-radius: 3.5px 3.5px 0 0;
+}
+
+.nz-ticket__head .nz-field {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.nz-ticket__no {
+  font-family: var(--nz-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.nz-ticket__body {
+  /* Bottom room so the stamp lands on the card, not on the last offer. */
+  padding: 6px 20px 58px;
+}
+
+.nz-ticket__row {
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  align-items: baseline;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--nz-line-soft);
+}
+
+.nz-ticket__row b {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.nz-ticket__row b span {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--nz-zinc);
+}
+
+.nz-ticket__price {
+  font-family: var(--nz-mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--nz-brass);
+}
+
+.nz-ticket__rule {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 0 12px;
+}
+
+.nz-ticket__rule::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--nz-line);
+}
+
+.nz-offer {
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 10px 8px;
+  margin-inline: -8px;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
+}
+
+.nz-offer__avatar {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  background: var(--nz-ground);
+  font-family: var(--nz-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--nz-zinc);
+}
+
+.nz-offer__who {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.nz-offer__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--nz-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--nz-zinc);
+}
+
+.nz-offer__sum {
+  font-family: var(--nz-mono);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.nz-offer--picked {
+  border-color: var(--nz-enamel);
+  background: #f2f5fd;
+}
+
+.nz-offer--picked .nz-offer__avatar {
+  color: #fff;
+  background: var(--nz-enamel);
+}
+
+.nz-offer--picked .nz-offer__sum {
+  color: var(--nz-enamel);
+}
+
+.nz-ticket__stamp {
+  position: absolute;
+  right: -16px;
+  bottom: -22px;
+  display: grid;
+  gap: 2px;
+  padding: 12px 18px;
+  border: 2.5px solid var(--nz-brass);
+  border-radius: 4px;
+  background: #fdfaf2;
+  color: var(--nz-brass);
+  text-align: center;
+  transform: rotate(-6deg);
+}
+
+.nz-ticket__stamp b {
+  font-family: var(--nz-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.nz-ticket__stamp span {
+  font-family: var(--nz-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  opacity: 0.8;
+}
+
+/* Page-load sequence: the ticket fills itself in, offers arrive, stamp lands. */
+@media (prefers-reduced-motion: no-preference) {
+  .nz-anim {
+    opacity: 0;
+    animation: nz-in 520ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  }
+
+  .nz-ticket__stamp {
+    opacity: 0;
+    animation: nz-stamp 420ms cubic-bezier(0.3, 1.5, 0.5, 1) both;
+    animation-delay: 2350ms;
+  }
+}
+
+@keyframes nz-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes nz-stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-6deg) scale(1.7);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-6deg) scale(1);
+  }
+}
+
+/* ── Sections ────────────────────────────────────────────── */
+
+.nz-section {
+  padding: 92px 0;
+  border-top: 1px solid var(--nz-line);
+}
+
+.nz-section--card {
+  background: var(--nz-card);
+}
+
+.nz-section__head {
+  max-width: 60ch;
+  margin-bottom: 52px;
+}
+
+.nz-section__head .nz-field {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.nz-section__head h2 {
+  font-size: clamp(28px, 3.5vw, 43px);
+}
+
+.nz-section__head p {
+  margin-top: 16px;
+  font-size: 16.5px;
+  color: var(--nz-zinc);
+}
+
+/* Stages — a real sequence, so the numbering carries information. */
+.nz-stages {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1.5px solid var(--nz-ink);
+}
+
+.nz-stages li {
+  padding: 26px 26px 30px 0;
+  border-bottom: 1px solid var(--nz-line);
+}
+
+.nz-stages li:not(:nth-child(3n)) {
+  border-right: 1px solid var(--nz-line);
+  padding-right: 26px;
+}
+
+.nz-stages li:not(:nth-child(3n)) {
+  padding-left: 0;
+}
+
+.nz-stages li:nth-child(3n + 2),
+.nz-stages li:nth-child(3n) {
+  padding-left: 26px;
+}
+
+.nz-stages__no {
+  font-family: var(--nz-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--nz-enamel);
+}
+
+.nz-stages h3 {
+  margin: 14px 0 8px;
+  font-size: 18px;
+}
+
+.nz-stages p {
+  font-size: 14.5px;
+  color: var(--nz-zinc);
+}
+
+/* Terms — the ticket's clauses. */
+.nz-terms {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.nz-term {
+  padding: 28px;
+  border: 1.5px solid var(--nz-ink);
+  border-radius: 5px;
+  background: var(--nz-card);
+}
+
+.nz-term__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 20px;
+  border-radius: 3px;
+  color: #fff;
+  background: var(--nz-enamel);
+}
+
+.nz-term h3 {
+  font-size: 19px;
+}
+
+.nz-term p {
+  margin-top: 10px;
+  font-size: 14.5px;
+  color: var(--nz-zinc);
+}
+
+.nz-term dl {
+  display: grid;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--nz-line-soft);
+}
+
+.nz-term dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nz-term dd {
+  margin: 0;
+  font-family: var(--nz-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* Masters — deep steel panel. */
+.nz-masters {
+  color: #fff;
+  background: var(--nz-steel);
+  border-top: none;
+}
+
+.nz-masters .nz-section__head h2,
+.nz-masters .nz-section__head p {
+  color: #fff;
+}
+
+.nz-masters .nz-section__head p {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.nz-masters .nz-field {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.nz-masters__grid {
+  display: grid;
+  grid-template-columns: 1fr 0.85fr;
+  align-items: center;
+  gap: 64px;
+}
+
+.nz-masters__list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.nz-masters__list li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 15px;
+}
+
+/* Ticked boxes, not a numbered sequence: these points have no order. */
+.nz-masters__list span {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-radius: 3px;
+  color: #fff;
+}
+
+.nz-masters__cta {
+  margin-top: 32px;
+}
+
+.nz-masters__visual img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+/* Final call */
+.nz-final {
+  padding: 84px 0;
+  color: #fff;
+  background: var(--nz-enamel);
+}
+
+.nz-final__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 36px;
+}
+
+.nz-final .nz-field {
+  display: block;
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.nz-final h2 {
+  max-width: 24ch;
+  font-size: clamp(28px, 3.6vw, 44px);
+}
+
+.nz-final p {
+  margin-top: 12px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.nz-final__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Footer — the tear-off stub. */
+.nz-footer {
+  padding: 64px 0 34px;
+  color: rgba(255, 255, 255, 0.72);
+  background: var(--nz-steel);
+  font-size: 14px;
+}
+
+.nz-footer__grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 44px;
+}
+
+.nz-footer__grid > div p {
+  max-width: 34ch;
+  margin-top: 14px;
+}
+
+.nz-footer .nz-logo {
+  color: #fff;
+}
+
+.nz-footer nav {
+  display: grid;
+  gap: 11px;
+  align-content: start;
+}
+
+.nz-footer nav strong {
+  font-family: var(--nz-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.nz-footer nav a:hover {
+  color: #fff;
+}
+
+.nz-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 52px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  font-family: var(--nz-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+@media (max-width: 1080px) {
+  .nz-nav {
+    display: none;
+  }
+
+  .nz-header__actions {
+    margin-left: auto;
+  }
+
+  .nz-burger {
+    display: grid;
+  }
+
+  .nz-hero__grid,
+  .nz-masters__grid {
+    grid-template-columns: 1fr;
+    gap: 52px;
+  }
+
+  .nz-hero {
+    padding: 56px 0 72px;
+  }
+
+  .nz-ticket {
+    max-width: 520px;
+  }
+
+  .nz-stages,
+  .nz-terms {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .nz-stages li:not(:nth-child(3n)) {
+    border-right: none;
+    padding-right: 26px;
+  }
+
+  .nz-stages li:nth-child(odd) {
+    border-right: 1px solid var(--nz-line);
+    padding-left: 0;
+  }
+
+  .nz-stages li:nth-child(even) {
+    padding-left: 26px;
+  }
+
+  .nz-footer__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  /* The header actions are duplicated inside the burger menu; keeping both
+     on screen overflows the viewport. */
+  .nz-header__actions {
+    display: none;
+  }
+
+  .nz-header__bar {
+    gap: 12px;
+  }
+
+  .nz-footer nav a {
+    padding-block: 7px;
+  }
+
+  .nz-section {
+    padding: 64px 0;
+  }
+
+  .nz-hero h1 {
+    font-size: clamp(33px, 9vw, 44px);
+  }
+
+  .nz-hero__actions .nz-btn,
+  .nz-final__actions .nz-btn {
+    flex: 1 1 100%;
+  }
+
+  .nz-facts div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .nz-stages,
+  .nz-terms,
+  .nz-footer__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nz-stages li,
+  .nz-stages li:nth-child(odd),
+  .nz-stages li:nth-child(even) {
+    padding: 22px 0;
+    border-right: none;
+    padding-left: 0;
+  }
+
+  .nz-ticket__stamp {
+    right: 8px;
+    bottom: -18px;
+  }
+
+  .nz-term {
+    padding: 22px;
+  }
+}
