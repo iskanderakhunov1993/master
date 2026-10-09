@@ -1,27 +1,27 @@
 import type { Metadata } from "next";
-import { Golos_Text, JetBrains_Mono, Unbounded } from "next/font/google";
+import { JetBrains_Mono, Onest, PT_Sans } from "next/font/google";
 
 import "./globals.css";
 
 // Display, body and utility faces for the public landing. All three carry
 // native Cyrillic; the dashboards keep their own type stack.
-const display = Unbounded({
+const display = Onest({
   subsets: ["cyrillic", "latin"],
-  weight: ["700", "800"],
+  weight: ["500", "600", "700", "800"],
   variable: "--font-display",
   display: "swap",
 });
 
-const body = Golos_Text({
+const body = PT_Sans({
   subsets: ["cyrillic", "latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "700"],
   variable: "--font-body",
   display: "swap",
 });
 
 const mono = JetBrains_Mono({
   subsets: ["cyrillic", "latin"],
-  weight: ["500", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-mono",
   display: "swap",
 });
